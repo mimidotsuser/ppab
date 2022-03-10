@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+    app:
+        image: mimidots/php7.4:1.0.4
+        volumes:
+            - $PWD:/var/www/html
+        restart: on-failure
+        ports:
+            - "9000:9000"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - ppab
+
+networks:
+    ppab:
+        name: ppab
+        driver: bridge
