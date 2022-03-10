@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
     app:
-        image: mimidots/php7.4:1.0.4
+        image: mimidots/php8.0:1.1.1
         volumes:
             - $PWD:/var/www/html
         restart: on-failure
