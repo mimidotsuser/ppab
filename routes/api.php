@@ -22,6 +22,7 @@ Route::group(['prefix' => 'v1/auth'], function () {
     Route::post('/login', [LoginController::class, 'authenticate']);
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
+    Route::post('/reset-password/{token}', [ResetPasswordController::class, 'store']);
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
