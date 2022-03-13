@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Utils\UserUtils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -20,7 +19,8 @@ class ForgotPasswordController extends Controller
 
         $request->validate(['username' => 'required|email|exists:users,email']);
 
-        $status = Password::sendResetLink(['email' => $request->get('username')]);
+        $status = Password::sendResetLink(['email' => $request->get('username'),
+            'status' => fn($query) => $query->where('status', '!=', UserUtils::Suspended)]);
 
         return $status == Password::RESET_LINK_SENT ?
             response(['message' => __($status)], 201) :
