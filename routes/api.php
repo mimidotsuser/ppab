@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,11 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => 'v1/auth', 'namespace' => 'App\Http\Controllers\Auth'], function () {
 
-    Route::post('/login', 'LoginController@login');
+Route::group(['prefix' => 'v1/auth'], function () {
+    Route::post('/login', [LoginController::class, 'authenticate']);
+    Route::post('/logout', [LoginController::class, 'logout']);
 });
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1/main'], function () {
+
+});
+
+Route::fallback(function () {
+    return response(['error' => 'Resource not found'], 404);
 });
