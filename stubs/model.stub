@@ -3,6 +3,7 @@
 namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Traits\AutofillAuthorFields;
@@ -11,4 +12,29 @@ class {{ class }} extends Model
 {
     use HasFactory, AutofillAuthorFields, Searchable;
 
+
+    /**
+     * Author relationship
+     * @return BelongsTo
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    /**
+     * Editor relationship
+     * @return BelongsTo
+     */
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+        //TODO
+        ];
+    }
 }
