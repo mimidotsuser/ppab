@@ -39,7 +39,7 @@ class LoginController extends Controller
             ]]);
         }
         return response()
-            ->json(['errors' => ['message' => 'Invalid username/password combination']]);
+            ->json(['errors' => ['message' => 'Invalid username/password combination']], 401);
     }
 
 
