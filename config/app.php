@@ -2,6 +2,14 @@
 
 return [
 
+    /**
+     *---------------
+     * Url to the frontend app
+     * --------------
+     * This is used when resolving clickable urls on emails.
+     *
+     */
+    'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -39,7 +47,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,10 +21,11 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'v1/auth'], function () {
     Route::post('/login', [LoginController::class, 'authenticate']);
     Route::post('/logout', [LoginController::class, 'logout']);
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
 });
 
-Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1/main'], function () {
-
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
+    Route::apiResource('users', \App\Http\Controllers\UserController::class);
 });
 
 Route::fallback(function () {
