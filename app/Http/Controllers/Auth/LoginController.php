@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Utils\UserUtils;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -16,9 +18,9 @@ class LoginController extends Controller
     /**
      * Authenticate user with username and password combination.
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse User profile if successful or error
+     * @return JsonResponse User profile if successful or error
      */
-    public function authenticate(Request $request): \Illuminate\Http\JsonResponse
+    public function authenticate(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'username' => ['required'],
@@ -46,9 +48,9 @@ class LoginController extends Controller
     /**
      * Invalidate user session
      * @param Request $request
-     * @return \Illuminate\Http\Response No content
+     * @return Response No content
      */
-    public function logout(Request $request): \Illuminate\Http\Response
+    public function logout(Request $request): Response
     {
 
         \auth()->logout();

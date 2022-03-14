@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\UserInviteNotification;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -25,9 +27,10 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return
+     * @param Request $request
+     * @return LengthAwarePaginator
      */
-    public function index(Request $request)
+    public function index(Request $request): LengthAwarePaginator
     {
 
         $meta = $this->queryMeta(['created_at', 'first_name', 'last_name'], ['role', 'createdBy']);
@@ -47,8 +50,8 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \App\Http\Requests\StoreUserRequest $request
-     * @return
+     * @param StoreUserRequest $request
+     * @return array
      */
     #[ArrayShape(['data' => "\App\Models\User"])]
     public function store(StoreUserRequest $request): array
@@ -77,7 +80,8 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\User $user
+     * @param User $user
+     * @return array
      */
     #[ArrayShape(['data' => "\App\Models\User"])]
     public function show(User $user): array
@@ -88,8 +92,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Http\Requests\UpdateUserRequest $request
-     * @param \App\Models\User $user
+     * @param UpdateUserRequest $request
+     * @param User $user
      * @return array['data'=> "\App\Models\User"]
      */
     #[ArrayShape(['data' => "\App\Models\User"])]
@@ -110,10 +114,10 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\User $user
-     * @return \Illuminate\Http\Response
+     * @param User $user
+     * @return Response
      */
-    public function destroy(User $user): \Illuminate\Http\Response
+    public function destroy(User $user): Response
     {
         $user->delete();
 

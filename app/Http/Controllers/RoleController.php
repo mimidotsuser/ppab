@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -24,9 +26,9 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      * @param Request $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
-    public function index(Request $request)
+    public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'name', 'description'],
             ['permissions', 'createdBy']);
@@ -50,7 +52,7 @@ class RoleController extends Controller
      * @return array
      */
     #[ArrayShape(['data' => "\App\Models\Role"])]
-    public function store(StoreRoleRequest $request)
+    public function store(StoreRoleRequest $request): array
     {
         DB::beginTransaction();
 
@@ -74,10 +76,11 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Role $role
+     * @param Role $role
      * @return array
      */
-    public function show(Role $role)
+    #[ArrayShape(['data' => "\App\Models\Role"])]
+    public function show(Role $role): array
     {
         return ['data' => $role];
     }
@@ -85,11 +88,12 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Http\Requests\UpdateRoleRequest $request
-     * @param \App\Models\Role $role
+     * @param UpdateRoleRequest $request
+     * @param Role $role
      * @return array
      */
-    public function update(UpdateRoleRequest $request, Role $role)
+    #[ArrayShape(['data' => "\App\Models\Role"])]
+    public function update(UpdateRoleRequest $request, Role $role): array
     {
         DB::beginTransaction();
 
@@ -116,10 +120,10 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Role $role
-     * @return \Illuminate\Http\Response
+     * @param Role $role
+     * @return Response
      */
-    public function destroy(Role $role)
+    public function destroy(Role $role): Response
     {
         $role->delete();
 

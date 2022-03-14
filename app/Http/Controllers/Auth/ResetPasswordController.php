@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Utils\UserUtils;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -18,7 +21,12 @@ class ResetPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    public function store(Request $request, string $token)
+    /**
+     * @param Request $request
+     * @param string $token
+     * @return Response|Application|ResponseFactory
+     */
+    public function store(Request $request, string $token): Response|Application|ResponseFactory
     {
         $request->validate([
             'username' => 'required|email',

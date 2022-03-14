@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Utils\UserUtils;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
@@ -14,7 +17,7 @@ class ForgotPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Response|Application|ResponseFactory
     {
 
         $request->validate(['username' => 'required|email|exists:users,email']);
