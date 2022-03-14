@@ -22,19 +22,19 @@ class UserController extends Controller
      *
      * @return
      */
-    public function index(Request $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function index(Request $request)
     {
 
         $meta = $this->queryMeta(['created_at', 'first_name', 'last_name'], ['role', 'createdBy']);
 
-        return User::search($request->search)
-            ->query(fn(Builder $query) => $query->with($meta->limit))
+          return User::search($request->search)
             ->query(function ($query) use ($meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->paginate($meta->limit, 'page', $meta->page);
+              ->query(fn(Builder $query) => $query->with($meta->include))
+              ->paginate($meta->limit, 'page', $meta->page);
 
     }
 
