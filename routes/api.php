@@ -27,6 +27,7 @@ Route::group(['prefix' => 'v1/auth'], function () {
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
+    Route::apiResource('roles', \App\Http\Controllers\RoleController::class);
 });
 
 Route::fallback(function () {

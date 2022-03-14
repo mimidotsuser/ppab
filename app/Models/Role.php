@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Laravel\Scout\Searchable;
 
 class Role extends Model
 {
-    use HasFactory, AutofillAuthorFields;
+    use HasFactory, AutofillAuthorFields, Searchable;
 
     /**
      * @return BelongsToMany
@@ -26,5 +27,13 @@ class Role extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    function toSearchableArray()
+    {
+        return [
+            'name' => $this->name,
+            'description' => $this->description,
+        ];
     }
 }
