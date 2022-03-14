@@ -17,6 +17,11 @@ use JetBrains\PhpStorm\ArrayShape;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,14 +32,14 @@ class UserController extends Controller
 
         $meta = $this->queryMeta(['created_at', 'first_name', 'last_name'], ['role', 'createdBy']);
 
-          return User::search($request->search)
+        return User::search($request->search)
             ->query(function ($query) use ($meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-              ->query(fn(Builder $query) => $query->with($meta->include))
-              ->paginate($meta->limit, 'page', $meta->page);
+            ->query(fn(Builder $query) => $query->with($meta->include))
+            ->paginate($meta->limit, 'page', $meta->page);
 
     }
 
@@ -96,7 +101,7 @@ class UserController extends Controller
         $user->role_id = $request->get('role_id') ?? $user->role_id;
         $user->status = $request->get('role_id') ?? $user->status;
 
-        $user->save();
+        $user->update();
         $user->load(['createdBy', 'role']);
 
         return ['data' => $user];
