@@ -10,6 +10,7 @@ return new class extends Migration {
     public function __construct()
     {
         $this->numberSeries = [
+            ['code' => 'MATERIAL_REQUEST', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'MRN_DOC', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'SIV_DOC', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'PR_DOC', 'prefix' => config('app.number_series_prefix')],
