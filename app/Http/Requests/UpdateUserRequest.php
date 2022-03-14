@@ -29,12 +29,12 @@ class UpdateUserRequest extends FormRequest
         return [
             'first_name' => 'sometimes|max:250',
             'last_name' => 'sometimes|max:250',
-            'email' => ['sometimes', 'email',
-                Rule::unique('users', 'email')->ignore($this->route('user'))],
-            'role_id' => 'sometimes|exists:roles,id',
+            'email' => ['sometimes', 'email', Rule::unique('App\Models\User', 'email')
+                ->ignore($this->route('user'))],
+            'role_id' => 'sometimes|exists:App\Models\Role,id',
             'status' => ['sometimes', Rule::in([UserUtils::Suspended, UserUtils::Active]),
                 Rule::when($this->route('user') //prevent updating status of invited user
-                        ->status === UserUtils::PendingActivation, 'prohibited')]
+                    ->status === UserUtils::PendingActivation, 'prohibited')]
         ];
     }
 

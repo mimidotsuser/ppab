@@ -15,7 +15,7 @@ class UpdateRoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->can('create', $this->route('role'));
+        return Auth::user()->can('update', $this->route('role'));
     }
 
     /**

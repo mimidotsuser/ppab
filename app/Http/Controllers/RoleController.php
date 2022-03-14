@@ -9,11 +9,17 @@ use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 
 class RoleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Role::class, 'role');
+    }
 
     /**
      * Display a listing of the resource.
@@ -54,8 +60,10 @@ class RoleController extends Controller
 
         $role->save();
 
-        $role->permissions()->attach(Arr::flatten($request->get('permissions')),
-            ['created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
+        $role->permissions()
+            ->withPivot(['created_at', 'updated_at']) //force laravel to detect timestamps columns
+            ->attach(Arr::flatten($request->get('permissions')),
+                ['created_by_id' => Auth::id(), 'updated_by_id' => Auth::id()]);
 
         DB::commit();
         $role->refresh();
@@ -88,11 +96,14 @@ class RoleController extends Controller
         $role->name = $request->get('name') ?? $role->name;
         $role->description = $request->get('description') ?? $role->description;
 
-        $role->save();
+        $role->update();
 
         if ($request->has('permissions')) {
-            $role->permissions()->sync(Arr::flatten($request->get('permissions')),
-                ['created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
+            $role->permissions()
+                ->syncWithPivotValues(Arr::flatten($request->get('permissions')),
+                    ['created_by_id' => Auth::id(), 'updated_by_id' => Auth::id(),
+                        'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]);
+
         }
 
         DB::commit();
