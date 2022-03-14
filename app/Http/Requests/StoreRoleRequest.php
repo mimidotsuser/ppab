@@ -26,7 +26,7 @@ class StoreRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:2|unique:roles,name|max:200',
+            'name' => 'required|min:2|unique:App\Models\Role,name|max:200',
             'description' => 'sometimes|max:200',
             'permissions' => 'required|array',
             'permissions.*.id' => 'exists:permissions,id'
