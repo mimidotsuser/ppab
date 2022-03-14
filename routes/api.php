@@ -28,6 +28,7 @@ Route::group(['prefix' => 'v1/auth'], function () {
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
     Route::apiResource('roles', \App\Http\Controllers\RoleController::class);
+    Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index']);
 });
 
 Route::fallback(function () {
