@@ -31,6 +31,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index']);
     Route::apiResource('customers', \App\Http\Controllers\CustomerController::class);
 
+    Route::get('product-categories', [\App\Http\Controllers\ProductCategoryController::class, 'index']);
+
 });
 
 Route::fallback(function () {

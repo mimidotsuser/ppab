@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
+use App\Models\ProductCategory;
 use JetBrains\PhpStorm\ArrayShape;
 
-class PermissionController extends Controller
+class ProductCategoryController extends Controller
 {
     /**
-     * Fetch all permissions
-     *
+     * Fetch all categories
      * @return array
      */
     #[ArrayShape(['data' => "mixed"])]
     public function index(): array
     {
-        return ['data' => Permission::all()];
+        return ['data' => ProductCategory::all()];
     }
 }

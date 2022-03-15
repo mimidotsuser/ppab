@@ -5,8 +5,8 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
 
-    private $numberSeriesFunctionQuery = <<<EOD
-        DELIMITER ;;
+    private string $numberSeriesFunctionQuery = <<<EOD
+            DROP FUNCTION IF EXISTS next_number_series;
             CREATE FUNCTION next_number_series(code_series varchar(100))
                 RETURNS varchar(255) NOT DETERMINISTIC MODIFIES SQL DATA
             BEGIN
@@ -22,8 +22,7 @@ return new class extends Migration {
                     WHERE code = code_series);
 
                 RETURN @number_series;
-            END;;
-        DELIMITER ;
+            END
         EOD;
 
 
@@ -45,6 +44,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        DB::unprepared('DROP FUNCTION next_number_series');
+        DB::unprepared('DROP FUNCTION IF EXISTS next_number_series');
     }
 };
