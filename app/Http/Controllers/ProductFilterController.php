@@ -18,18 +18,23 @@ class ProductFilterController extends Controller
     {
 
         $meta = $this->queryMeta(['created_at', 'item_code', 'economic_order_qty', 'min_level',
-            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent']);
+            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent', 'balance',
+            'aggregateBalance']);
 
         //if not searching but includes parent key
         $sparesOnly = empty($request->search) && !empty($request->query('parent'));
+
 
         return $productCategory
             ->products()
             ->when(!empty($meta->include), function ($query) use ($meta) {
                 $query->with($meta->include);
             })
-            ->when($sparesOnly, function ($query) {
-                $query->where('parent_id', $query - $query('parent'));
+            ->when($sparesOnly, function ($query) use ($request) {
+                $query->where('parent_id', $request->query('parent'));
+            })
+            ->when(!$request->get('variants'), function ($query) {
+                $query->whereNull('variant_of');
             })
             ->when(!empty($request->search), function ($query) use ($request) {
                 $query->where(function ($query) use ($request) {

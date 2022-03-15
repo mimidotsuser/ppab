@@ -18,10 +18,10 @@ return new class extends Migration {
                 DECLARE main_warehouse INT;
                 #it's safe to assume the first warehouse will be the main one
                 SET main_warehouse = (SELECT id FROM warehouses LIMIT 1);
-                INSERT INTO stock_balances(warehouse_id, product_id, reorder_level,
+                INSERT INTO stock_balances(warehouse_id, product_id, reorder_level, internal_code,
                                            created_by_id, updated_by_id, created_at, updated_at)
-                VALUES (main_warehouse, NEW.id, NEW.reorder_level, NEW.created_by_id,
-                        NEW.updated_by_id, NEW.created_at, NEW.updated_at);
+                VALUES (main_warehouse, NEW.id, NEW.reorder_level, NEW.internal_code,
+                        NEW.created_by_id, NEW.updated_by_id, NEW.created_at, NEW.updated_at);
             END
         EOD;
 

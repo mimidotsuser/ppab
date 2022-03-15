@@ -41,7 +41,7 @@ class StockBalanceController extends Controller
     {
         $this->authorize('view', $stockBalance);
 
-        $stockBalance->load('product', 'updatedBy','warehouse');
+        $stockBalance->load('product', 'updatedBy', 'warehouse');
         return ['data' => $stockBalance];
     }
 
@@ -65,7 +65,7 @@ class StockBalanceController extends Controller
         $stockBalance->b2b_qty_in_pipeline = $request->get('reorder_requests_total') ??
             $stockBalance->b2b_qty_in_pipeline;
         $stockBalance->update();
-
+        $stockBalance->refresh();
         $stockBalance->load('product', 'updatedBy');
         return ['data' => $stockBalance];
     }

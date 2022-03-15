@@ -69,6 +69,8 @@ class ProductController extends Controller
         $product->max_level = $request->get('max_level');
         $product->save();
 
+        $product->refresh();
+
         if ($request->get('create_old_variant') === true) {
             //clone and create new record
             $variant = $product->replicate(['id']);
@@ -123,6 +125,8 @@ class ProductController extends Controller
         $product->reorder_level = $request->get('reorder_level') ?? $product->reorder_level;
         $product->max_level = $request->get('max_level') ?? $product->max_level;
         $product->update();
+
+        $product->refresh();
 
         $product->load('category');
 

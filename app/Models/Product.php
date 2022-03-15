@@ -25,7 +25,25 @@ class Product extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(ProductCategory::class,'product_category_id');
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
+
+    public function balance()
+    {
+        return $this->hasOne(StockBalance::class);
+    }
+
+    public function aggregateBalance()
+    {
+        $exp = <<< EOD
+            `internal_code`,sum(`stock_balance`) as stock_balance,
+            sum(`virtual_balance`) as virtual_balance,
+            max(reorder_level) as reorder_level
+        EOD;
+
+        return $this->hasMany(StockBalance::class, 'internal_code', 'internal_code')
+            ->selectRaw($exp)
+            ->groupBy('internal_code');
     }
 
     /**

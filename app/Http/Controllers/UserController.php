@@ -106,6 +106,8 @@ class UserController extends Controller
         $user->status = $request->get('role_id') ?? $user->status;
 
         $user->update();
+        $user->refresh();
+
         $user->load(['createdBy', 'role']);
 
         return ['data' => $user];

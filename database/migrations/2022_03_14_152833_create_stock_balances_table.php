@@ -22,6 +22,7 @@ return new class extends Migration {
                 ->cascadeOnDelete();
 
             $table->unsignedInteger('reorder_level')->default(0); //snapshot
+            $table->string('internal_code'); // for human dev use
             $table->unsignedInteger('qty_in')->default(0);
             $table->unsignedInteger('qty_out')->default(0);
 

@@ -12,7 +12,7 @@ class StockBalance extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    protected $hidden = ['b2c_qty_in_pipeline','b2b_qty_in_pipeline'];
+    protected $hidden = ['b2c_qty_in_pipeline', 'b2b_qty_in_pipeline', 'qty_in', 'qty_out'];
 
     public function product()
     {
