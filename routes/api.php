@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductFilterController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,10 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('warehouses', [WarehouseController::class, 'index']);
 
     Route::apiResource('product-categories.products', ProductFilterController::class);
+    Route::get('stock-balances', [StockBalanceController::class, 'index']);
+    Route::get('stock-balances/{stock_balance}', [StockBalanceController::class, 'show']);
+    Route::patch('stock-balances/{stock_balance}', [StockBalanceController::class, 'update']);
+
 });
 
 Route::fallback(function () {

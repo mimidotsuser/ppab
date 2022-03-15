@@ -58,10 +58,12 @@ interface PermissionUtils
         ['name' => 'user.worksheets.delete', 'group' => 'worksheets',
             'description' => 'User can delete other user\'s worksheets'],
 
-        ['name' => 'inventory.ledger.view', 'group' => 'stock ledger',
-            'description' => 'User can view stock ledger'],
-        ['name' => 'inventory.ledger.edit', 'group' => 'stock ledger',
-            'description' => 'User can adjust stock ledger items quantity'],
+        ['name' => 'inventory.stock-balances.view', 'group' => 'stock balances',
+            'description' => 'User can view stock balances page'],
+        ['name' => 'inventory.stock-balances.search', 'group' => 'stock balances',
+            'description' => 'User can search stock balances'],
+        ['name' => 'inventory.stock-balances.edit', 'group' => 'stock balances',
+            'description' => 'User can adjust stock balances'],
 
         ['name' => 'checkin.receivingReports.view', 'group' => 'receiving report',
             'description' => 'User can view all RGA and GRN documents'],
