@@ -3,7 +3,12 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,12 +31,14 @@ Route::group(['prefix' => 'v1/auth'], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
-    Route::apiResource('users', \App\Http\Controllers\UserController::class);
-    Route::apiResource('roles', \App\Http\Controllers\RoleController::class);
-    Route::get('permissions', [\App\Http\Controllers\PermissionController::class, 'index']);
-    Route::apiResource('customers', \App\Http\Controllers\CustomerController::class);
 
-    Route::get('product-categories', [\App\Http\Controllers\ProductCategoryController::class, 'index']);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('roles', RoleController::class);
+    Route::get('permissions', [PermissionController::class, 'index']);
+    Route::apiResource('customers', CustomerController::class);
+
+    Route::get('product-categories', [ProductCategoryController::class, 'index']);
+    Route::apiResource('products', ProductController::class);
 
 });
 
