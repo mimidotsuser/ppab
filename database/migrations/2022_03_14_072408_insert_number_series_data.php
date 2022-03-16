@@ -19,6 +19,8 @@ return new class extends Migration {
             ['code' => 'GRN_DOC', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'RGA_DOC', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'WORKSHEET_DOC', 'prefix' => config('app.number_series_prefix')],
+            ['code' => 'SERIAL_NUMBER', 'prefix' => config('app.number_series_prefix')],
+            ['code' => 'CUSTOMER_CONTRACT', 'prefix' => config('app.number_series_prefix')],
         ];
     }
 
