@@ -13,7 +13,7 @@ return new class extends Migration {
                 SET @last_id = 0;
 
                 UPDATE number_series
-                    SET number_series= @last_id := last_id + 1
+                    SET last_id= @last_id := last_id + 1
                     WHERE code = code_series;
 
                 SET @number_series = (

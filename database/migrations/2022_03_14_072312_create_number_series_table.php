@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->string('code')->unique();
             $table->string('prefix');
-            $table->unsignedInteger('last_series')->default(0);
+            $table->unsignedInteger('last_id')->default(0);
             $table->foreignId('created_by_id')
                 ->nullable()->constrained('users')
                 ->restrictOnDelete();
