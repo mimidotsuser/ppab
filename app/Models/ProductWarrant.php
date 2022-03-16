@@ -6,21 +6,30 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 
-class Warehouse extends Model
+class ProductWarrant extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
     /**
-     * @return MorphMany
+     * Item to which this warrant belongs to
+     * @return BelongsTo
      */
-    public function productTrackingLogs(): MorphMany
+    public function productItem(): BelongsTo
     {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
+        return $this->belongsTo(ProductItem::class, 'product_item_id');
     }
+
+    /**
+     * Customer to which this warrant belongs to
+     * @return BelongsTo
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
 
     /**
      * Author relationship

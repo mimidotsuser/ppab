@@ -2,7 +2,7 @@
 
 namespace App\Utils;
 
-interface PermissionUtils
+abstract class PermissionUtils
 {
     const  Permissions = [
         ['name' => 'organization.settings.view', 'group' => 'organization',

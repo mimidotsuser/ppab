@@ -6,20 +6,30 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 
-class Warehouse extends Model
+class ProductRepairItem extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $fillable = ['old_total', 'product_id', 'brand_new_total'];
+
     /**
-     * @return MorphMany
+     * Spare product.
+     * @return BelongsTo
      */
-    public function productTrackingLogs(): MorphMany
+    public function spare(): BelongsTo
     {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    /**
+     * Same as spare product above
+     * @return BelongsTo
+     */
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     /**

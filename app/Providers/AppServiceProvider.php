@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Customer;
+use App\Models\Warehouse;
+use App\Models\Worksheet;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Relation::morphMap([
+            'warehouse' => Warehouse::class,
+            'customer' => Customer::class,
+            'worksheet' => Worksheet::class
+        ]);
     }
 }

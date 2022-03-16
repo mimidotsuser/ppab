@@ -6,20 +6,20 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
-class Warehouse extends Model
+class ProductRepair extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
     /**
-     * @return MorphMany
+     * Spares used in repair
+     * @return HasMany
      */
-    public function productTrackingLogs(): MorphMany
+    public function sparesUtilized(): HasMany
     {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
+        return $this->hasMany(ProductRepairItem::class, 'product_repair_id');
     }
 
     /**

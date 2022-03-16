@@ -6,21 +6,13 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 
-class Warehouse extends Model
+class EntryRemark extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    /**
-     * @return MorphMany
-     */
-    public function productTrackingLogs(): MorphMany
-    {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
-    }
+    protected $table = 'entry_remarks';
 
     /**
      * Author relationship

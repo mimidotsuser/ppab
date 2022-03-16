@@ -6,32 +6,40 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Laravel\Scout\Attributes\SearchUsingFullText;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
-class Customer extends Model
+class CustomerContract extends Model
 {
     use HasFactory, AutofillAuthorFields, Searchable;
 
 
     /**
-     * @return MorphMany
+     * Items under this contract
+     * @return BelongsToMany
      */
-    public function productTrackingLogs(): MorphMany
+    public function productItems(): BelongsToMany
     {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
+        return $this->belongsToMany(ProductItem::class, 'customer_contract_items');
     }
 
     /**
-     * HO/Parent to the customer branch
-     *
+     * Customer who owns of the contract
      * @return BelongsTo
      */
-    public function parent(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'parent_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    /**
+     * Tracking logs created by items under this log
+     * @return HasMany
+     */
+    public function trackingLogs(): HasMany
+    {
+        return $this->hasMany(ProductTrackingLog::class, 'customer_contract_id');
     }
 
     /**
@@ -52,17 +60,10 @@ class Customer extends Model
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    /**
-     * @return array
-     */
-    #[SearchUsingFullText(['name', 'branch', 'region'])]
     public function toSearchableArray()
     {
         return [
-            'name' => $this->name,
-            'branch' => $this->branch,
-            'region' => $this->region,
-            'location' => $this->location,
+            ''
         ];
     }
 }

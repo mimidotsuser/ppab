@@ -9,17 +9,28 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 
-class Warehouse extends Model
+class Worksheet extends Model
 {
-    use HasFactory, AutofillAuthorFields;
+    use HasFactory, AutofillAuthorFields, Searchable;
+
 
     /**
+     * @return BelongsTo
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+
+    /**
+     * All product tracking logs related to a worksheet entry
      * @return MorphMany
      */
-    public function productTrackingLogs(): MorphMany
+    public function entries(): MorphMany
     {
-        return $this->morphMany(ProductTrackingLog::class,
-            'location', 'location_type', 'location_id');
+        return $this->morphMany(ProductTrackingLog::class, 'eventable');
+
     }
 
     /**
@@ -40,4 +51,11 @@ class Warehouse extends Model
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
+    public function toSearchableArray()
+    {
+        return [
+            'sn' => $this->sn,
+            'reference' => $this->reference
+        ];
+    }
 }

@@ -8,10 +8,12 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductFilterController;
+use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WorksheetController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +51,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('stock-balances/{stock_balance}', [StockBalanceController::class, 'show']);
     Route::patch('stock-balances/{stock_balance}', [StockBalanceController::class, 'update']);
 
+    Route::apiResource('product-items', ProductItemController::class);
+    Route::apiResource('worksheets', WorksheetController::class);
 });
 
 Route::fallback(function () {
