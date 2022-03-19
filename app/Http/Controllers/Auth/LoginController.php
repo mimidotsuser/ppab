@@ -36,9 +36,9 @@ class LoginController extends Controller
 
             $request->session()->regenerate();
 
-            return response()->json(['data' => ['user' => User::with(['role', 'role.permissions'])
+            return response()->json(['data' =>  User::with(['role', 'role.permissions'])
                 ->findOrFail(Auth::id())
-            ]]);
+            ]);
         }
         return response()
             ->json(['errors' => ['message' => 'Invalid username/password combination']], 401);

@@ -38,7 +38,7 @@ class UserInviteNotification extends Notification implements ShouldQueue
 
     protected function buildMailMessage($token)
     {
-        $url = config('app.frontend_url') . '/reset-password/' . $token . '?invite=true';
+        $url = config('app.frontend_url') . '/account-recovery/' . $token . '?invite=true';
 
         return (new MailMessage)
             ->subject(Lang::get('Account Setup Invitation'))
