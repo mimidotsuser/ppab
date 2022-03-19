@@ -23,6 +23,7 @@ class UserInviteNotification extends Notification implements ShouldQueue
     public function __construct(User $user, string $token)
     {
         $this->token = $token;
+        $this->user = $user;
     }
 
     /**
@@ -38,7 +39,8 @@ class UserInviteNotification extends Notification implements ShouldQueue
 
     protected function buildMailMessage($token)
     {
-        $url = config('app.frontend_url') . '/account-recovery/' . $token . '?invite=true';
+        $url = config('app.frontend_url') . '/account-recovery/' . $token .
+            '?invite=true&email=' . $this->user->email;
 
         return (new MailMessage)
             ->subject(Lang::get('Account Setup Invitation'))
