@@ -33,6 +33,9 @@ Route::group(['prefix' => 'v1/auth'], function () {
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::post('/forgot-password', [ForgotPasswordController::class, 'store']);
     Route::post('/reset-password/{token}', [ResetPasswordController::class, 'store']);
+    Route::post('is-authenticated', function () {
+        return response()->noContent(auth('sanctum')->check() ? 200 : 401);
+    });
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
