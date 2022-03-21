@@ -17,7 +17,7 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'user.view');
+        return $user->role->permissions->contains('name', 'users.view');
     }
 
     /**
@@ -30,7 +30,7 @@ class UserPolicy
     public function view(User $user, User $model)
     {
         return $user->id == $model->id ||
-            $user->role->permissions->contains('name', 'user.view');
+            $user->role->permissions->contains('name', 'users.view');
     }
 
     /**
@@ -41,7 +41,7 @@ class UserPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->contains('name', 'user.create');
+        return $user->role->permissions->contains('name', 'users.create');
     }
 
     /**
@@ -54,7 +54,7 @@ class UserPolicy
     public function update(User $user, User $model)
     {
         return $user->id == $model->id ||
-            $user->role->permissions->contains('name', 'user.edit');
+            $user->role->permissions->contains('name', 'users.edit');
     }
 
     /**
@@ -66,7 +66,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-        return $user->role->permissions->contains('name', 'user.delete');
+        return $user->role->permissions->contains('name', 'users.delete');
     }
 
     /**
@@ -79,7 +79,7 @@ class UserPolicy
     public function restore(User $user, User $model)
     {
         return $user->id == $model->id ||
-            $user->role->permissions->contains('name', 'user.edit');
+            $user->role->permissions->contains('name', 'users.edit');
     }
 
     /**
@@ -91,6 +91,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model)
     {
-        return $user->role->permissions->contains('name', 'user.delete');
+        return $user->role->permissions->contains('name', 'users.delete');
     }
 }

@@ -18,7 +18,7 @@ class ProductPolicy
      */
     public function search(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.search');
+        return $user->role->permissions->contains('name', 'products.search');
     }
 
     /**
@@ -29,7 +29,7 @@ class ProductPolicy
      */
     public function viewAny(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.view');
+        return $user->role->permissions->contains('name', 'products.view');
     }
 
     /**
@@ -41,7 +41,7 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.view');
+        return $user->role->permissions->contains('name', 'products.view');
     }
 
     /**
@@ -52,7 +52,7 @@ class ProductPolicy
      */
     public function create(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.create');
+        return $user->role->permissions->contains('name', 'products.create');
     }
 
     /**
@@ -64,7 +64,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.edit');
+        return $user->role->permissions->contains('name', 'products.edit');
     }
 
     /**
@@ -76,7 +76,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.delete');
+        return $user->role->permissions->contains('name', 'products.delete');
     }
 
     /**
@@ -88,7 +88,7 @@ class ProductPolicy
      */
     public function restore(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.edit');
+        return $user->role->permissions->contains('name', 'products.edit');
     }
 
     /**
@@ -100,6 +100,6 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'product.delete');
+        return $user->role->permissions->contains('name', 'products.delete');
     }
 }

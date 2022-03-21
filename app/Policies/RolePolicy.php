@@ -18,7 +18,7 @@ class RolePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'role.view');
+        return $user->role->permissions->contains('name', 'roles.view');
     }
 
     /**
@@ -30,7 +30,7 @@ class RolePolicy
      */
     public function view(User $user, Role $role)
     {
-        return $user->role->permissions->contains('name', 'role.view');
+        return $user->role->permissions->contains('name', 'roles.view');
     }
 
     /**
@@ -41,7 +41,7 @@ class RolePolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->contains('name', 'role.create');
+        return $user->role->permissions->contains('name', 'roles.create');
     }
 
     /**
@@ -53,7 +53,7 @@ class RolePolicy
      */
     public function update(User $user, Role $role)
     {
-        return $role->editable && $user->role->permissions->contains('name', 'role.edit');
+        return $role->editable && $user->role->permissions->contains('name', 'roles.edit');
     }
 
     /**
@@ -65,7 +65,7 @@ class RolePolicy
      */
     public function delete(User $user, Role $role)
     {
-        return $role->editable && $user->role->permissions->contains('name', 'role.delete');
+        return $role->editable && $user->role->permissions->contains('name', 'roles.delete');
     }
 
     /**
@@ -77,7 +77,7 @@ class RolePolicy
      */
     public function restore(User $user, Role $role)
     {
-        return $role->editable && $user->role->permissions->contains('name', 'role.edit');
+        return $role->editable && $user->role->permissions->contains('name', 'roles.edit');
     }
 
     /**
@@ -89,6 +89,6 @@ class RolePolicy
      */
     public function forceDelete(User $user, Role $role)
     {
-        return $role->editable && $user->role->permissions->contains('name', 'role.delete');
+        return $role->editable && $user->role->permissions->contains('name', 'roles.delete');
     }
 }

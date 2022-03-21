@@ -18,7 +18,7 @@ class CustomerPolicy
      */
     public function search(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'customer.search');
+        return $user->role->permissions->contains('name', 'customers.search');
     }
 
     /**
@@ -29,7 +29,7 @@ class CustomerPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'customer.view');
+        return $user->role->permissions->contains('name', 'customers.view');
     }
 
     /**
@@ -41,7 +41,7 @@ class CustomerPolicy
      */
     public function view(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'customer.view');
+        return $user->role->permissions->contains('name', 'customers.view');
     }
 
     /**
@@ -52,7 +52,7 @@ class CustomerPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->contains('name', 'customer.create');
+        return $user->role->permissions->contains('name', 'customers.create');
     }
 
     /**
@@ -64,7 +64,7 @@ class CustomerPolicy
      */
     public function update(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'customer.edit');
+        return $user->role->permissions->contains('name', 'customers.edit');
     }
 
     /**
@@ -76,7 +76,7 @@ class CustomerPolicy
      */
     public function delete(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'customer.delete');
+        return $user->role->permissions->contains('name', 'customers.delete');
 
     }
 
@@ -89,7 +89,7 @@ class CustomerPolicy
      */
     public function restore(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'customer.edit');
+        return $user->role->permissions->contains('name', 'customers.edit');
     }
 
     /**
@@ -101,6 +101,6 @@ class CustomerPolicy
      */
     public function forceDelete(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'customer.delete');
+        return $user->role->permissions->contains('name', 'customers.delete');
     }
 }
