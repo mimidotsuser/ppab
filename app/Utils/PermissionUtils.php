@@ -19,6 +19,8 @@ abstract class PermissionUtils
         ['name' => 'roles.delete', 'group' => 'roles',
             'description' => 'User can delete a role'],
 
+        ['name' => 'users.search', 'group' => 'users',
+            'description' => 'User can search user accounts'],
         ['name' => 'users.view', 'group' => 'users',
             'description' => 'User can view all user accounts'],
         ['name' => 'users.create', 'group' => 'users',
