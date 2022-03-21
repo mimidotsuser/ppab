@@ -36,7 +36,9 @@ class LoginController extends Controller
 
             $request->session()->regenerate();
 
-            return response()->json(['data' =>  User::with(['role', 'role.permissions'])
+            return response()->json(['data' => User::with(['role:name,id',
+                'role.permissions:name,id'])
+                ->select(['first_name', 'last_name', 'id', 'updated_at','role_id'])
                 ->findOrFail(Auth::id())
             ]);
         }
