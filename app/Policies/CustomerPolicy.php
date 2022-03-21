@@ -12,6 +12,16 @@ class CustomerPolicy
     use HandlesAuthorization;
 
     /**
+     * User can search customer models
+     * @param User $user
+     * @return Response|bool
+     */
+    public function search(User $user): Response|bool
+    {
+        return $user->role->permissions->contains('name', 'customer.search');
+    }
+
+    /**
      * Determine whether the user can view any models.
      *
      * @param User $user
@@ -19,7 +29,7 @@ class CustomerPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.view');
+        return $user->role->permissions->contains('name', 'customer.view');
     }
 
     /**
@@ -31,7 +41,7 @@ class CustomerPolicy
      */
     public function view(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.view');
+        return $user->role->permissions->contains('name', 'customer.view');
     }
 
     /**
@@ -42,7 +52,7 @@ class CustomerPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.create');
+        return $user->role->permissions->contains('name', 'customer.create');
     }
 
     /**
@@ -54,7 +64,7 @@ class CustomerPolicy
      */
     public function update(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.edit');
+        return $user->role->permissions->contains('name', 'customer.edit');
     }
 
     /**
@@ -66,7 +76,7 @@ class CustomerPolicy
      */
     public function delete(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.delete');
+        return $user->role->permissions->contains('name', 'customer.delete');
 
     }
 
@@ -79,7 +89,7 @@ class CustomerPolicy
      */
     public function restore(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.edit');
+        return $user->role->permissions->contains('name', 'customer.edit');
     }
 
     /**
@@ -91,6 +101,6 @@ class CustomerPolicy
      */
     public function forceDelete(User $user, Customer $customer)
     {
-        return $user->role->permissions->contains('name', 'organization.customers.delete');
+        return $user->role->permissions->contains('name', 'customer.delete');
     }
 }

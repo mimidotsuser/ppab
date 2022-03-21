@@ -13,7 +13,7 @@ class StockBalancePolicy
 
     public function search(User $user)
     {
-        return $user->role->permissions->contains('name', 'inventory.stock-balances.search');
+        return $user->role->permissions->contains('name', 'stockBalance.search');
     }
 
     /**
@@ -24,7 +24,7 @@ class StockBalancePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'inventory.stock-balances.view');
+        return $user->role->permissions->contains('name', 'stockBalance.view');
     }
 
     /**
@@ -36,7 +36,7 @@ class StockBalancePolicy
      */
     public function view(User $user, StockBalance $stockBalance)
     {
-        return $user->role->permissions->contains('name', 'inventory.stock-balances.view');
+        return $user->role->permissions->contains('name', 'stockBalance.view');
     }
 
     /**
@@ -48,7 +48,7 @@ class StockBalancePolicy
      */
     public function update(User $user, StockBalance $stockBalance)
     {
-        return $user->role->permissions->contains('name', 'inventory.stock-balances.edit');
+        return $user->role->permissions->contains('name', 'stockBalance.edit');
     }
 
 }

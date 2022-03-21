@@ -12,6 +12,16 @@ class ProductPolicy
     use HandlesAuthorization;
 
     /**
+     * User can search product models
+     * @param User $user
+     * @return Response|bool
+     */
+    public function search(User $user): Response|bool
+    {
+        return $user->role->permissions->contains('name', 'product.search');
+    }
+
+    /**
      * Determine whether the user can view any models.
      *
      * @param User $user
@@ -19,7 +29,7 @@ class ProductPolicy
      */
     public function viewAny(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.view');
+        return $user->role->permissions->contains('name', 'product.view');
     }
 
     /**
@@ -31,7 +41,7 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.view');
+        return $user->role->permissions->contains('name', 'product.view');
     }
 
     /**
@@ -42,7 +52,7 @@ class ProductPolicy
      */
     public function create(User $user): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.create');
+        return $user->role->permissions->contains('name', 'product.create');
     }
 
     /**
@@ -54,7 +64,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.edit');
+        return $user->role->permissions->contains('name', 'product.edit');
     }
 
     /**
@@ -66,7 +76,7 @@ class ProductPolicy
      */
     public function delete(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.delete');
+        return $user->role->permissions->contains('name', 'product.delete');
     }
 
     /**
@@ -78,7 +88,7 @@ class ProductPolicy
      */
     public function restore(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.edit');
+        return $user->role->permissions->contains('name', 'product.edit');
     }
 
     /**
@@ -90,6 +100,6 @@ class ProductPolicy
      */
     public function forceDelete(User $user, Product $product): Response|bool
     {
-        return $user->role->permissions->contains('name', 'inventory.products.delete');
+        return $user->role->permissions->contains('name', 'product.delete');
     }
 }
