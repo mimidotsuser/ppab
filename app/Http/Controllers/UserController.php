@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
 use App\Notifications\UserInviteNotification;
+use App\Utils\UserUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
-use App\Utils\UserUtils;
-use App\Models\User;
 use JetBrains\PhpStorm\ArrayShape;
 
 class UserController extends Controller
@@ -86,6 +86,7 @@ class UserController extends Controller
     #[ArrayShape(['data' => "\App\Models\User"])]
     public function show(User $user): array
     {
+        $user->load(['createdBy', 'role']);
         return ['data' => $user];
     }
 
@@ -103,7 +104,7 @@ class UserController extends Controller
         $user->last_name = $request->get('last_name') ?? $user->last_name;
         $user->email = $request->get('email') ?? $user->email;
         $user->role_id = $request->get('role_id') ?? $user->role_id;
-        $user->status = $request->get('role_id') ?? $user->status;
+        $user->status = $request->get('status') ?? $user->status;
 
         $user->update();
         $user->refresh();
@@ -123,6 +124,16 @@ class UserController extends Controller
     {
         $user->delete();
 
+        return response()->noContent();
+    }
+
+    public function resendInvite(User $user)
+    {
+        if ($user->status !== UserUtils::PendingActivation) {
+            return response(['errors' => ['message' => 'User account not found']], 404);
+        }
+        $token = Password::createToken($user);
+        Notification::send($user, new UserInviteNotification($user, $token));
         return response()->noContent();
     }
 }

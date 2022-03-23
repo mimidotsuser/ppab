@@ -40,6 +40,7 @@ Route::group(['prefix' => 'v1/auth'], function () {
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
+    Route::post('users/{user}/resend-invite', [UserController::class, 'resendInvite']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('roles', RoleController::class);
     Route::get('permissions', [PermissionController::class, 'index']);

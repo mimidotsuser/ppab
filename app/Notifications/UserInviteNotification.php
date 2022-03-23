@@ -14,6 +14,7 @@ class UserInviteNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private $token;
+    private $user;
 
     /**
      * Create a new notification instance.
