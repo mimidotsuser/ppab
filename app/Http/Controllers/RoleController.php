@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -69,7 +69,7 @@ class RoleController extends Controller
 
         DB::commit();
         $role->refresh();
-        $role->load('permissions');
+        $role->load(['permissions', 'createdBy']);
         return ['data' => $role];
     }
 
@@ -82,6 +82,9 @@ class RoleController extends Controller
     #[ArrayShape(['data' => "\App\Models\Role"])]
     public function show(Role $role): array
     {
+        $meta = $this->queryMeta([], ['permissions', 'createdBy']);
+        $role->load($meta->include);
+
         return ['data' => $role];
     }
 
@@ -113,7 +116,7 @@ class RoleController extends Controller
         DB::commit();
 
         $role->refresh();
-        $role->load('permissions');
+        $role->load(['permissions', 'createdBy']);
         return ['data' => $role];
     }
 
