@@ -33,7 +33,7 @@ class ProductFilterController extends Controller
             ->when($withParentOnly, function ($query) use ($request) {
                 $query->where('parent_id', $request->query('parent_id'));
             })
-            ->when($request->get('variants'), function ($query) {
+            ->when(!$request->get('variants'), function ($query) {
                 $query->whereNull('variant_of_id');
             })
             ->when(!empty($request->search), function ($query) use ($request) {
