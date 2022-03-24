@@ -39,11 +39,13 @@ return new class extends Migration {
 
             $table->foreign('parent_id')
                 ->on('products')
-                ->references('id');
+                ->references('id')
+                ->cascadeOnDelete();
 
             $table->foreign('variant_of_id')
                 ->on('products')
-                ->references('id');
+                ->references('id')
+                ->cascadeOnDelete();
         });
     }
 
