@@ -75,6 +75,11 @@ class ProductController extends Controller
             //clone and create new record
             $variant = $product->replicate(['id']);
             $variant->variant_of_id = $product->id;
+            $variant->item_code =  $variant->item_code.'[old]';
+            $variant->economic_order_qty = 0;
+            $variant->min_level = 0;
+            $variant->reorder_level = 0;
+            $variant->max_level = 0;
             $variant->save();
         }
         DB::commit();
