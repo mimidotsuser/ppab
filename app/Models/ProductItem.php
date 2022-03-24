@@ -17,6 +17,7 @@ class ProductItem extends Model
     use HasFactory, AutofillAuthorFields, Searchable;
 
     protected $table = 'product_items';
+    protected $casts=['out_of_order'=>'boolean'];
 
 
     /**

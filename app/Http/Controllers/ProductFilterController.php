@@ -22,7 +22,7 @@ class ProductFilterController extends Controller
             'aggregateBalance']);
 
         //if not searching but includes parent key
-        $sparesOnly = empty($request->search) && !empty($request->query('parent'));
+        $withParentOnly = empty($request->search) && !empty($request->query('parent_id'));
 
 
         return $productCategory
@@ -30,11 +30,11 @@ class ProductFilterController extends Controller
             ->when(!empty($meta->include), function ($query) use ($meta) {
                 $query->with($meta->include);
             })
-            ->when($sparesOnly, function ($query) use ($request) {
-                $query->where('parent_id', $request->query('parent'));
+            ->when($withParentOnly, function ($query) use ($request) {
+                $query->where('parent_id', $request->query('parent_id'));
             })
-            ->when(!$request->get('variants'), function ($query) {
-                $query->whereNull('variant_of');
+            ->when($request->get('variants'), function ($query) {
+                $query->whereNull('variant_of_id');
             })
             ->when(!empty($request->search), function ($query) use ($request) {
                 $query->where(function ($query) use ($request) {
@@ -42,8 +42,8 @@ class ProductFilterController extends Controller
                     $query->orWhereFullText('description', $request->search);
                     $query->orWhereFullText('local_description', $request->search);
 
-                    if ($request->query('parent', false)) {
-                        $query->whereHas('parent', function ($query) use ($request) {
+                    if ($request->query('parent_id', false)) {
+                        $query->whereHas('parent_id', function ($query) use ($request) {
                             $query->orWhereFullText('item_code', $request->search);
                             $query->orWhereFullText('description', $request->search);
                         });

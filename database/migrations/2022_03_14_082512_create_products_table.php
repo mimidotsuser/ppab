@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable();
-            $table->foreignId('variant_of')->nullable();
+            $table->foreignId('variant_of_id')->nullable();
             $table->foreignId('product_category_id')
                 ->constrained('product_categories');
             $table->string('internal_code'); // for human dev use
@@ -41,7 +41,7 @@ return new class extends Migration {
                 ->on('products')
                 ->references('id');
 
-            $table->foreign('variant_of')
+            $table->foreign('variant_of_id')
                 ->on('products')
                 ->references('id');
         });

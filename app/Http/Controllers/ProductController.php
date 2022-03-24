@@ -74,7 +74,7 @@ class ProductController extends Controller
         if ($request->get('create_old_variant') === true) {
             //clone and create new record
             $variant = $product->replicate(['id']);
-            $variant->variant_of = $product->id;
+            $variant->variant_of_id = $product->id;
             $variant->save();
         }
         DB::commit();
