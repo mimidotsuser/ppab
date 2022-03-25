@@ -55,7 +55,7 @@ class ProductFilterController extends Controller
                 });
 
             })
-            ->paginate($meta->limit, '*', $meta->page);
+            ->paginate($meta->limit, '*', 'page', $meta->page);
 
     }
 }

@@ -40,7 +40,7 @@ class ProductItemController extends Controller
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entryLogs');
             })
-            ->paginate($meta->limit, '*', $meta->page);
+            ->paginate($meta->limit, '*','page', $meta->page);
     }
 
     /**

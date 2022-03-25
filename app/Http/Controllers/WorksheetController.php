@@ -41,7 +41,7 @@ class WorksheetController extends Controller
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entries');
             })
-            ->paginate($meta->limit, '*', $meta->page);
+            ->paginate($meta->limit, '*', 'page',$meta->page);
     }
 
     /**

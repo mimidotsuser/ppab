@@ -26,7 +26,7 @@ class StockBalanceController extends Controller
 
         return StockBalance::when(!empty($meta->include), function ($query) use ($meta) {
             $query->with($meta->include);
-        })->paginate($meta->limit, '*', $meta->page);
+        })->paginate($meta->limit, '*', 'page', $meta->page);
     }
 
 
