@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
-use Illuminate\Database\Eloquent\Builder;
 use App\Models\Customer;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -59,7 +59,7 @@ class CustomerController extends Controller
         $customer->save();
 
         $customer->refresh();
-        $customer->load('createdBy');
+        $customer->load(['createdBy', 'parent']);
         return ['data' => $customer];
     }
 
@@ -95,7 +95,7 @@ class CustomerController extends Controller
         $customer->save();
 
         $customer->refresh();
-        $customer->load('createdBy');
+        $customer->load(['createdBy', 'parent']);
         return ['data' => $customer];
     }
 

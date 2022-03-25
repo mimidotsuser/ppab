@@ -6,7 +6,7 @@ use App\Http\Requests\StoreCustomerContractRequest;
 use App\Http\Requests\UpdateCustomerContractRequest;
 use App\Models\CustomerContract;
 
-class ClientContractController extends Controller
+class CustomerContractController extends Controller
 {
     /**
      * Display a listing of the resource.

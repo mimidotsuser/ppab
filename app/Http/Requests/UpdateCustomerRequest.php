@@ -34,9 +34,9 @@ class UpdateCustomerRequest extends FormRequest
                     ->where('region', $request->get('region'))
                     ->ignore($this->route('customer'))
             ],
-            'branch' => 'sometimes|string|max:255',
-            'region' => 'sometimes|string|max:255',
-            'location' => 'sometimes|string|max:255',
+            'branch' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
         ];
     }
 }

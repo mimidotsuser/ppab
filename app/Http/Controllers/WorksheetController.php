@@ -29,7 +29,7 @@ class WorksheetController extends Controller
     public function index(Request $request)
     {
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
-            ['createdBy', 'customer', 'entries', 'entries.productItem', 'entries.warrant',
+            ['createdBy', 'customer', 'entries','entries.createdBy', 'entries.productItem', 'entries.warrant',
                 'entries.repair', 'entries.repair.sparesUtilized',
                 'entries.repair.sparesUtilized.product']);
 
