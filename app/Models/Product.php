@@ -69,9 +69,9 @@ class Product extends Model
         return $query->where($column, 'like', '%' . $value . '%');
     }
 
-    public function scopeOrWhereLike($query, $column, $value)
+    public function scopeOrWhereLike($query, $column, $value, $startBoundary = true)
     {
-        return $query->orWhere($column, 'like', '%' . $value . '%');
+        return $query->orWhere($column, 'like', $startBoundary ? '%' : '' . $value . '%');
     }
 
     /**

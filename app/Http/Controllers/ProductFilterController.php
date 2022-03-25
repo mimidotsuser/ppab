@@ -38,8 +38,11 @@ class ProductFilterController extends Controller
             })
             ->when(!empty($request->search), function ($query) use ($request) {
                 $query->where(function ($query) use ($request) {
+                    $query->orWhereLike('item_code', $request->search, false);
                     $query->orWhereLike('item_code', $request->search);
+                    $query->orWhereLike('description', $request->search, false);
                     $query->orWhereLike('description', $request->search);
+                    $query->orWhereLike('local_description', $request->search, false);
                     $query->orWhereLike('local_description', $request->search);
 
                     if ($request->query('parent_id', false)) {
