@@ -6,9 +6,9 @@ use App\Events\ProductItemUpsert;
 use App\Http\Requests\StoreProductItemRequest;
 use App\Http\Requests\UpdateProductItemRequest;
 use App\Models\Customer;
+use App\Models\EntryRemark;
 use App\Models\ProductItem;
 use App\Models\ProductTrackingLog;
-use App\Models\EntryRemark;
 use App\Models\ProductWarrant;
 use App\Models\Warehouse;
 use App\Utils\ProductTrackingUtils;
@@ -20,6 +20,12 @@ use JetBrains\PhpStorm\ArrayShape;
 
 class ProductItemController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(ProductItem::class, 'product_item');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -40,7 +46,7 @@ class ProductItemController extends Controller
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entryLogs');
             })
-            ->paginate($meta->limit, '*','page', $meta->page);
+            ->paginate($meta->limit, '*', 'page', $meta->page);
     }
 
     /**

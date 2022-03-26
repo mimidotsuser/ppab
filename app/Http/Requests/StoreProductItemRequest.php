@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ProductItem;
 use App\Utils\ProductTrackingUtils;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class StoreProductItemRequest extends FormRequest
@@ -14,9 +16,9 @@ class StoreProductItemRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return Auth::user()->can('create', ProductItem::class);
     }
 
     /**

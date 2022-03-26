@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\ProductItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateProductItemRequest extends FormRequest
@@ -13,9 +14,9 @@ class UpdateProductItemRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;//TODO fix this
+        return Auth::user()->can('update', $this->route('product_item'));
     }
 
     /**
