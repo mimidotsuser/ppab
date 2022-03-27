@@ -109,8 +109,7 @@ class ProductItemController extends Controller
                 $request->get('increment_stock_by'));
         }
 
-        $productItem->load('entryLogs.location');
-        $productItem->loadCount('entryLogs');
+        $productItem->load(['latestEntryLog.location', 'latestEntryLog.warrant', 'product']);
 
         return ['data' => $productItem];
     }
@@ -157,6 +156,7 @@ class ProductItemController extends Controller
             ProductItemUpsert::dispatch($productItem->product,
                 $request->get('increment_stock_by'));
         }
+        $productItem->load(['latestEntryLog.location', 'latestEntryLog.warrant', 'product']);
 
         return ['data' => $productItem];
     }
