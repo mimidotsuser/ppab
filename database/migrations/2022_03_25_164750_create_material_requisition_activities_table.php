@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -19,7 +18,7 @@ return new class extends Migration
                 ->constrained('material_requisitions')->cascadeOnDelete();
             $table->string('stage');
             $table->string('outcome');
-            $table->string('remarks');
+            $table->string('remarks')->nullable();
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')

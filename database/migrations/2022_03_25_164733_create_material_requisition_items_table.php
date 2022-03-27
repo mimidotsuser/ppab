@@ -25,9 +25,9 @@ return new class extends Migration {
             $table->string('purpose_code');
             $table->string('purpose_title');
             $table->unsignedInteger('requested_qty');
-            $table->unsignedInteger('verified_qty');
-            $table->unsignedInteger('approved_qty');
-            $table->unsignedInteger('issued_qty');
+            $table->unsignedInteger('verified_qty')->nullable();
+            $table->unsignedInteger('approved_qty')->nullable();
+            $table->unsignedInteger('issued_qty')->nullable();
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')
