@@ -36,7 +36,8 @@ class ProductItemController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
             ['createdBy', 'updatedBy', 'product', 'latestEntryLog', 'latestEntryLog.location',
-                'latestEntryLog.warrant', 'entryLogs']);
+                'latestEntryLog.warrant', 'entryLogs', 'entryLogs.location', 'entryLogs.warrant',
+                'entryLogs.createdBy', 'entryLogs.remark', 'entryLogs.repair.sparesUtilized', 'entryLogs.repair.sparesUtilized.product']);
 
         return ProductItem::with($meta->include)
             ->when($request->search, function ($query) use ($request) {
@@ -104,7 +105,8 @@ class ProductItemController extends Controller
         DB::commit();
 
         //if increment by is not zero,fire product item upsert event
-        if ($request->get('increment_stock_by')) {
+        if (!empty($request->get('increment_stock_by'))
+            && $request->get('increment_stock_by') != 0) {
             ProductItemUpsert::dispatch($productItem->product,
                 $request->get('increment_stock_by'));
         }
@@ -152,7 +154,8 @@ class ProductItemController extends Controller
         $productItem->refresh();
 
         //if increment by is not zero,fire product item upsert event
-        if ($request->get('increment_stock_by')) {
+        if (!empty($request->get('increment_stock_by'))
+            && $request->get('increment_stock_by') != 0) {
             ProductItemUpsert::dispatch($productItem->product,
                 $request->get('increment_stock_by'));
         }
