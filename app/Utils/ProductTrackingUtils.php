@@ -14,7 +14,7 @@ abstract class ProductTrackingUtils
     #[Pure] #[ArrayShape(['REPAIR' => "string",
         'GENERAL_SERVICING' => "string", 'TRAINING_AND_INSTALLATION' => "string",
         'DELIVERY_AND_INSTALLATION' => "string", 'TECHNICAL_REPORT' => "string",
-        'OTHER' => "string"])]
+        'OTHER' => "string", 'MATERIAL_REQUISITION_ISSUED' => 'string'])]
     public static function getLogCategories(): array
     {
         return array_merge(WorksheetUtils::getWorksheetCategories(), [
@@ -25,6 +25,7 @@ abstract class ProductTrackingUtils
             'STANDBY_CHECKIN' => 'Standby Reminder',
             'LEASE_CHECKIN' => 'Out of Lease',
             'CUSTOMER_TRANSFER' => 'Customer/Branch Transfer',
+            'MATERIAL_REQUISITION_ISSUED' => 'MRN issued',
         ]);
     }
 }

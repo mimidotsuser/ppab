@@ -4,6 +4,10 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\MRF\ApprovalController as MRFApproveController;
+use App\Http\Controllers\MRF\IssueController as MRFIssueController;
+use App\Http\Controllers\MRF\MaterialRequisitionController as MRFController;
+use App\Http\Controllers\MRF\VerificationController as MRFVerifyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
@@ -57,6 +61,27 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::apiResource('product-items', ProductItemController::class);
     Route::apiResource('worksheets', WorksheetController::class);
+
+
+    Route::get('material-requisitions/verification', [MRFVerifyController::class, 'index']);
+    Route::get('material-requisitions/{material_requisition}/verification',
+        [MRFVerifyController::class, 'show']);
+    Route::post('material-requisitions/{material_requisition}/verification',
+        [MRFVerifyController::class, 'store']);
+
+    Route::get('material-requisitions/approval', [MRFApproveController::class, 'index']);
+    Route::get('material-requisitions/{material_requisition}/approval',
+        [MRFApproveController::class, 'show']);
+    Route::post('material-requisitions/{material_requisition}/approval',
+        [MRFApproveController::class, 'store']);
+
+    Route::get('material-requisitions/issue', [MRFIssueController::class, 'index']);
+    Route::get('material-requisitions/{material_requisition}/issue',
+        [MRFIssueController::class, 'show']);
+    Route::post('material-requisitions/{material_requisition}/issue',
+        [MRFIssueController::class, 'store']);
+
+    Route::apiResource('material-requisitions', MRFController::class);
 });
 
 Route::fallback(function () {

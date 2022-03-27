@@ -6,6 +6,7 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Attributes\SearchUsingFullText;
 use Laravel\Scout\Searchable;
 
@@ -19,6 +20,10 @@ class Product extends Model
         return $this->belongsTo(Product::class, 'parent_id');
     }
 
+    public function variants(): HasMany
+    {
+        return $this->hasMany(Product::class, 'variant_of_id');
+    }
 
     /**
      * @return BelongsTo

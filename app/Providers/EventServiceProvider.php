@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\B2CRequestQtyModified;
+use App\Events\ProductCheckout;
 use App\Events\ProductItemUpsert;
+use App\Listeners\UpdateB2CPipelineBalance;
 use App\Listeners\UpdateStockInBalance;
+use App\Listeners\UpdateStockOutBalance;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,6 +25,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProductItemUpsert::class => [
             UpdateStockInBalance::class
+        ],
+        B2CRequestQtyModified::class => [
+            UpdateB2CPipelineBalance::class
+        ],
+        ProductCheckout::class => [
+            UpdateStockOutBalance::class
         ]
     ];
 

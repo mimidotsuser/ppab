@@ -7,20 +7,39 @@ use JetBrains\PhpStorm\ArrayShape;
 abstract class MRFUtils
 {
 
-    #[ArrayShape(['repair' => "string", 'sale' => "string", 'standby' => "string",
-        'demo' => "string", 'lease' => "string"])]
+    #[ArrayShape(['REPAIR' => "string", 'SALE' => "string", 'STANDBY' => "string",
+        'DEMO' => "string", 'LEASE' => "string"])]
     public static function purpose(): array
     {
         return [
-            'repair' => 'Machine Repair',
-            'sale' => 'Customer Purchase',
-            'standby' => 'Standby',
-            'demo' => 'Customer Demo',
-            'lease' => 'Customer Lease',
+            'REPAIR' => 'Machine Repair',
+            'SALE' => 'Customer Purchase',
+            'STANDBY' => 'Standby',
+            'DEMO' => 'Customer Demo',
+            'LEASE' => 'Customer Lease',
         ];
     }
 
+    #[ArrayShape(['REQUEST_CREATED' => "string", 'VERIFIED_OKAYED' => "string",
+        'VERIFIED_REJECTED' => "string", 'APPROVAL_OKAYED' => "string",
+        'APPROVAL_REJECTED' => "string", 'PARTIAL_ISSUE' => "string", 'ISSUED' => "string"])]
     public static function stage(): array
+    {
+        return [
+            'REQUEST_CREATED' => 'REQUEST_CREATED',
+            'VERIFIED_OKAYED' => 'VERIFIED_OKAYED',
+            'VERIFIED_REJECTED' => 'VERIFIED_REJECTED',
+            'APPROVAL_OKAYED' => 'APPROVAL_OKAYED',
+            'APPROVAL_REJECTED' => 'APPROVAL_REJECTED',
+            'PARTIAL_ISSUE' => 'PARTIAL_ISSUE',
+            'ISSUED' => 'ISSUED',
+        ];
+    }
+
+    #[ArrayShape(['REQUEST_CREATED' => "string", 'VERIFIED_OKAYED' => "string",
+        'VERIFIED_REJECTED' => "string", 'APPROVAL_OKAYED' => "string",
+        'APPROVAL_REJECTED' => "string", 'PARTIAL_ISSUE' => "string", 'ISSUED' => "string"])]
+    public static function outcome()
     {
         return [
             'REQUEST_CREATED' => 'Request Created',
@@ -32,6 +51,5 @@ abstract class MRFUtils
             'ISSUED' => 'Issue complete',
         ];
     }
-
 
 }
