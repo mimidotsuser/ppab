@@ -15,6 +15,7 @@ return new class extends Migration {
         Schema::create('material_requisitions', function (Blueprint $table) {
             $table->id();
             $table->string('sn')->unique();
+            $table->string('email_thread_id')->nullable();
             $table->foreignId('warehouse_id')->constrained('warehouses')
                 ->restrictOnDelete();
             $table->foreignId('created_by_id')->constrained('users')
