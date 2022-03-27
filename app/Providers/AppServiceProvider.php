@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Customer;
+use App\Models\MaterialRequisition;
 use App\Models\Warehouse;
 use App\Models\Worksheet;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -30,7 +31,8 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'warehouse' => Warehouse::class,
             'customer' => Customer::class,
-            'worksheet' => Worksheet::class
+            'worksheet' => Worksheet::class,
+            'mrf' => MaterialRequisition::class,
         ]);
     }
 }
