@@ -29,7 +29,7 @@ class CustomerPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'customers.view');
+        return $this->search($user) || $user->role->permissions->contains('name', 'customers.view');
     }
 
     /**
