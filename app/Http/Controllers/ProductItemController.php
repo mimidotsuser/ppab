@@ -13,8 +13,10 @@ use App\Models\ProductWarrant;
 use App\Models\Warehouse;
 use App\Utils\ProductTrackingUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -40,9 +42,25 @@ class ProductItemController extends Controller
                 'entryLogs.createdBy', 'entryLogs.remark', 'entryLogs.repair.sparesUtilized', 'entryLogs.repair.sparesUtilized.product']);
 
         return ProductItem::with($meta->include)
-            ->when($request->search, function ($query) use ($request) {
-                $query->whereLike('sn', $request->search);
-                $query->orWhereLike('serial_number', $request->search);
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->whereLike('sn', $searchTerm);
+                $query->orWhereLike('serial_number', $searchTerm);
+            })
+            ->when($request->get('warehouse_id'), function ($query, $warehouseId) {
+                //should only issue items in specified warehouse
+                $query->whereRelation('latestEntryLog', 'location_id', $warehouseId);
+                $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Warehouse::class));
+                $query->whereRelation('latestEntryLog', 'location_type', $morphKey);
+            })
+            ->when($request->get('outOfOrder'), function ($query) {
+                //should only issue items in warehouse
+                $query->where('out_of_order', \request()->boolean('outOfOrder'));
+            })
+            ->when($request->get('customer_id'), function ($query, $customer_id) {
+                //should only issue items in specified warehouse
+                $query->whereRelation('latestEntryLog', 'location_id', $customer_id);
+                $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
+                $query->whereRelation('latestEntryLog', 'location_type', $morphKey);
             })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entryLogs');
