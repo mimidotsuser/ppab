@@ -66,9 +66,9 @@ class MaterialRequisitionService
 
         foreach ($items as $item) {
             //check if incrementing the virtual balance will exceed the stock_balance
-            $increment = -($item->requested_qty - $item->verified_qty);
+            $decrementBy = $item->requested_qty - $item->verified_qty;
             $model = $item->product;
-            $this->decrementB2CModelQty($model, $increment);
+            $this->decrementB2CModelQty($model, $decrementBy);
         }
     }
 
@@ -78,9 +78,9 @@ class MaterialRequisitionService
 
         foreach ($items as $item) {
             //check if incrementing the virtual balance will exceed the stock_balance
-            $increment = -($item->verified_qty - $item->approved_qty);
+            $decrementBy = $item->verified_qty - $item->approved_qty;
             $model = $item->product;
-            $this->decrementB2CModelQty($model, $increment);
+            $this->decrementB2CModelQty($model, $decrementBy);
         }
     }
 
@@ -115,8 +115,12 @@ class MaterialRequisitionService
         }
     }
 
-    private function decrementB2CModelQty(Product $model, $by)
+    private function decrementB2CModelQty(Product $model, int $by)
     {
+
+        if ($by === 0) {
+            return;
+        }
 
         if ($model->balance->virtual_balance + $by <= $model->balance->stock_balance) {
             //if it's less or equal the balance,
