@@ -6,7 +6,6 @@ use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use JetBrains\PhpStorm\ArrayShape;
@@ -30,14 +29,24 @@ class CustomerController extends Controller
         $meta = $this->queryMeta(['created_at', 'name', 'region', 'branch'],
             ['createdBy', 'parent'], 'name');
 
-        return Customer::search($request->search)
-            ->query(function ($query) use ($meta) {
+        return Customer::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('name', $searchTerm);
+                    $query->orWhereLike('name', $searchTerm);
+
+                    $query->orWhereBeginsWith('region', $searchTerm);
+                    $query->orWhereLike('region', $searchTerm);
+                    $query->orWhereBeginsWith('branch', $searchTerm);
+                    $query->orWhereLike('branch', $searchTerm);
+                });
+
+            })->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->query(fn(Builder $query) => $query->with($meta->include))
-            ->paginate($meta->limit, 'page', $meta->page);
+            ->paginate($meta->limit, '*', $meta->page);
     }
 
     /**
