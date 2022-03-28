@@ -24,7 +24,7 @@ class MaterialRequisitionService
 
             } else {
 
-                if (!empty($model->variants)) {
+                if (empty($model->variants)) {
                     B2CRequestQtyModified::dispatch($model, $model->balance->virtual_balance);
 
                     Log::critical('MRF Request has excess items of ' . $row['product_id']
