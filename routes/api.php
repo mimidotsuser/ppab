@@ -54,6 +54,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('products', ProductController::class);
     Route::get('warehouses', [WarehouseController::class, 'index']);
 
+    Route::get('products/{product}/melded-balances', [ProductFilterController::class, 'productBalances']);
     Route::apiResource('product-categories.products', ProductFilterController::class);
     Route::get('stock-balances', [StockBalanceController::class, 'index']);
     Route::get('stock-balances/{stock_balance}', [StockBalanceController::class, 'show']);

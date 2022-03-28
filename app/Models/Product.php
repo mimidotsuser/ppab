@@ -51,6 +51,11 @@ class Product extends Model
             ->groupBy('internal_code');
     }
 
+    public function meldedBalances(): HasMany
+    {
+        return $this->hasMany(StockBalance::class, 'internal_code', 'internal_code');
+    }
+
     /**
      * @param $query
      * @return mixed

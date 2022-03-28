@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use JetBrains\PhpStorm\ArrayShape;
 
 class ProductFilterController extends Controller
 {
@@ -29,7 +31,7 @@ class ProductFilterController extends Controller
             ->when(!empty($meta->include), function ($query) use ($meta) {
                 $query->with($meta->include);
             })
-            ->when(! empty($request->search), function ($query) use ($request) {
+            ->when(!empty($request->search), function ($query) use ($request) {
                 $query->where('parent_id', $request->query('parent_id'));
             })
             ->when(!$request->get('variants'), function ($query) {
@@ -48,5 +50,20 @@ class ProductFilterController extends Controller
             })
             ->paginate($meta->limit, '*', 'page', $meta->page);
 
+    }
+
+    /**
+     * Fetch product balances and that of closely related models (variants)
+     * @param Request $request
+     * @param Product $product
+     * @return array
+     */
+    #[ArrayShape(['data' => "\Illuminate\Database\Eloquent\Collection"])]
+    public function productBalances(Request $request, Product $product): array
+    {
+        $data = $product->meldedBalances()
+            ->with(['product:id,item_code,variant_of_id,parent_id,product_category_id'])
+            ->get();
+        return ['data' => $data];
     }
 }
