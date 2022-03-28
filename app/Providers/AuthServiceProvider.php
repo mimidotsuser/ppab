@@ -29,7 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         ResetPassword::createUrlUsing(function ($notifiable, string $token) {
-            return config('app.frontend_url') . '/account-recovery/' . $token.'?email='.$notifiable->email;
+            return config('weburls.root') . '/account-recovery/' . $token.'?email='.$notifiable->email;
         });
     }
 }

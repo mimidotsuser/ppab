@@ -2,15 +2,6 @@
 
 return [
 
-    /**
-     *---------------
-     * Url to the frontend app
-     * --------------
-     * This is used when resolving clickable urls on emails.
-     *
-     */
-    'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
-
     'number_series_prefix' => env('NUMBER_SERIES_PREFIX', 'DOC'),
 
     /*

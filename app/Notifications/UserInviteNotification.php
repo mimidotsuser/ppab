@@ -40,7 +40,7 @@ class UserInviteNotification extends Notification implements ShouldQueue
 
     protected function buildMailMessage($token)
     {
-        $url = config('app.frontend_url') . '/account-recovery/' . $token .
+        $url = config('weburls.root') . '/account-recovery/' . $token .
             '?invite=true&email=' . $this->user->email;
 
         return (new MailMessage)
