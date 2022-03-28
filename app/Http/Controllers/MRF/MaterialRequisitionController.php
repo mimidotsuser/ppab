@@ -59,7 +59,7 @@ class MaterialRequisitionController extends Controller
             $item->request()->associate($mrf);
             $item->product_id = $row['product_id'];
             $item->customer_id = $row['customer_id'];
-            $item->worksheet_id = $row['worksheet_id'];
+            $item->worksheet_id = $row['worksheet_id'] ?? null;
             $item->purpose_code = $purposeCode;
             $item->purpose_title = $purposeTitle;
             $item->requested_qty = $row['requested_qty'];
