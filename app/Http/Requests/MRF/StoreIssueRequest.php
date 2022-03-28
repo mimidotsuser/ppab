@@ -38,10 +38,10 @@ class StoreIssueRequest extends FormRequest
                     if (empty($value['id'])) {
                         return $fail($attribute . '.id field is required.');
                     }
-                    if (empty($value['old_total'])) {
+                    if (!is_numeric($value['old_total'])) {
                         return $fail($attribute . '.old_total field is required.');
                     }
-                    if (empty($value['new_total'])) {
+                    if (!is_numeric($value['new_total'])) {
                         return $fail($attribute . '.new_total field is required.');
                     }
 
