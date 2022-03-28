@@ -12,6 +12,7 @@ use App\Utils\MRFUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
 use function response;
 
@@ -48,6 +49,7 @@ class MaterialRequisitionController extends Controller
         DB::beginTransaction();
         $mrf = new MaterialRequisition;
         $mrf->warehouse_id = $request->get('warehouse_id');
+        $mrf->email_thread_id = Str::replace('-', '', (string)Str::uuid());
         $mrf->save();
 
 
