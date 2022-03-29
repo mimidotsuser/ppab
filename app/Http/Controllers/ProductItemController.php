@@ -43,8 +43,11 @@ class ProductItemController extends Controller
 
         return ProductItem::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
-                $query->whereLike('sn', $searchTerm);
-                $query->orWhereLike('serial_number', $searchTerm);
+
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->whereLike('sn', $searchTerm);
+                    $query->orWhereLike('serial_number', $searchTerm);
+                });
             })
             ->when($request->get('warehouse_id'), function ($query, $warehouseId) {
                 //should only issue items in specified warehouse
