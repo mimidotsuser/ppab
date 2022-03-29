@@ -102,7 +102,7 @@ class MaterialRequisitionService
             ProductCheckout::dispatch($model, $newQty);
         }
         if ($oldQty > 0) {
-            foreach ($model->variants() as $variant) {
+            foreach ($model->variants as $variant) {
                 //distribute it among all variants
                 $remainder = $variant->balance->stock_balance - $oldQty;
                 if ($remainder >= 0) {
