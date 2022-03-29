@@ -62,6 +62,10 @@ class ProductItemController extends Controller
                 $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
                 $query->whereRelation('latestEntryLog', 'location_type', $morphKey);
             })
+            ->when($request->get('product_id'), function ($query, $productId) {
+                //only return of specific model
+                $query->where('product_id', $productId);
+            })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entryLogs');
             })
