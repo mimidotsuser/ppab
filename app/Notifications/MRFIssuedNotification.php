@@ -52,14 +52,13 @@ class MRFIssuedNotification extends Notification
 
         return (new MailMessage)
             ->subject('Material Request Form Issue Status Update')
-            ->line('Dear ' . $name)
+            ->greeting('Dear ' . $name)
             ->line('Your material requisition form (' . $this->request->sn
                 . ') status has been updated')
             ->action('Generate Store Issue Voucher', $url)
             ->when($this->request, function ($mail) {
                 $mail->line('The items have been issued to you successfully.');
             })
-            ->line('Kind regards')
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 

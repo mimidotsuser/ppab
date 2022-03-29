@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Scout\Searchable;
-use App\Traits\AutofillAuthorFields;
 
 class User extends Authenticatable
 {
@@ -64,6 +63,21 @@ class User extends Authenticatable
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function scopeMRFVerifier($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'materialRequisition.verify');
+    }
+
+    public function scopeMRFApprover($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'materialRequisition.approve');
+    }
+
+    public function scopeMRFIssuer($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'checkout.create');
     }
 
     public function toSearchableArray()

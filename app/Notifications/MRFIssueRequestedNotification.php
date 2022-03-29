@@ -50,11 +50,9 @@ class MRFIssueRequestedNotification extends Notification
 
         return (new MailMessage)
             ->subject('Material Request Form Pending Issue')
-            ->line('Hello,')
             ->line('Material requisition form (' . $this->request->sn . ') by ' . $author
                 . ' requires your attention')
             ->action('Click here to action the request', $url)
-            ->line('Kind regards.')
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 

@@ -7,11 +7,16 @@ use App\Http\Requests\MRF\StoreVerificationRequest;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
+use App\Models\User;
+use App\Notifications\MRFApprovalRequestedNotification;
+use App\Notifications\MRFVerifiedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
 class VerificationController extends Controller
@@ -78,6 +83,15 @@ class VerificationController extends Controller
 
         DB::commit();
 
+        if ($hasOkayedQty) {
+            //notify approvers
+            Notification::send(User::whereNot('id', Auth::id())->MRFApprover()->get(),
+                new MRFApprovalRequestedNotification($materialRequisition));
+        }
+        //notify requester
+        Notification::send(Auth::user(),
+            new MRFVerifiedNotification($materialRequisition, !$hasOkayedQty));
+
         return ['data' => $materialRequisition];
     }
 
@@ -91,7 +105,7 @@ class VerificationController extends Controller
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
     public function show(MaterialRequisition $materialRequisition): array
     {
-        $this->authorize('view', $materialRequisition);
+        $this->authorize('verify', $materialRequisition);
 
         $meta = $this->queryMeta([], ['items', 'activities']);
         $materialRequisition->load($meta->include);

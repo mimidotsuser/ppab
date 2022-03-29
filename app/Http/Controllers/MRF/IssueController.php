@@ -9,13 +9,16 @@ use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ProductTrackingLog;
 use App\Models\ProductWarrant;
+use App\Notifications\MRFIssuedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use App\Utils\ProductTrackingUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
 class IssueController extends Controller
@@ -69,7 +72,7 @@ class IssueController extends Controller
 
             foreach ($itemModels as $itemModel) {
                 //will raise error if item is not found
-                $item = Arr::where($sparesIssued, fn($v) => $v['id'] == $itemModel->id)[0];
+                $item = Arr::first($sparesIssued, fn($v) => $v['id'] == $itemModel->id);
 
                 $qty = $item['old_total'] + $item['new_total'];
 
@@ -148,6 +151,9 @@ class IssueController extends Controller
         DB::commit();
 
         //emit email notification to user
+        //notify requester
+        Notification::send(Auth::user(),
+            new MRFIssuedNotification($materialRequisition, $notIssuedItemsTotal ==0));
 
         return ['data' => $materialRequisition];
 
@@ -163,7 +169,7 @@ class IssueController extends Controller
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
     public function show(MaterialRequisition $materialRequisition): array
     {
-        $this->authorize('view', $materialRequisition);
+        $this->authorize('issue', $materialRequisition);
 
         $meta = $this->queryMeta([], ['items', 'activities']);
         $materialRequisition->load($meta->include);

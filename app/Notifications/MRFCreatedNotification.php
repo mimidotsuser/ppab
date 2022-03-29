@@ -49,12 +49,11 @@ class MRFCreatedNotification extends Notification
 
         return (new MailMessage)
             ->subject('Material Request Form Submitted')
-            ->line('Dear ' . $name)
+            ->greeting('Dear ' . $name)
             ->line('Your material requisition form ' . $this->request->sn
                 . ' has been submitted successfully.')
             ->action('View Request', $url)
             ->line('We will notify you of the outcome.')
-            ->line('Kind regards')
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 

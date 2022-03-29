@@ -7,11 +7,16 @@ use App\Http\Requests\MRF\StoreApprovalRequest;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
+use App\Models\User;
+use App\Notifications\MRFApprovedNotification;
+use App\Notifications\MRFIssueRequestedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
 class ApprovalController extends Controller
@@ -76,6 +81,14 @@ class ApprovalController extends Controller
         $materialRequisitionService->OnApprovalFormQtyRejected($rejected);
         DB::commit();
 
+        if ($hasOkayedQty) {
+            //notify issuer
+            Notification::send(User::whereNot('id', Auth::id())->MRFIssuer()->get(),
+                new MRFIssueRequestedNotification($materialRequisition));
+        }
+        //notify requester
+        Notification::send(Auth::user(),
+            new MRFApprovedNotification($materialRequisition, !$hasOkayedQty));
 
         return ['data' => $materialRequisition];
     }
@@ -90,7 +103,7 @@ class ApprovalController extends Controller
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
     public function show(MaterialRequisition $materialRequisition): array
     {
-        $this->authorize('view', $materialRequisition);
+        $this->authorize('approve', $materialRequisition);
 
         $meta = $this->queryMeta([], ['items', 'activities']);
         $materialRequisition->load($meta->include);

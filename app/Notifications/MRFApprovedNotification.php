@@ -51,7 +51,7 @@ class MRFApprovedNotification extends Notification
 
         return (new MailMessage)
             ->subject('Material Request Form Approval Update')
-            ->line('Dear ' . $name)
+            ->greeting('Dear ' . $name)
             ->line('Your material requisition form (' . $this->request->sn
                 . ') status has been updated')
             ->when($this->rejected, function ($mail) use ($url) {
@@ -61,7 +61,6 @@ class MRFApprovedNotification extends Notification
                 $mail->action('Generate Store Issue Voucher', $url);
                 $mail->line('The request is now pending issuance.');
             })
-            ->line('Kind regards')
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 

@@ -7,11 +7,16 @@ use App\Http\Requests\MRF\StoreMaterialRequisitionRequest;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
+use App\Models\User;
+use App\Notifications\MRFCreatedNotification;
+use App\Notifications\MRFVerificationRequestedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
 use function response;
@@ -51,6 +56,7 @@ class MaterialRequisitionController extends Controller
         $mrf->warehouse_id = $request->get('warehouse_id');
         $mrf->email_thread_id = Str::replace('-', '', (string)Str::uuid());
         $mrf->save();
+        $mrf->refresh();
 
 
         foreach ($request->get('items') as $row) {
@@ -81,7 +87,10 @@ class MaterialRequisitionController extends Controller
         DB::commit();
 
         //notify verifiers
+        Notification::send(User::whereNot('id', Auth::id())->MRFVerifier()->get(),
+            new MRFVerificationRequestedNotification($mrf));
         //notify requester
+        Notification::send(Auth::user(), new MRFCreatedNotification($mrf));
 
         return ['data' => $mrf];
     }
