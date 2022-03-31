@@ -9,6 +9,7 @@ use App\Http\Controllers\MRF\IssueController as MRFIssueController;
 use App\Http\Controllers\MRF\MaterialRequisitionController as MRFController;
 use App\Http\Controllers\MRF\VerificationController as MRFVerifyController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PR\ApprovalController;
 use App\Http\Controllers\PR\PurchaseRequestController;
 use App\Http\Controllers\PR\VerificationController as PRVerificationController;
 use App\Http\Controllers\ProductCategoryController;
@@ -84,7 +85,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::post('material-requisitions/{material_requisition}/issue',
         [MRFIssueController::class, 'store']);
 
-    Route::apiResource('material-requisitions', MRFController::class);
+    Route::apiResource('material-requisitions', MRFController::class)
+        ->only(['GET', 'SHOW', 'POST', 'DELETE']);
 
     Route::get('purchase-requests/verification', [PRVerificationController::class, 'index']);
     Route::get('purchase-requests/{purchase_request}/verification',
@@ -92,7 +94,14 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::post('purchase-requests/{purchase_request}/verification',
         [PRVerificationController::class, 'store']);
 
-    Route::apiResource('purchase-requests', PurchaseRequestController::class);
+    Route::get('purchase-requests/approval', [ApprovalController::class, 'index']);
+    Route::get('purchase-requests/{purchase_request}/approval',
+        [ApprovalController::class, 'show']);
+    Route::post('purchase-requests/{purchase_request}/approval',
+        [ApprovalController::class, 'store']);
+
+    Route::apiResource('purchase-requests', PurchaseRequestController::class)
+        ->only(['GET', 'SHOW', 'POST', 'DELETE']);
 });
 
 Route::fallback(function () {

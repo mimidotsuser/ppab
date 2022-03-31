@@ -4,6 +4,7 @@ namespace App\Http\Requests\PR;
 
 use App\Models\PurchaseRequestItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class StoreApprovalRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Auth::user()->can('approve', $this->route('purchase_request'));
     }
 
     /**
