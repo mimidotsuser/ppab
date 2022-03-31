@@ -9,6 +9,7 @@ use App\Http\Controllers\MRF\IssueController as MRFIssueController;
 use App\Http\Controllers\MRF\MaterialRequisitionController as MRFController;
 use App\Http\Controllers\MRF\VerificationController as MRFVerifyController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PR\PurchaseRequestController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductFilterController;
@@ -83,6 +84,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         [MRFIssueController::class, 'store']);
 
     Route::apiResource('material-requisitions', MRFController::class);
+
+    Route::apiResource('purchase-requests', PurchaseRequestController::class);
 });
 
 Route::fallback(function () {

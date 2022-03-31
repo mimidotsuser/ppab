@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\B2BQtyModified;
 use App\Events\B2CRequestQtyModified;
 use App\Events\ProductCheckout;
 use App\Events\ProductItemUpsert;
+use App\Listeners\UpdateB2BPipelineBalance;
 use App\Listeners\UpdateB2CPipelineBalance;
 use App\Listeners\UpdateStockInBalance;
 use App\Listeners\UpdateStockOutBalance;
@@ -31,6 +33,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProductCheckout::class => [
             UpdateStockOutBalance::class
+        ],
+        B2BQtyModified::class => [
+            UpdateB2BPipelineBalance::class
         ]
     ];
 
