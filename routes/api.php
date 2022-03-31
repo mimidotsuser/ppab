@@ -14,7 +14,7 @@ use App\Http\Controllers\PR\PurchaseRequestController;
 use App\Http\Controllers\PR\VerificationController as PRVerificationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProductFilterController;
+use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
@@ -57,8 +57,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('products', ProductController::class);
     Route::get('warehouses', [WarehouseController::class, 'index']);
 
-    Route::get('products/{product}/melded-balances', [ProductFilterController::class, 'productBalances']);
-    Route::apiResource('product-categories.products', ProductFilterController::class);
+    Route::get('products/{product}/melded-balances', [ProductCategoryFilterController::class, 'productBalances']);
+    Route::apiResource('product-categories.products', ProductCategoryFilterController::class);
     Route::get('stock-balances', [StockBalanceController::class, 'index']);
     Route::get('stock-balances/{stock_balance}', [StockBalanceController::class, 'show']);
     Route::patch('stock-balances/{stock_balance}', [StockBalanceController::class, 'update']);

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use JetBrains\PhpStorm\ArrayShape;
 
-class ProductFilterController extends Controller
+class ProductCategoryFilterController extends Controller
 {
 
     /**
