@@ -29,7 +29,7 @@ class VerificationController extends Controller
      */
     public function index(): LengthAwarePaginator
     {
-        $this->authorize('viewAny', MaterialRequisition::class);
+        $this->authorize('viewAnyPendingVerification', MaterialRequisition::class);
 
         $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity']);
 

@@ -11,10 +11,20 @@ class MaterialRequisitionPolicy
 {
     use HandlesAuthorization;
 
+    public function viewAnyPendingVerification(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'materialRequisition.verify');
+    }
+
     public function verify(User $user, MaterialRequisition $materialRequisition): bool
     {
         return $materialRequisition->created_by_id !== $user->id && //cannot verify their own request
             $user->role->permissions->contains('name', 'materialRequisition.verify');
+    }
+
+    public function viewAnyPendingApproval(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'materialRequisition.approve');
     }
 
     public function approve(User $user, MaterialRequisition $materialRequisition): bool
@@ -25,7 +35,7 @@ class MaterialRequisitionPolicy
 
     public function issue(User $user, MaterialRequisition $materialRequisition): bool
     {
-        return  $user->role->permissions->contains('name', 'checkout.create');
+        return $user->role->permissions->contains('name', 'checkout.create');
     }
 
     /**

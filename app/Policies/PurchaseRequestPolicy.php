@@ -11,12 +11,40 @@ class PurchaseRequestPolicy
 {
     use HandlesAuthorization;
 
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function viewAnyPendingVerification(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'purchaseRequests.verify');
+    }
+
+    /**
+     * @param User $user
+     * @param PurchaseRequest $purchaseRequest
+     * @return bool
+     */
     public function verify(User $user, PurchaseRequest $purchaseRequest): bool
     {
         return $purchaseRequest->created_by_id !== $user->id && //cannot verify their own request
             $user->role->permissions->contains('name', 'purchaseRequests.verify');
     }
 
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function viewAnyPendingApproval(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'purchaseRequests.approve');
+    }
+
+    /**
+     * @param User $user
+     * @param PurchaseRequest $purchaseRequest
+     * @return bool
+     */
     public function approve(User $user, PurchaseRequest $purchaseRequest): bool
     {
         return $purchaseRequest->created_by_id !== $user->id && //cannot approve their own request
