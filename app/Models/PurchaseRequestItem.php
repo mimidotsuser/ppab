@@ -11,6 +11,7 @@ class PurchaseRequestItem extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $with = ['product']; //always eager load
 
     public function request()
     {
