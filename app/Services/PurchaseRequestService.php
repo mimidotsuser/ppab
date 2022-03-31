@@ -16,4 +16,22 @@ class PurchaseRequestService
             B2BQtyModified::dispatch($model, $row['requested_qty']);
         }
     }
+
+    public function OnVerificationFormQtyRejected(array $items)
+    {
+        foreach ($items as $model) {
+            //deduct the B2B pipeline by rejected diff
+            B2BQtyModified::dispatch($model->product->balance,
+                ($model->verified_qty - $model->requested_qty));
+        }
+    }
+
+    public function OnApprovalFormQtyRejected(array $items)
+    {
+        foreach ($items as $model) {
+            //deduct the B2B pipeline by rejected diff
+            B2BQtyModified::dispatch($model->product->balance,
+                ($model->approved_qty - $model->verified_qty));
+        }
+    }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\MRF\MaterialRequisitionController as MRFController;
 use App\Http\Controllers\MRF\VerificationController as MRFVerifyController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PR\PurchaseRequestController;
+use App\Http\Controllers\PR\VerificationController as PRVerificationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductFilterController;
@@ -84,6 +85,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         [MRFIssueController::class, 'store']);
 
     Route::apiResource('material-requisitions', MRFController::class);
+
+    Route::get('purchase-requests/verification', [PRVerificationController::class, 'index']);
+    Route::get('purchase-requests/{purchase_request}/verification',
+        [PRVerificationController::class, 'show']);
+    Route::post('purchase-requests/{purchase_request}/verification',
+        [PRVerificationController::class, 'store']);
 
     Route::apiResource('purchase-requests', PurchaseRequestController::class);
 });
