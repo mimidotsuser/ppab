@@ -86,7 +86,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         [MRFIssueController::class, 'store']);
 
     Route::apiResource('material-requisitions', MRFController::class)
-        ->only(['GET', 'SHOW', 'POST', 'DELETE']);
+        ->only(['index', 'show', 'store', 'delete']);
 
     Route::get('purchase-requests/verification', [PRVerificationController::class, 'index']);
     Route::get('purchase-requests/{purchase_request}/verification',
@@ -101,7 +101,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         [ApprovalController::class, 'store']);
 
     Route::apiResource('purchase-requests', PurchaseRequestController::class)
-        ->only(['GET', 'SHOW', 'POST', 'DELETE']);
+        ->only(['index', 'show', 'store', 'delete']);
 });
 
 Route::fallback(function () {
