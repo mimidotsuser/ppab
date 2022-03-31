@@ -14,6 +14,7 @@ class MaterialRequisition extends Model
     use HasFactory, AutofillAuthorFields;
 
     protected $with = ['createdBy'];
+    protected $hidden = ['email_thread_id'];
 
     /**
      * @return HasMany

@@ -37,7 +37,7 @@ class StoreVerificationRequest extends FormRequest
                         if (empty($value['id'])) {
                             return $fail($attribute . '.id field is required.');
                         }
-                        if (empty($value['verified_qty'])) {
+                        if (is_numeric($value['verified_qty'])) {
                             return $fail($attribute . '.verified_qty field is required.');
                         }
                         $itemModel = MaterialRequisitionItem::without(['customer', 'product'])

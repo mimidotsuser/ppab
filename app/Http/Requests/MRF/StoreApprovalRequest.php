@@ -35,7 +35,7 @@ class StoreApprovalRequest extends FormRequest
                         if (empty($value['id'])) {
                             return $fail($attribute . '.id field is required.');
                         }
-                        if (empty($value['approved_qty'])) {
+                        if (!is_numeric($value['approved_qty'])) {
                             return $fail($attribute . '.approved_qty field is required.');
                         }
 
