@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\PR;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PR\StorePurchaseRequestRequest;
+use App\Http\Requests\PR\StorePurchaseRequisitionRequest;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
 use App\Models\PurchaseRequestItem;
@@ -39,10 +39,10 @@ class PurchaseRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param StorePurchaseRequestRequest $request
+     * @param StorePurchaseRequisitionRequest $request
      * @return PurchaseRequest[]
      */
-    public function store(StorePurchaseRequestRequest $request,PurchaseRequestService $service)
+    public function store(StorePurchaseRequisitionRequest $request, PurchaseRequestService $service)
     {
         DB::beginTransaction();
 

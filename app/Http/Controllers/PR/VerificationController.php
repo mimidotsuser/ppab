@@ -39,7 +39,9 @@ class VerificationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param StoreVerificationRequest $request
+     * @param PurchaseRequest $purchaseRequest
+     * @param PurchaseRequestService $service
      * @return PurchaseRequest[]
      */
     public function store(StoreVerificationRequest $request, PurchaseRequest $purchaseRequest,
@@ -72,8 +74,8 @@ class VerificationController extends Controller
             }
         }
 
-        $stage = $hasOkayedQty ? PurchaseRequestUtils::stage()['APPROVAL_OKAYED'] :
-            PurchaseRequestUtils::stage()['APPROVAL_REJECTED'];
+        $stage = $hasOkayedQty ? PurchaseRequestUtils::stage()['VERIFIED_OKAYED'] :
+            PurchaseRequestUtils::stage()['VERIFIED_REJECTED'];
 
         $activity = new PurchaseRequestActivity;
         $activity->request()->associate($purchaseRequest);

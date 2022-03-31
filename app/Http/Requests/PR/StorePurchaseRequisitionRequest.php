@@ -6,7 +6,7 @@ use App\Models\PurchaseRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
-class StorePurchaseRequestRequest extends FormRequest
+class StorePurchaseRequisitionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
