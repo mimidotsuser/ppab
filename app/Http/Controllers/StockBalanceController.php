@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateStockBalanceRequest;
 use App\Models\StockBalance;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 use JetBrains\PhpStorm\ArrayShape;
 
 class StockBalanceController extends Controller
@@ -18,15 +19,23 @@ class StockBalanceController extends Controller
      * @return LengthAwarePaginator
      * @throws AuthorizationException
      */
-    public function index(): LengthAwarePaginator
+    public function index(Request $request): LengthAwarePaginator
     {
 
         $this->authorize('viewAny', StockBalance::class);
-        $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'product', 'warehouse']);
+        $meta = $this->queryMeta(['out_of_stock'],
+            ['createdBy', 'updatedBy', 'product', 'warehouse']);
 
         return StockBalance::when(!empty($meta->include), function ($query) use ($meta) {
             $query->with($meta->include);
-        })->paginate($meta->limit, '*', 'page', $meta->page);
+        })->when($request->boolean('exclude_variants', false), function ($query) {
+            $query->whereRelation('product', 'variant_of_id', null);
+        })->when($meta, function ($query, $meta) {
+            foreach ($meta->orderBy as $sortKey) {
+                $query->orderBy($sortKey, $meta->direction);
+            }
+        })
+            ->paginate($meta->limit, '*', 'page', $meta->page);
     }
 
 
