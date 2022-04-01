@@ -42,7 +42,7 @@ class RequestForQuotationPolicy
      */
     public function view(User $user, RequestForQuotation $requestForQuotation)
     {
-        return $user->role->permissions->contains('name', 'rfqs.view');
+        return $user->whereRelation('role.permissions', 'name', 'rfqs.view')->exists();
     }
 
     /**

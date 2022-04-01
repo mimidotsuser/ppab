@@ -28,8 +28,8 @@ class RequestForQuotation extends Model
 
     public function vendors(): BelongsToMany
     {
-        return $this->belongsToMany(Vendor::class,'request_for_quotation_vendors',
-            'request_for_quotation_id','vendor_id',);
+        return $this->belongsToMany(Vendor::class, 'request_for_quotation_vendors',
+            'request_for_quotation_id', 'vendor_id',);
     }
 
     /**

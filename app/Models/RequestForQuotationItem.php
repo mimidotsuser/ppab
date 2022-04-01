@@ -11,6 +11,8 @@ class RequestForQuotationItem extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $with = ['uom', 'product'];
+
     public function request(): BelongsTo
     {
         return $this->belongsTo(RequestForQuotation::class, 'request_for_quotation_id');
@@ -26,9 +28,9 @@ class RequestForQuotationItem extends Model
         return $this->belongsTo(UnitOfMeasure::class, 'unit_of_measure_id');
     }
 
-    public function purchaseRequestItem()
+    public function purchaseRequestItem(): BelongsTo
     {
-        return $this->belongsTo(PurchaseRequestItem::class,'purchase_request_item_id');
+        return $this->belongsTo(PurchaseRequestItem::class, 'purchase_request_item_id');
     }
 
     /**

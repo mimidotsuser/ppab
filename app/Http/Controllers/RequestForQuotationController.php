@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateRequestForQuotationRequest;
 use App\Models\PurchaseRequestItem;
 use App\Models\RequestForQuotation;
 use App\Models\RequestForQuotationItem;
+use App\Models\UnitOfMeasure;
 use App\Services\RequestForQuotationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -81,18 +82,23 @@ class RequestForQuotationController extends Controller
                 $item->qty = $row['qty'];
                 $item->unit_of_measure_id = $row['unit_of_measure_id'];
 
+                $uom = UnitOfMeasure::findOrFail($row['unit_of_measure_id']);
+
                 if (isset($row['purchase_request_item_id'])) {
                     $prItemModel = PurchaseRequestItem::findOrFail($row['purchase_request_item_id']);
                     //check the diff
-                    if ($prItemModel->approved_qty != $row['qty']) {
+                    if ($prItemModel->approved_qty != ($row['qty'] * $uom->unit)) {
                         $productsItemWithBalDiff[] = [
                             'id' => $row['product_id'],
-                            'by' => $row['qty'] - $prItemModel->approved_qty
+                            'by' => ($row['qty'] * $uom->unit) - $prItemModel->approved_qty
                         ];
                     }
                     $item->purchaseRequestItem()->associate($prItemModel);
                 } else {
-                    $productsItemWithBalDiff[] = ['id' => $row['product_id'], 'by' => $row['qty']];
+                    $productsItemWithBalDiff[] = [
+                        'id' => $row['product_id'],
+                        'by' => ($row['qty'] * $uom->unit)
+                    ];
                 }
 
                 $items[] = $item;
@@ -164,7 +170,10 @@ class RequestForQuotationController extends Controller
             foreach ($requestForQuotation->items as $item) {
                 //if it has no purchase request item id, mark it for stock balance deduction
                 if (empty($item->purchase_request_item_id)) {
-                    $productsItemWithBalDiff[] = ['id' => $item['product_id'], 'by' => $item['qty'] * -1];
+                    $productsItemWithBalDiff[] = [
+                        'id' => $item['product_id'],
+                        'by' => $item['qty'] * -1 * $item->uom->unit
+                    ];
                 }
             }
 
@@ -177,20 +186,25 @@ class RequestForQuotationController extends Controller
                 $item->qty = $row['qty'];
                 $item->unit_of_measure_id = $row['unit_of_measure_id'];
 
+                $uom = UnitOfMeasure::findOrFail($row['unit_of_measure_id']);
+
                 if (isset($row['purchase_request_item_id'])) {
                     //if the new item has purchase request item id
 
                     $prItemModel = PurchaseRequestItem::findOrFail($row['purchase_request_item_id']);
                     //check the diff
-                    if ($prItemModel->approved_qty != $row['qty']) {
+                    if ($prItemModel->approved_qty != $row['qty'] * $uom->unit) {
                         $productsItemWithBalDiff[] = [
                             'id' => $row['product_id'],
-                            'by' => $row['qty'] - $prItemModel->approved_qty
+                            'by' => ($row['qty'] * $uom->unit) - $prItemModel->approved_qty
                         ];
                     }
                     $item->purchaseRequestItem()->associate($prItemModel);
                 } else {
-                    $productsItemWithBalDiff[] = ['id' => $row['product_id'], 'by' => $row['qty']];
+                    $productsItemWithBalDiff[] = [
+                        'id' => $row['product_id'],
+                        'by' => $row['qty'] * $uom->unit
+                    ];
                 }
 
                 $items[] = $item;
