@@ -11,6 +11,8 @@ class PurchaseRequestActivity extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $with = ['createdBy'];
+
 
     public function request()
     {
