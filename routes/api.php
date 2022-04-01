@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WorksheetController;
 use Illuminate\Support\Facades\Route;
@@ -102,6 +103,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::apiResource('purchase-requests', PurchaseRequestController::class)
         ->only(['index', 'show', 'store', 'delete']);
+
+    Route::apiResource('vendors', VendorController::class);
 });
 
 Route::fallback(function () {
