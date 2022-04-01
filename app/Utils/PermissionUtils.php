@@ -119,6 +119,8 @@ abstract class PermissionUtils
             'description' => 'User can view all RFQ\'s'],
         ['name' => 'rfqs.create', 'group' => 'RFQ\'s',
             'description' => 'User can create an RFQ'],
+        ['name' => 'rfqs.edit', 'group' => 'RFQ\'s',
+            'description' => 'User can edit an RFQ'],
         ['name' => 'rfqs.delete', 'group' => 'RFQ\'s',
             'description' => 'User can delete any RFQ'],
 

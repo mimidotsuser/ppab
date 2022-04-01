@@ -13,9 +13,10 @@ use App\Http\Controllers\PR\ApprovalController;
 use App\Http\Controllers\PR\PurchaseRequestController;
 use App\Http\Controllers\PR\VerificationController as PRVerificationController;
 use App\Http\Controllers\ProductCategoryController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductCategoryFilterController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductItemController;
+use App\Http\Controllers\RequestForQuotationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UnitOfMeasureController;
@@ -107,6 +108,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::apiResource('vendors', VendorController::class);
     Route::apiResource('unit-of-measures', UnitOfMeasureController::class);
+    Route::apiResource('request-for-quotation', RequestForQuotationController::class);
 });
 
 Route::fallback(function () {
