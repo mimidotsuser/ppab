@@ -155,6 +155,15 @@ abstract class PermissionUtils
             'description' => 'User can edit vendors info'],
         ['name' => 'vendors.delete', 'group' => 'vendors',
             'description' => 'User can delete vendors'],
+
+        ['name' => 'uom.view', 'group' => 'uom',
+            'description' => 'User can view all unit of measures'],
+        ['name' => 'uom.create', 'group' => 'uom',
+            'description' => 'User can create a unit of measure'],
+        ['name' => 'uom.edit', 'group' => 'uom',
+            'description' => 'User can edit unit of measure info'],
+        ['name' => 'uom.delete', 'group' => 'uom',
+            'description' => 'User can delete unit of measure'],
     ];
 
 

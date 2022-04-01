@@ -18,6 +18,7 @@ use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
+use App\Http\Controllers\UnitOfMeasureController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WarehouseController;
@@ -105,6 +106,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         ->only(['index', 'show', 'store', 'delete']);
 
     Route::apiResource('vendors', VendorController::class);
+    Route::apiResource('unit-of-measures', UnitOfMeasureController::class);
 });
 
 Route::fallback(function () {
