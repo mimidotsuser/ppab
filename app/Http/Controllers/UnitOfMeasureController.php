@@ -9,6 +9,11 @@ use Illuminate\Http\Response;
 
 class UnitOfMeasureController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(UnitOfMeasure::class,'unit_of_measure');
+    }
+
     /**
      * Display a listing of the resource.
      *
