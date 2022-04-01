@@ -28,7 +28,7 @@ class ApprovalController extends Controller
         $meta = $this->queryMeta(['created_at', 'id', 'warehouse_id'],
             ['items', 'activities', 'latestActivity']);
 
-        $stage = PurchaseRequestUtils::stage()['APPROVAL_OKAYED'];
+        $stage = PurchaseRequestUtils::stage()['VERIFIED_OKAYED'];
 
         return PurchaseRequest::with($meta->include)
             ->whereRelation('latestActivity', 'stage', $stage)
