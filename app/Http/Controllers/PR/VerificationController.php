@@ -10,7 +10,6 @@ use App\Services\PurchaseRequestService;
 use App\Utils\PurchaseRequestUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -107,7 +106,8 @@ class VerificationController extends Controller
     {
         $this->authorize('verify', $purchaseRequest);
 
-        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta([],
+            ['items', 'activities', 'items.product.balance', 'latestActivity']);
 
         $purchaseRequest->load($meta->include);
         return ['data' => $purchaseRequest];

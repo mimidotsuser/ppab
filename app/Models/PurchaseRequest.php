@@ -12,6 +12,7 @@ class PurchaseRequest extends Model
     use HasFactory, AutofillAuthorFields;
 
     protected $hidden = ['email_thread_id'];
+    protected $with = ['createdBy'];
 
 
     public function warehouse()

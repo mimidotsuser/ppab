@@ -104,7 +104,8 @@ class ApprovalController extends Controller
     {
         $this->authorize('approve', $purchaseRequest);
 
-        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta([],
+            ['items', 'activities', 'items.product.balance', 'latestActivity']);
 
         $purchaseRequest->load($meta->include);
 
