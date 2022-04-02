@@ -23,6 +23,11 @@ class PurchaseRequestItem extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function purchaseRequestItem()
+    {
+        return $this->belongsTo(PurchaseRequestItem::class, 'purchase_request_item_id');
+    }
+
     /**
      * Author relationship
      * @return BelongsTo

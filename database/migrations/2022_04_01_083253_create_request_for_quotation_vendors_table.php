@@ -15,7 +15,7 @@ return new class extends Migration {
         Schema::create('request_for_quotation_vendors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('request_for_quotation_id')
-                ->constrained('request_for_quotations');
+                ->constrained('request_for_quotations')->cascadeOnDelete();
             $table->foreignId('vendor_id')->constrained('vendors');
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();

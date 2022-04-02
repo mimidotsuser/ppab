@@ -53,9 +53,11 @@ class RequestForQuotationController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreRequestForQuotationRequest $request
-     * @return RequestForQuotation[]
+     * @param RequestForQuotationService $service
+     * @return array
      */
-    public function store(StoreRequestForQuotationRequest $request, RequestForQuotationService $service): array
+    public function store(StoreRequestForQuotationRequest $request,
+                          RequestForQuotationService      $service): array
     {
         DB::beginTransaction();
 
@@ -168,12 +170,22 @@ class RequestForQuotationController extends Controller
 
             //for current existing items
             foreach ($requestForQuotation->items as $item) {
-                //if it has no purchase request item id, mark it for stock balance deduction
-                if (empty($item->purchase_request_item_id)) {
+                if (!isset($item->purchase_request_item_id)) {
+                    //if it has no purchase request item id, mark it for stock balance deduction
                     $productsItemWithBalDiff[] = [
                         'id' => $item['product_id'],
                         'by' => $item['qty'] * -1 * $item->uom->unit
                     ];
+                } else {
+                    $model = $item->purchaseRequestItem;
+
+                    if ($model->approved_qty != $item['qty'] * $item->uom->unit) {
+                        //reset to how it was before RFQ
+                        $productsItemWithBalDiff[] = [
+                            'id' => $item['product_id'],
+                            'by' => $model->approved_qty - ($item['qty'] * $item->uom->unit)
+                        ];
+                    }
                 }
             }
 
@@ -233,7 +245,33 @@ class RequestForQuotationController extends Controller
     public function destroy(RequestForQuotation $requestForQuotation): Response
     {
 
+        DB::beginTransaction();
+        $productsItemWithBalDiff = [];
+
+        //reset restock quantity
+        foreach ($requestForQuotation->items as $item) {
+            if (!isset($item->purchase_request_item_id)) {
+                //if it has no purchase request item id, mark it for stock balance deduction
+                $productsItemWithBalDiff[] = [
+                    'id' => $item['product_id'],
+                    'by' => $item['qty'] * -1 * $item->uom->unit
+                ];
+            } else {
+                $model = $item->purchaseRequestItem;
+
+                if ($model->approved_qty != $item['qty'] * $item->uom->unit) {
+                    //reset to how it was before RFQ
+                    $productsItemWithBalDiff[] = [
+                        'id' => $item['product_id'],
+                        'by' => $model->approved_qty - ($item['qty'] * $item->uom->unit)
+                    ];
+                }
+            }
+        }
+
+
         $requestForQuotation->delete();
+        DB::commit();
 
         return \response()->noContent();
     }
