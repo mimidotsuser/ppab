@@ -91,9 +91,16 @@ abstract class PermissionUtils
         ['name' => 'stockBalances.edit', 'group' => 'stock balances',
             'description' => 'User can adjust stock balances'],
 
-        ['name' => 'receivingReport.view', 'group' => 'receiving report',
+        ['name' => 'standByCheckIn.view', 'group' => 'product checkin',
+            'description' => 'User can view standby reminder products'],
+        ['name' => 'standByCheckIn.create', 'group' => 'product checkin',
+            'description' => 'User can receive standby reminder products'],
+
+        ['name' => 'receiptNoteVoucher.view', 'group' => 'receipt note voucher',
             'description' => 'User can view all RGA and GRN documents'],
-        ['name' => 'receivingReport.approve', 'group' => 'receiving report',
+       ['name' => 'receiptNoteVoucher.create', 'group' => 'receipt note voucher',
+            'description' => 'User can receive/checkIn purchase products (with PO)'],
+        ['name' => 'receivingReport.approve', 'group' => 'receipt note voucher',
             'description' => 'User can approve RGA and GRN documents'],
 
         ['name' => 'inspectionReport.view', 'group' => 'product inspection',
@@ -101,8 +108,6 @@ abstract class PermissionUtils
         ['name' => 'inspectionReport.create', 'group' => 'product inspection',
             'description' => 'User can inspect products'],
 
-        ['name' => 'productCheckIn.create', 'group' => 'product checkin',
-            'description' => 'User can receive/checkIn purchased and standby reminder products'],
 
         ['name' => 'purchaseOrders.search', 'group' => 'purchase orders',
             'description' => 'User can search purchase orders'],
