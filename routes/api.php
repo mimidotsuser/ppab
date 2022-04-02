@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MRF\ApprovalController as MRFApproveController;
 use App\Http\Controllers\MRF\IssueController as MRFIssueController;
@@ -109,6 +110,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('vendors', VendorController::class);
     Route::apiResource('unit-of-measures', UnitOfMeasureController::class);
     Route::apiResource('request-for-quotation', RequestForQuotationController::class);
+
+    Route::get('currencies', [CurrencyController::class, 'index']);
 });
 
 Route::fallback(function () {
