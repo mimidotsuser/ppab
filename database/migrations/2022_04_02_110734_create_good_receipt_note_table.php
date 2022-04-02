@@ -12,13 +12,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('receipt_note_voucher_activities', function (Blueprint $table) {
+        Schema::create('goods_receipt_notes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('receipt_note_voucher_id')
-                ->constrained('receipt_note_vouchers')->cascadeOnDelete();
-            $table->string('stage');
-            $table->string('outcome');
-            $table->string('remarks')->nullable();
+            $table->string('sn');
+            $table->string('reference');
+            $table->foreignId('purchase_order_id')->constrained('purchase_orders')
+                ->restrictOnDelete();
+            $table->foreignId('warehouse_id')->constrained('warehouses')
+                ->restrictOnDelete();
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')
@@ -34,6 +35,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('receipt_note_voucher_activities');
+        Schema::dropIfExists('goods_receipt_notes');
     }
 };

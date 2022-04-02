@@ -6,9 +6,9 @@ use App\Http\Requests\StoreInspectionNoteRequest;
 use App\Http\Requests\UpdateInspectionNoteRequest;
 use App\Models\InspectionChecklist;
 use App\Models\InspectionNote;
-use App\Models\ReceiptNoteVoucherActivity;
-use App\Models\ReceiptNoteVoucherItem;
-use App\Utils\ReceiptNoteVoucherUtils;
+use App\Models\GoodsReceiptNoteActivity;
+use App\Models\GoodsReceiptNoteItem;
+use App\Utils\goodsReceiptNoteUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,8 +29,8 @@ class InspectionNoteController extends Controller
     public function index(Request $request)
     {
         $meta = $this->queryMeta(['created_at', 'sn'],
-            ['createdBy', 'updatedBy', 'receiptNoteVoucher', 'receiptNoteVoucher.purchaseOrder',
-                'receiptNoteVoucher.latestActivity']);
+            ['createdBy', 'updatedBy', 'goodsReceiptNote', 'goodsReceiptNote.purchaseOrder',
+                'goodsReceiptNote.latestActivity']);
 
         return InspectionNote::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -57,7 +57,7 @@ class InspectionNoteController extends Controller
     {
         DB::beginTransaction();
         $inspectionNote = new InspectionNote;
-        $inspectionNote->receipt_note_voucher_id = $request->get('receipt_note_voucher_id');
+        $inspectionNote->goods_receipt_note_id = $request->get('goods_receipt_note_id');
         $inspectionNote->remarks = $request->get('remarks');
         $inspectionNote->save();
         $inspectionNote->refresh();
@@ -76,17 +76,17 @@ class InspectionNoteController extends Controller
 
         //update the items
         foreach ($request->get('items') as $row) {
-            $item = ReceiptNoteVoucherItem::findOrFail($row['item_id']);
+            $item = GoodsReceiptNoteItem::findOrFail($row['item_id']);
             $item->rejected_qty = $row['rejected_qty'];
             $item->update();
         }
 
-        //update receipt note voucher
-        $stage = ReceiptNoteVoucherUtils::stage()['INSPECTION_DONE'];
-        $activity = new ReceiptNoteVoucherActivity;
-        $activity->receipt_note_voucher_id = $request->get('receipt_note_voucher_id');
+        //update goods receipt note
+        $stage = goodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
+        $activity = new GoodsReceiptNoteActivity;
+        $activity->goods_receipt_note_id = $request->get('goods_receipt_note_id');
         $activity->stage = $stage;
-        $activity->outcome = ReceiptNoteVoucherUtils::outcome()[$stage];
+        $activity->outcome = goodsReceiptNoteUtils::outcome()[$stage];
         $activity->remarks = $request->get('remarks'); //yes, it's a duplicate
 
         DB::commit();
@@ -105,8 +105,8 @@ class InspectionNoteController extends Controller
     public function show(InspectionNote $inspectionNote): array
     {
 
-        $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'receiptNoteVoucher',
-            'receiptNoteVoucher.purchaseOrder', 'receiptNoteVoucher.latestActivity']);
+        $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'goodsReceiptNote',
+            'goodsReceiptNote.purchaseOrder', 'goodsReceiptNote.latestActivity']);
 
         $inspectionNote->load($meta->include);
         return ['data' => $inspectionNote];
@@ -122,7 +122,7 @@ class InspectionNoteController extends Controller
     public function update(UpdateInspectionNoteRequest $request, InspectionNote $inspectionNote): array
     {
         DB::beginTransaction();
-        $inspectionNote->receipt_note_voucher_id = $request->get('receipt_note_voucher_id');
+        $inspectionNote->goods_receipt_note_id = $request->get('goods_receipt_note_id');
         $inspectionNote->remarks = $request->get('remarks');
         $inspectionNote->update();
 
@@ -144,7 +144,7 @@ class InspectionNoteController extends Controller
 
         //update the items
         foreach ($request->get('items') as $row) {
-            $item = ReceiptNoteVoucherItem::findOrFail($row['item_id']);
+            $item = GoodsReceiptNoteItem::findOrFail($row['item_id']);
             $item->rejected_qty = $row['rejected_qty'];
             $item->update();
         }

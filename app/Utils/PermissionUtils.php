@@ -96,11 +96,11 @@ abstract class PermissionUtils
         ['name' => 'standByCheckIn.create', 'group' => 'product checkin',
             'description' => 'User can receive standby reminder products'],
 
-        ['name' => 'receiptNoteVoucher.view', 'group' => 'receipt note voucher',
+        ['name' => 'goodsReceiptNote.view', 'group' => 'goods receipt note',
             'description' => 'User can view all RGA and GRN documents'],
-       ['name' => 'receiptNoteVoucher.create', 'group' => 'receipt note voucher',
-            'description' => 'User can receive/checkIn purchase products (with PO)'],
-        ['name' => 'receivingReport.approve', 'group' => 'receipt note voucher',
+       ['name' => 'goodsReceiptNote.create', 'group' => 'goods receipt note',
+            'description' => 'User can create  goods receipt note (GRN) for respective PO'],
+        ['name' => 'goodsReceiptNote.approve', 'group' => 'goods receipt note',
             'description' => 'User can approve RGA and GRN documents'],
 
         ['name' => 'inspectionReport.view', 'group' => 'product inspection',

@@ -18,9 +18,9 @@ class InspectionNote extends Model
     /**
      * @return BelongsTo
      */
-    public function receiptNoteVoucher(): BelongsTo
+    public function goodsReceiptNote(): BelongsTo
     {
-        return $this->belongsTo(ReceiptNoteVoucher::class, 'receipt_note_voucher_id');
+        return $this->belongsTo(GoodsReceiptNote::class, 'goods_receipt_note_id');
     }
 
     /**

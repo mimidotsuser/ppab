@@ -8,13 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ReceiptNoteVoucherActivity extends Model
+class GoodsReceiptNoteActivity extends Model
 {
     use HasFactory, AutofillAuthorFields, FilterScopes;
 
     public function request(): BelongsTo
     {
-        return $this->belongsTo(ReceiptNoteVoucher::class, 'receipt_note_voucher_id');
+        return $this->belongsTo(GoodsReceiptNote::class, 'goods_receipt_note_id');
     }
 
     /**

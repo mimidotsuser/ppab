@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\InspectionNote;
-use App\Models\ReceiptNoteVoucher;
-use App\Models\ReceiptNoteVoucherItem;
+use App\Models\GoodsReceiptNote;
+use App\Models\GoodsReceiptNoteItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -29,12 +29,12 @@ class StoreInspectionNoteRequest extends FormRequest
     public function rules()
     {
         return [
-            'receipt_note_voucher_id' => ['required',
-                Rule::exists(ReceiptNoteVoucher::class, 'id')],
+            'goods_receipt_note_id' => ['required',
+                Rule::exists(GoodsReceiptNote::class, 'id')],
             'remarks' => 'required|max:250',
             'items' => 'required|array|min:1',
             'items.*.item_id' => ['required',
-                Rule::exists(ReceiptNoteVoucherItem::class, 'id')],
+                Rule::exists(GoodsReceiptNoteItem::class, 'id')],
             'items*.rejected_qty' => ['required', 'min:0'],
             'checklist' => 'required|array|min:1',
             'checklist.*.feature' => 'required|max:250',

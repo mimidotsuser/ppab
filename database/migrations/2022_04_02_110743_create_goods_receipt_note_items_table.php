@@ -12,10 +12,10 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('receipt_note_voucher_items', function (Blueprint $table) {
+        Schema::create('goods_receipt_note_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('receipt_note_voucher_id')
-                ->constrained('receipt_note_vouchers')->cascadeOnDelete();
+            $table->foreignId('goods_receipt_note_id')
+                ->constrained('goods_receipt_notes')->cascadeOnDelete();
             $table->foreignId('po_item_id')
                 ->constrained('purchase_order_items');
             $table->foreignId('product_id')->constrained('products');

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class UpdateReceiptNoteVoucherRequest extends FormRequest
+class UpdateGoodsReceiptNoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,7 +17,7 @@ class UpdateReceiptNoteVoucherRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->can('update', $this->route('receipt_note_voucher'));
+        return Auth::user()->can('update', $this->route('goods_receipt_note'));
     }
 
     /**

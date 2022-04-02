@@ -5,14 +5,14 @@ namespace App\Http\Requests;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use App\Models\ReceiptNoteVoucher;
+use App\Models\GoodsReceiptNote;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class StoreReceiptNoteVoucherRequest extends FormRequest
+class StoreGoodsReceiptNoteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class StoreReceiptNoteVoucherRequest extends FormRequest
     public function authorize()
     {
 
-        return Auth::user()->can('create', ReceiptNoteVoucher::class);
+        return Auth::user()->can('create', GoodsReceiptNote::class);
     }
 
     /**

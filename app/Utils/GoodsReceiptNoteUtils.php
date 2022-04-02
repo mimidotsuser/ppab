@@ -4,7 +4,7 @@ namespace App\Utils;
 
 use JetBrains\PhpStorm\ArrayShape;
 
-abstract class ReceiptNoteVoucherUtils
+abstract class GoodsReceiptNoteUtils
 {
 
     #[ArrayShape(['REQUEST_CREATED' => "string", 'INSPECTION_DONE' => "string",

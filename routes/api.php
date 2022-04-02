@@ -19,7 +19,7 @@ use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\ReceiptNoteVoucherController;
+use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Http\Controllers\RequestForQuotationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
@@ -116,7 +116,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
-    Route::apiResource('receipt-note-vouchers', ReceiptNoteVoucherController::class);
+    Route::apiResource('goods-receipt-note', GoodsReceiptNoteController::class);
     Route::apiResource('inspection-note', InspectionNoteController::class);
 });
 

@@ -16,13 +16,13 @@ return new class extends Migration
     {
 
         $trigger = <<<EOL
-            DROP TRIGGER IF EXISTS set_rnv_sn;
-            CREATE TRIGGER set_rnv_sn
+            DROP TRIGGER IF EXISTS set_grn_sn;
+            CREATE TRIGGER set_grn_sn
                 BEFORE INSERT
-                ON receipt_note_vouchers
+                ON goods_receipt_notes
                 FOR EACH ROW
             BEGIN
-                SET NEW.sn = next_number_series('RECEIPT_NOTE_VOUCHER');
+                SET NEW.sn = next_number_series('GOODS_RECEIPT_NOTE');
             END;
            EOL;
 
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP TRIGGER IF EXISTS set_rnv_sn');
+        DB::unprepared('DROP TRIGGER IF EXISTS set_grn_sn');
     }
 };

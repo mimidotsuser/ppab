@@ -56,7 +56,7 @@ class MRFIssuedNotification extends Notification implements ShouldQueue
             ->greeting('Dear ' . $name)
             ->line('Your material requisition form (' . $this->request->sn
                 . ') status has been updated')
-            ->action('Generate Store Issue Voucher', $url)
+            ->action('Generate Store Issue Note', $url)
             ->when($this->request, function ($mail) {
                 $mail->line('The items have been issued to you successfully.');
             })

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\ReceiptNoteVoucherItem;
+use App\Models\GoodsReceiptNoteItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -30,7 +30,7 @@ class UpdateInspectionNoteRequest extends FormRequest
             'remarks' => 'required|max:250',
             'items' => 'sometimes|array|min:1',
             'items.*.item_id' => ['required',
-                Rule::exists(ReceiptNoteVoucherItem::class, 'id')],
+                Rule::exists(GoodsReceiptNoteItem::class, 'id')],
             'items*.rejected_qty' => ['required', 'min:0'],
             'checklist' => 'sometimes|array|min:1',
             'checklist.*.feature' => 'required|max:250',

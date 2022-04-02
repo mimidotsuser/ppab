@@ -7,25 +7,31 @@ use App\Traits\FilterScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class ReceiptNoteVoucherItem extends Model
+class GoodsReceiptNote extends Model
 {
     use HasFactory, AutofillAuthorFields, FilterScopes;
 
-
-    public function request(): BelongsTo
+    public function purchaseOrder()
     {
-        return $this->belongsTo(ReceiptNoteVoucher::class, 'receipt_note_voucher_id');
+        return $this->belongsTo(PurchaseOrder::class);
     }
 
-    public function product()
+    public function items(): HasMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(GoodsReceiptNoteItem::class);
     }
 
-    public function POItem()
+    public function activities(): HasMany
     {
-        return $this->belongsTo(PurchaseOrderItem::class, 'po_item_id');
+        return $this->hasMany(GoodsReceiptNoteActivity::class);
+    }
+
+    public function latestActivity(): HasOne
+    {
+        return $this->hasOne(GoodsReceiptNoteActivity::class)->latestOfMany();
     }
 
     /**

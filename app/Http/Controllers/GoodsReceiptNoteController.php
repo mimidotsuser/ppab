@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreReceiptNoteVoucherRequest;
-use App\Http\Requests\UpdateReceiptNoteVoucherRequest;
-use App\Models\ReceiptNoteVoucher;
-use App\Models\ReceiptNoteVoucherActivity;
-use App\Models\ReceiptNoteVoucherItem;
-use App\Utils\ReceiptNoteVoucherUtils;
+use App\Http\Requests\StoreGoodsReceiptNoteRequest;
+use App\Http\Requests\UpdateGoodsReceiptNoteRequest;
+use App\Models\GoodsReceiptNote;
+use App\Models\GoodsReceiptNoteActivity;
+use App\Models\GoodsReceiptNoteItem;
+use App\Utils\GoodsReceiptNoteUtils;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-class ReceiptNoteVoucherController extends Controller
+class GoodsReceiptNoteController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(ReceiptNoteVoucher::class, 'receipt_note_voucher');
+        $this->authorizeResource(GoodsReceiptNote::class, 'goods_receipt_note');
     }
 
     /**
@@ -29,7 +29,7 @@ class ReceiptNoteVoucherController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn'],
             ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder']);
 
-        return ReceiptNoteVoucher::with($meta->include)
+        return GoodsReceiptNote::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
                 $query->where(function ($query) use ($searchTerm) {
                     $query->orWhereBeginsWith('sn', $searchTerm);
@@ -47,14 +47,14 @@ class ReceiptNoteVoucherController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreReceiptNoteVoucherRequest $request
+     * @param StoreGoodsReceiptNoteRequest $request
      * @return array
      */
-    public function store(StoreReceiptNoteVoucherRequest $request): array
+    public function store(StoreGoodsReceiptNoteRequest $request): array
     {
 
         DB::beginTransaction();
-        $note = new ReceiptNoteVoucher;
+        $note = new GoodsReceiptNote;
         $note->purchase_order_id = $request->get('purchase_order_id');
         $note->reference = $request->get('reference');
         $note->warehouse_id = $request->get('warehouse_id');
@@ -63,7 +63,7 @@ class ReceiptNoteVoucherController extends Controller
 
         $items = [];
         foreach ($request->get('items') as $row) {
-            $item = new ReceiptNoteVoucherItem;
+            $item = new GoodsReceiptNoteItem;
             $item->product_id = $row['product_id'];
             $item->po_item_id = $row['po_item_id'];
             $item->delivered_qty = $row['delivered_qty'];
@@ -72,11 +72,11 @@ class ReceiptNoteVoucherController extends Controller
         }
         $note->items()->saveMany($items);
 
-        $stage = ReceiptNoteVoucherUtils::stage()['REQUEST_CREATED'];
+        $stage = GoodsReceiptNoteUtils::stage()['REQUEST_CREATED'];
 
-        $activity = new ReceiptNoteVoucherActivity;
+        $activity = new GoodsReceiptNoteActivity;
         $activity->stage = $stage;
-        $activity->outcome = ReceiptNoteVoucherUtils::outcome()[$stage];
+        $activity->outcome = GoodsReceiptNoteUtils::outcome()[$stage];
         $activity->remarks = $request->get('remarks', 'N/A');
         $activity->request()->associate($note);
         $activity->save();
@@ -89,45 +89,45 @@ class ReceiptNoteVoucherController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param ReceiptNoteVoucher $receiptNoteVoucher
-     * @return ReceiptNoteVoucher[]
+     * @param GoodsReceiptNote $goodsReceiptNote
+     * @return GoodsReceiptNote[]
      */
-    public function show(ReceiptNoteVoucher $receiptNoteVoucher): array
+    public function show(GoodsReceiptNote $goodsReceiptNote): array
     {
         $meta = $this->queryMeta([],
             ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder']);
-        $receiptNoteVoucher->load($meta->include);
-        return ['data' => $receiptNoteVoucher];
+        $goodsReceiptNote->load($meta->include);
+        return ['data' => $goodsReceiptNote];
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateReceiptNoteVoucherRequest $request
-     * @param ReceiptNoteVoucher $receiptNoteVoucher
-     * @return ReceiptNoteVoucher[]
+     * @param UpdateGoodsReceiptNoteRequest $request
+     * @param GoodsReceiptNote $goodsReceiptNote
+     * @return GoodsReceiptNote[]
      */
-    public function update(UpdateReceiptNoteVoucherRequest $request, ReceiptNoteVoucher $receiptNoteVoucher)
+    public function update(UpdateGoodsReceiptNoteRequest $request, GoodsReceiptNote $goodsReceiptNote)
     {
-        $receiptNoteVoucher->purchase_order_id = $request->get('purchase_order_id');
-        $receiptNoteVoucher->reference = $request->get('reference');
-        $receiptNoteVoucher->warehouse_id = $request->get('warehouse_id');
-        $receiptNoteVoucher->reference = $request->get('reference');
-        $receiptNoteVoucher->update();
-        $receiptNoteVoucher->refresh();
+        $goodsReceiptNote->purchase_order_id = $request->get('purchase_order_id');
+        $goodsReceiptNote->reference = $request->get('reference');
+        $goodsReceiptNote->warehouse_id = $request->get('warehouse_id');
+        $goodsReceiptNote->reference = $request->get('reference');
+        $goodsReceiptNote->update();
+        $goodsReceiptNote->refresh();
 
-        return ['data' => $receiptNoteVoucher];
+        return ['data' => $goodsReceiptNote];
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param ReceiptNoteVoucher $receiptNoteVoucher
+     * @param GoodsReceiptNote $goodsReceiptNote
      * @return Response
      */
-    public function destroy(ReceiptNoteVoucher $receiptNoteVoucher)
+    public function destroy(GoodsReceiptNote $goodsReceiptNote)
     {
-        $receiptNoteVoucher->delete();
+        $goodsReceiptNote->delete();
         return \response()->noContent();
     }
 }

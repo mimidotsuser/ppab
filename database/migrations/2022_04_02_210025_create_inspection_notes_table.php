@@ -15,8 +15,8 @@ return new class extends Migration {
         Schema::create('inspection_notes', function (Blueprint $table) {
             $table->id();
             $table->string('sn')->unique()->index();
-            $table->foreignId('receipt_note_voucher_id')
-                ->constrained('receipt_note_vouchers')->restrictOnDelete();
+            $table->foreignId('goods_receipt_note_id')
+                ->constrained('goods_receipt_notes')->cascadeOnDelete();
             $table->string('remarks');
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
