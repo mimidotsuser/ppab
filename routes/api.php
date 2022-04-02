@@ -17,6 +17,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductItemController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RequestForQuotationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
@@ -112,6 +113,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('request-for-quotation', RequestForQuotationController::class);
 
     Route::get('currencies', [CurrencyController::class, 'index']);
+    Route::apiResource('purchase-orders', PurchaseOrderController::class);
 });
 
 Route::fallback(function () {

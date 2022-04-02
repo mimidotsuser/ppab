@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use App\Traits\AutofillAuthorFields;
+use App\Traits\FilterScopes;
 
 class {{ class }} extends Model
 {
-    use HasFactory, AutofillAuthorFields, Searchable;
+    use HasFactory, AutofillAuthorFields, Searchable, FilterScopes;
 
 
     /**

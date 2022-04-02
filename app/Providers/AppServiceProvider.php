@@ -7,6 +7,7 @@ use App\Models\MaterialRequisition;
 use App\Models\Warehouse;
 use App\Models\Worksheet;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider

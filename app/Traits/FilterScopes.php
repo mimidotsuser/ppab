@@ -34,4 +34,35 @@ trait FilterScopes
     {
         return $query->orWhere($column, 'like', '%' . $value);
     }
+
+    public function scopeWhereRelationLike($query, string $relation, $column, $value)
+    {
+        return $query->whereRelation($relation, $column, 'like', '%' . $value . '%');
+    }
+
+    public function scopeOrWhereRelationLike($query, string $relation, $column, $value)
+    {
+        return $query->orWhereRelation($relation, $column, 'like', '%' . $value . '%');
+    }
+
+    public function scopeWhereRelationBeginsWith($query, string $relation, $column, $value,)
+    {
+        return $query->whereRelation($relation, $column, 'like', $value . '%');
+    }
+
+    public function scopeOrWhereRelationBeginsWith($query, string $relation, $column, $value,)
+    {
+        return $query->orWhereRelation($relation, $column, 'like', $value . '%');
+
+    }
+
+    public function scopeWhereRelationEndsWith($query, string $relation, $column, $value,)
+    {
+        return $query->whereRelation($relation, $column, 'like', '%' . $value);
+    }
+
+    public function scopeOrWhereRelationEndsWith($query, string $relation, $column, $value,)
+    {
+        return $query->orWhereRelation($relation, $column, 'like', '%' . $value);
+    }
 }
