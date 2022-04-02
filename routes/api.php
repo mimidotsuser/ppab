@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InspectionNoteController;
 use App\Http\Controllers\MRF\ApprovalController as MRFApproveController;
 use App\Http\Controllers\MRF\IssueController as MRFIssueController;
 use App\Http\Controllers\MRF\MaterialRequisitionController as MRFController;
@@ -116,6 +117,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
     Route::apiResource('receipt-note-vouchers', ReceiptNoteVoucherController::class);
+    Route::apiResource('inspection-note', InspectionNoteController::class);
 });
 
 Route::fallback(function () {
