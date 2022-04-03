@@ -33,7 +33,7 @@ class PurchaseRequestController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'id', 'warehouse_id'],
-            ['items', 'activities', 'latestActivity']);
+            ['items', 'activities', 'latestActivity', 'items.product.balance']);
 
 
         return PurchaseRequest::with($meta->include)
@@ -104,7 +104,8 @@ class PurchaseRequestController extends Controller
     public function show(PurchaseRequest $purchaseRequest): array
     {
 
-        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity',
+            'items.product.balance']);
 
         $purchaseRequest->load($meta->include);
         return ['data' => $purchaseRequest];
