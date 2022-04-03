@@ -39,9 +39,14 @@ return new class extends Migration {
             $table->integer('virtual_balance')
                 ->storedAs(new Expression('`stock_balance`-`b2c_qty_in_pipeline`'));
 
-            $exp = new Expression('((`stock_balance` + CAST(`b2b_qty_in_pipeline` AS SIGNED))- CAST(`reorder_level` AS SIGNED))<=0');
-            $table->integer('out_of_stock')
-                ->storedAs($exp);
+            $outOfOrderExpression = <<<EOL
+                IF(`reorder_level`=0,0,
+               ((`stock_balance` + CAST(`b2b_qty_in_pipeline` AS SIGNED)) -
+                CAST(`reorder_level` AS SIGNED))<=0
+                )
+            EOL;
+
+            $table->integer('out_of_stock')->storedAs(new Expression($outOfOrderExpression));
 
             $table->foreignId('created_by_id')->constrained('users')->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')->restrictOnDelete();
