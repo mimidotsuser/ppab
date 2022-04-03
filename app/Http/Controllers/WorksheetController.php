@@ -136,7 +136,7 @@ class WorksheetController extends Controller
                 'entries.repair', 'entries.repair.sparesUtilized',
                 'entries.repair.sparesUtilized.product']);
 
-        $worksheet->load($meta->included);
+        $worksheet->load($meta->include);
         return ['data' => $worksheet];
     }
 
