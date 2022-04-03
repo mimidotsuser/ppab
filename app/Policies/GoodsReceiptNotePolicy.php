@@ -11,6 +11,18 @@ class GoodsReceiptNotePolicy
 {
     use HandlesAuthorization;
 
+
+    public function viewAnyPendingApproval(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'goodsReceiptNote.approve');
+    }
+
+    public function approve(User $user,  GoodsReceiptNote $goodsReceiptNote): bool
+    {
+        return $goodsReceiptNote->created_by_id !== $user->id && //cannot approve their own request
+            $user->role->permissions->contains('name', 'goodsReceiptNote.approve');
+    }
+
     /**
      * Determine whether the user can view any models.
      *

@@ -22,7 +22,7 @@ return new class extends Migration {
             ['code' => 'SERIAL_NUMBER', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'CUSTOMER_CONTRACT', 'prefix' => config('app.number_series_prefix')],
             ['code' => 'PURCHASE_ORDER', 'prefix' => config('app.number_series_prefix')],
-            ['code' => 'RECEIPT_NOTE_VOUCHER', 'prefix' => config('app.number_series_prefix')],
+            ['code' => 'GOODS_RECEIPT_NOTE', 'prefix' => config('app.number_series_prefix')],
         ];
     }
 

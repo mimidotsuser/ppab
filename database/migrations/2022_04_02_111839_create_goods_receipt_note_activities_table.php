@@ -12,7 +12,7 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('receipt_note_voucher_activities', function (Blueprint $table) {
+        Schema::create('goods_receipt_note_activities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('goods_receipt_note_id')
                 ->constrained('goods_receipt_notes')->cascadeOnDelete();
@@ -34,6 +34,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('receipt_note_voucher_activities');
+        Schema::dropIfExists('goods_receipt_note_activities');
     }
 };

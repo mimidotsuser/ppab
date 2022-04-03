@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreInspectionNoteRequest;
 use App\Http\Requests\UpdateInspectionNoteRequest;
-use App\Models\InspectionChecklist;
-use App\Models\InspectionNote;
 use App\Models\GoodsReceiptNoteActivity;
 use App\Models\GoodsReceiptNoteItem;
-use App\Utils\goodsReceiptNoteUtils;
+use App\Models\InspectionChecklist;
+use App\Models\InspectionNote;
+use App\Utils\GoodsReceiptNoteUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,7 +18,7 @@ class InspectionNoteController extends Controller
 {
     public function __construct()
     {
-      //  $this->authorizeResource(InspectionNote::class,'inspection_note');
+        $this->authorizeResource(InspectionNote::class, 'inspection_note');
     }
 
     /**
@@ -30,7 +30,7 @@ class InspectionNoteController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn'],
             ['createdBy', 'updatedBy', 'goodsReceiptNote', 'goodsReceiptNote.purchaseOrder',
-                'goodsReceiptNote.latestActivity']);
+                'goodsReceiptNote.latestActivity', 'goodsReceiptNote.items']);
 
         return InspectionNote::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -82,12 +82,13 @@ class InspectionNoteController extends Controller
         }
 
         //update goods receipt note
-        $stage = goodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
+        $stage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
         $activity = new GoodsReceiptNoteActivity;
         $activity->goods_receipt_note_id = $request->get('goods_receipt_note_id');
         $activity->stage = $stage;
-        $activity->outcome = goodsReceiptNoteUtils::outcome()[$stage];
+        $activity->outcome = GoodsReceiptNoteUtils::outcome()[$stage];
         $activity->remarks = $request->get('remarks'); //yes, it's a duplicate
+        $activity->save();
 
         DB::commit();
 
@@ -106,7 +107,8 @@ class InspectionNoteController extends Controller
     {
 
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'goodsReceiptNote',
-            'goodsReceiptNote.purchaseOrder', 'goodsReceiptNote.latestActivity']);
+            'goodsReceiptNote.purchaseOrder', 'goodsReceiptNote.latestActivity',
+            'goodsReceiptNote.items']);
 
         $inspectionNote->load($meta->include);
         return ['data' => $inspectionNote];
