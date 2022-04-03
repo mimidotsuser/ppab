@@ -32,7 +32,7 @@ class RequestForQuotationController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'sn'], ['createdBy', 'updatedBy',
-            'items', 'vendors', 'purchaseRequest']);
+            'items', 'vendors', 'purchaseRequest', 'purchaseOrder',]);
 
         return RequestForQuotation::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -129,7 +129,7 @@ class RequestForQuotationController extends Controller
     public function show(RequestForQuotation $requestForQuotation)
     {
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'vendors',
-            'purchaseRequest']);
+            'purchaseRequest', 'purchaseOrder',]);
 
         $requestForQuotation->load($meta->include);
         return ['data' => $requestForQuotation];

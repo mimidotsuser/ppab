@@ -31,6 +31,11 @@ class RequestForQuotation extends Model
             'request_for_quotation_id', 'vendor_id',);
     }
 
+    public function purchaseOrder()
+    {
+        return $this->hasOne(PurchaseOrder::class,'rfq_id');
+    }
+
     /**
      * Author relationship
      * @return BelongsTo
