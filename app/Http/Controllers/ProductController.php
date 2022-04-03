@@ -6,10 +6,8 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
@@ -29,19 +27,32 @@ class ProductController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'item_code', 'economic_order_qty', 'min_level',
-            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent']);
+            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent','balance']);
 
         array_push($meta->include, 'category'); //category relationship load always
 
-        return Product::search($request->search)
-            ->query(function ($query) use ($meta) {
+        return Product::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('item_code', $searchTerm,);
+                    $query->orWhereLike('item_code', $searchTerm,);
+
+                    $query->orWhereBeginsWith('description', $searchTerm);
+                    $query->orWhereLike('description', $searchTerm);
+
+                    $query->orWhereBeginsWith('local_description', $searchTerm);
+                    $query->orWhereLike('local_description', $searchTerm);
+                });
+
+            })->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->query(fn(Builder $query) => $query->with($meta->include))
-            ->paginate($meta->limit, 'page', $meta->page);
-
+            ->when(!$request->get('variants'), function ($query) {
+                $query->whereNull('variant_of_id');
+            })
+            ->paginate($meta->limit, '*', $meta->page);
     }
 
     /**
@@ -75,7 +86,7 @@ class ProductController extends Controller
             //clone and create new record
             $variant = $product->replicate(['id']);
             $variant->variant_of_id = $product->id;
-            $variant->item_code =  $variant->item_code.'[old]';
+            $variant->item_code = $variant->item_code . '[old]';
             $variant->economic_order_qty = 0;
             $variant->min_level = 0;
             $variant->reorder_level = 0;

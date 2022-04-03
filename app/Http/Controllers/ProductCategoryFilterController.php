@@ -37,14 +37,14 @@ class ProductCategoryFilterController extends Controller
             ->when(!$request->get('variants'), function ($query) {
                 $query->whereNull('variant_of_id');
             })
-            ->when(!empty($request->search), function ($query) use ($request) {
-                $query->where(function ($query) use ($request) {
-                    $query->orWhereLike('item_code', $request->search, false);
-                    $query->orWhereLike('item_code', $request->search);
-                    $query->orWhereLike('description', $request->search, false);
-                    $query->orWhereLike('description', $request->search);
-                    $query->orWhereLike('local_description', $request->search, false);
-                    $query->orWhereLike('local_description', $request->search);
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('item_code', $searchTerm);
+                    $query->orWhereLike('item_code', $searchTerm,);
+                    $query->orWhereBeginsWith('description', $searchTerm);
+                    $query->orWhereLike('description', $searchTerm);
+                    $query->orWhereBeginsWith('local_description', $searchTerm);
+                    $query->orWhereLike('local_description', $searchTerm);
                 });
 
             })

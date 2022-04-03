@@ -56,33 +56,6 @@ class Product extends Model
         return $this->hasMany(StockBalance::class, 'internal_code', 'internal_code');
     }
 
-    /**
-     * @param $query
-     * @return mixed
-     */
-    public function scopeIsSpare($query): mixed
-    {
-        return $query->category->where('name', 'spare');
-    }
-
-    /**
-     * @param $query
-     * @return mixed
-     */
-    public function scopeIsMachine($query)
-    {
-        return $query->category->where('name', 'machine');
-    }
-
-    public function scopeWhereLike($query, $column, $value)
-    {
-        return $query->where($column, 'like', '%' . $value . '%');
-    }
-
-    public function scopeOrWhereLike($query, $column, $value, $startBoundary = true)
-    {
-        return $query->orWhere($column, 'like', $startBoundary ? '%' : '' . $value . '%');
-    }
 
     /**
      * Author relationship
