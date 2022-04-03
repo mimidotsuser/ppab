@@ -35,13 +35,15 @@ class PurchaseRequestController extends Controller
         $meta = $this->queryMeta(['created_at', 'id', 'warehouse_id'],
             ['items', 'activities', 'latestActivity', 'items.product.balance']);
 
-
         return PurchaseRequest::with($meta->include)
             ->when($request->search, function ($query, string $searchTerm) {
                 $query->where(function ($query) use ($searchTerm) {
                     $query->orWhereBeginsWith('sn', $searchTerm);
                     $query->orWhereLike('sn', $searchTerm);
                 });
+            })
+            ->when($request->boolean('withoutRFQ', false), function (Builder $query) {
+                $query->doesntHave('rfq');
             })
             ->when($request->get('stage'), function (Builder $query, string $stage,) {
                 $query->whereRelation('latestActivity', 'stage', $stage);
@@ -98,12 +100,15 @@ class PurchaseRequestController extends Controller
      * Display the specified resource.
      *
      * @param PurchaseRequest $purchaseRequest
-     * @return PurchaseRequest[]
+     * @return PurchaseRequest[]|Response
      */
     #[ArrayShape(['data' => "\App\Models\PurchaseRequest"])]
-    public function show(PurchaseRequest $purchaseRequest): array
+    public function show(PurchaseRequest $purchaseRequest)
     {
 
+        if (\request()->boolean('withoutRFQ', false) && $purchaseRequest->has('rfq')->exists()) {
+            return \response()->noContent(404);
+        }
         $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity',
             'items.product.balance']);
 
