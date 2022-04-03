@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\GoodsReceiptNoteApprovalController;
+use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Http\Controllers\InspectionNoteController;
 use App\Http\Controllers\MRF\ApprovalController as MRFApproveController;
 use App\Http\Controllers\MRF\IssueController as MRFIssueController;
@@ -19,7 +21,6 @@ use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\GoodsReceiptNoteController;
 use App\Http\Controllers\RequestForQuotationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StockBalanceController;
@@ -116,7 +117,18 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
+
+    Route::get('goods-receipt-note/approval', [GoodsReceiptNoteApprovalController::class, 'index']);
+    Route::get('goods-receipt-note/{goods_receipt_note}/approval',
+        [GoodsReceiptNoteApprovalController::class, 'show']);
+    Route::post('goods-receipt-note/{goods_receipt_note}/approval',
+        [GoodsReceiptNoteApprovalController::class, 'store']);
+    Route::patch('goods-receipt-note/{goods_receipt_note}/approval',
+        [GoodsReceiptNoteApprovalController::class, 'update']);
+    Route::delete('goods-receipt-note/{goods_receipt_note}/approval',
+        [GoodsReceiptNoteApprovalController::class, 'destroy']);
     Route::apiResource('goods-receipt-note', GoodsReceiptNoteController::class);
+
     Route::apiResource('inspection-note', InspectionNoteController::class);
 });
 
