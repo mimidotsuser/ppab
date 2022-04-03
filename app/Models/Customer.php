@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
-use App\Traits\FilterScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,7 @@ use Laravel\Scout\Searchable;
 
 class Customer extends Model
 {
-    use HasFactory, AutofillAuthorFields, Searchable, FilterScopes;
+    use HasFactory, AutofillAuthorFields, Searchable;
 
 
     /**

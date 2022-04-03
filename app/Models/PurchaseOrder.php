@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
-use App\Traits\FilterScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseOrder extends Model
 {
-    use HasFactory, AutofillAuthorFields, FilterScopes;
+    use HasFactory, AutofillAuthorFields;
 
     protected $with = ['currency', 'vendor'];
 

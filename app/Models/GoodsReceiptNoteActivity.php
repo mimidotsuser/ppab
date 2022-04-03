@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
-use App\Traits\FilterScopes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GoodsReceiptNoteActivity extends Model
 {
-    use HasFactory, AutofillAuthorFields, FilterScopes;
+    use HasFactory, AutofillAuthorFields;
 
     public function request(): BelongsTo
     {

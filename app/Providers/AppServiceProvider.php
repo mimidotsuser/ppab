@@ -2,12 +2,13 @@
 
 namespace App\Providers;
 
+use App\Mixins\ModelFilterMixin;
 use App\Models\Customer;
 use App\Models\MaterialRequisition;
 use App\Models\Warehouse;
 use App\Models\Worksheet;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,5 +36,7 @@ class AppServiceProvider extends ServiceProvider
             'worksheet' => Worksheet::class,
             'mrf' => MaterialRequisition::class,
         ]);
+
+        Builder::mixin(new ModelFilterMixin());
     }
 }

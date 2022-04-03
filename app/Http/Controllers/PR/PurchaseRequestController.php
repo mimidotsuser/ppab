@@ -10,6 +10,8 @@ use App\Models\PurchaseRequestItem;
 use App\Services\PurchaseRequestService;
 use App\Utils\PurchaseRequestUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -28,11 +30,22 @@ class PurchaseRequestController extends Controller
      *
      * @return LengthAwarePaginator
      */
-    public function index(): LengthAwarePaginator
+    public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'id', 'warehouse_id'],
             ['items', 'activities', 'latestActivity']);
+
+
         return PurchaseRequest::with($meta->include)
+            ->when($request->search, function ($query, string $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('sn', $searchTerm);
+                    $query->orWhereLike('sn', $searchTerm);
+                });
+            })
+            ->when($request->get('stage'), function (Builder $query, string $stage,) {
+                $query->whereRelation('latestActivity', 'stage', $stage);
+            })
             ->paginate($meta->limit, '*', 'page', $meta->page);
     }
 
@@ -40,9 +53,8 @@ class PurchaseRequestController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StorePurchaseRequisitionRequest $request
-     * @return PurchaseRequest[]
      */
-    public function store(StorePurchaseRequisitionRequest $request, PurchaseRequestService $service)
+    public function store(StorePurchaseRequisitionRequest $request, PurchaseRequestService $service): array
     {
         DB::beginTransaction();
 
