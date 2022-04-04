@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PurchaseOrderItem extends Model
 {
@@ -31,6 +33,11 @@ class PurchaseOrderItem extends Model
     public function rfqItem(): BelongsTo
     {
         return $this->belongsTo(RequestForQuotationItem::class, 'rfq_item_id');
+    }
+
+    public function receivedItems(): HasMany
+    {
+        return $this->hasMany(GoodsReceiptNoteItem::class, 'po_item_id');
     }
 
     /**

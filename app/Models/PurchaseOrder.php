@@ -6,6 +6,7 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PurchaseOrder extends Model
 {
@@ -31,6 +32,14 @@ class PurchaseOrder extends Model
     public function rfq(): BelongsTo
     {
         return $this->belongsTo(RequestForQuotation::class);
+    }
+
+
+    public function receivedItems()
+    {
+        return $this->hasManyThrough(GoodsReceiptNoteItem::class,
+            GoodsReceiptNote::class, 'purchase_order_id',
+            'goods_receipt_note_id', 'id', 'id');
     }
 
 
