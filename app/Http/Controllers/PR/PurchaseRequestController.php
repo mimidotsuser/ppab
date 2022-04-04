@@ -106,7 +106,8 @@ class PurchaseRequestController extends Controller
     public function show(PurchaseRequest $purchaseRequest)
     {
 
-        if (\request()->boolean('withoutRFQ', false) && $purchaseRequest->has('rfq')->exists()) {
+        if (\request()->boolean('withoutRFQ', false)
+            && $purchaseRequest->has('rfq')->exists()) {
             return \response()->noContent(404);
         }
         $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity',
