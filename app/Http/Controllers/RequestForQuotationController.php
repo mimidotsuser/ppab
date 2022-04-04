@@ -11,6 +11,7 @@ use App\Models\UnitOfMeasure;
 use App\Services\RequestForQuotationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class RequestForQuotationController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'sn'], ['createdBy', 'updatedBy',
-            'items', 'vendors', 'purchaseRequest', 'purchaseOrder',]);
+            'items', 'vendors', 'purchaseRequest', 'purchaseOrder', 'items.product.balance']);
 
         return RequestForQuotation::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -40,6 +41,9 @@ class RequestForQuotationController extends Controller
                     $query->orWhereBeginsWith('sn', $searchTerm);
                     $query->orWhereLike('sn', $searchTerm);
                 });
+            })
+            ->when($request->boolean('withoutPO', false), function (Builder $query) {
+                $query->doesntHave('purchaseOrder');
             })
             ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
@@ -124,12 +128,17 @@ class RequestForQuotationController extends Controller
      * Display the specified resource.
      *
      * @param RequestForQuotation $requestForQuotation
-     * @return RequestForQuotation[]
+     * @return RequestForQuotation[]|Response
      */
     public function show(RequestForQuotation $requestForQuotation)
     {
+
+        if (\request()->boolean('withoutPO', false)
+            && $requestForQuotation->has('purchaseOrder')->exists()) {
+            return \response()->noContent(404);
+        }
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'vendors',
-            'purchaseRequest', 'purchaseOrder',]);
+            'purchaseRequest', 'purchaseOrder', 'items.product.balance']);
 
         $requestForQuotation->load($meta->include);
         return ['data' => $requestForQuotation];
