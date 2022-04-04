@@ -57,14 +57,14 @@ class ModelFilterMixin
 
     public function whereRelationBeginsWith()
     {
-        return function ($query, string $relation, $column, $value) {
+        return function (string $relation, $column, $value) {
             return $this->whereRelation($relation, $column, 'like', $value . '%');
         };
     }
 
     public function orWhereRelationBeginsWith()
     {
-        return function ($query, string $relation, $column, $value) {
+        return function (string $relation, $column, $value) {
             return $this->orWhereRelation($relation, $column, 'like', $value . '%');
         };
 
@@ -72,14 +72,14 @@ class ModelFilterMixin
 
     public function whereRelationEndsWith()
     {
-        return function ($query, string $relation, $column, $value) {
+        return function (string $relation, $column, $value) {
             return $this->whereRelation($relation, $column, 'like', '%' . $value);
         };
     }
 
     public function orWhereRelationEndsWith()
     {
-        return function ($query, string $relation, $column, $value) {
+        return function (string $relation, $column, $value) {
             return $this->orWhereRelation($relation, $column, 'like', '%' . $value);
         };
     }
