@@ -10,6 +10,7 @@ use App\Models\RequestForQuotationItem;
 use App\Models\UnitOfMeasure;
 use App\Services\PurchaseOrderService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -33,13 +34,13 @@ class PurchaseOrderController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn'], ['createdBy', 'updatedBy', 'items', 'rfq']);
 
         return PurchaseOrder::with($meta->include)
-            ->when($request->search, function ($query, $searchTerm) {
+            ->when($request->search, function (Builder $query, $searchTerm) {
                 $query->where(function ($query) use ($searchTerm) {
                     $query->orWhereBeginsWith('sn', $searchTerm);
                     $query->orWhereLike('sn', $searchTerm);
 
-                    $query->orWhereBeginsWith('sn', $searchTerm);
-                    $query->orWhereLike('sn', $searchTerm);
+                    $query->orWhereRelationBeginsWith('vendor', 'name', $searchTerm);
+                    $query->orWhereRelationLike('vendor', 'name', $searchTerm);
                 });
             })
             ->when($meta, function ($query, $meta) {
