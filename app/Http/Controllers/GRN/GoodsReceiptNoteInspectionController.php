@@ -20,7 +20,7 @@ class GoodsReceiptNoteInspectionController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
 
-        Gate::allowIf(fn($user) => $user->role->permissions->contains('name', 'inspectionReport.view'));
+        Gate::allowIf(fn($user) => $user->role->permissions->contains('name', 'inspectionNote.view'));
 
         $meta = $this->queryMeta(['created_at', 'sn'],
             ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder',
@@ -55,7 +55,7 @@ class GoodsReceiptNoteInspectionController extends Controller
     public function show(GoodsReceiptNote $goodsReceiptNote)
     {
 
-        Gate::allowIf(fn($user) => $user->role->permissions->contains('name', 'inspectionReport.view'));
+        Gate::allowIf(fn($user) => $user->role->permissions->contains('name', 'inspectionNote.view'));
 
         $stage = GoodsReceiptNoteUtils::stage()['REQUEST_CREATED'];
 

@@ -103,9 +103,9 @@ abstract class PermissionUtils
         ['name' => 'goodsReceiptNote.approve', 'group' => 'goods receipt note',
             'description' => 'User can approve RGA and GRN documents'],
 
-        ['name' => 'inspectionReport.view', 'group' => 'product inspection',
+        ['name' => 'inspectionNote.view', 'group' => 'product inspection',
             'description' => 'User can view all created inspection reports'],
-        ['name' => 'inspectionReport.create', 'group' => 'product inspection',
+        ['name' => 'inspectionNote.create', 'group' => 'product inspection',
             'description' => 'User can inspect products'],
 
 

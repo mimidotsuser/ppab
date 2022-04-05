@@ -19,7 +19,7 @@ class InspectionNotePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.view');
+        return $user->role->permissions->contains('name', 'inspectionNote.view');
     }
 
     /**
@@ -31,7 +31,7 @@ class InspectionNotePolicy
      */
     public function view(User $user, InspectionNote $inspectionNote)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.view');
+        return $user->role->permissions->contains('name', 'inspectionNote.view');
     }
 
     /**
@@ -42,7 +42,7 @@ class InspectionNotePolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.create');
+        return $user->role->permissions->contains('name', 'inspectionNote.create');
     }
 
     /**
@@ -54,7 +54,7 @@ class InspectionNotePolicy
      */
     public function update(User $user, InspectionNote $inspectionNote)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.edit');
+        return $user->role->permissions->contains('name', 'inspectionNote.edit');
     }
 
     /**
@@ -66,7 +66,7 @@ class InspectionNotePolicy
      */
     public function delete(User $user, InspectionNote $inspectionNote)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.delete');
+        return $user->role->permissions->contains('name', 'inspectionNote.delete');
     }
 
     /**
@@ -78,7 +78,7 @@ class InspectionNotePolicy
      */
     public function restore(User $user, InspectionNote $inspectionNote)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.edit');
+        return $user->role->permissions->contains('name', 'inspectionNote.edit');
     }
 
     /**
@@ -90,6 +90,6 @@ class InspectionNotePolicy
      */
     public function forceDelete(User $user, InspectionNote $inspectionNote)
     {
-        return $user->role->permissions->contains('name', 'inspectionReport.delete');
+        return $user->role->permissions->contains('name', 'inspectionNote.delete');
     }
 }
