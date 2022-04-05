@@ -21,7 +21,7 @@ class GoodsReceiptNoteApprovalController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
-        // $this->authorize('viewAnyPendingApproval', GoodsReceiptNote::class);
+        $this->authorize('viewAnyPendingApproval', GoodsReceiptNote::class);
 
         $meta = $this->queryMeta(['created_at', 'sn'],
             ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder']);
@@ -55,7 +55,7 @@ class GoodsReceiptNoteApprovalController extends Controller
     public function store(Request                 $request, GoodsReceiptNote $goodsReceiptNote,
                           GoodsReceiptNoteService $service): array
     {
-        //  $this->authorize('approve', GoodsReceiptNote::class);
+        $this->authorize('approve', GoodsReceiptNote::class);
         $request->validate([
             'remarks' => 'nullable|max::255',
             'approved' => 'required|boolean'
@@ -90,7 +90,7 @@ class GoodsReceiptNoteApprovalController extends Controller
      */
     public function show(GoodsReceiptNote $goodsReceiptNote): array
     {
-        //$this->authorize('approve', $goodsReceiptNote);
+        $this->authorize('approve', $goodsReceiptNote);
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'activities',
             'purchaseOrder']);
 
@@ -101,7 +101,7 @@ class GoodsReceiptNoteApprovalController extends Controller
     public function update(Request                 $request, GoodsReceiptNote $goodsReceiptNote,
                            GoodsReceiptNoteService $service)
     {
-        //$this->authorize('approve', $goodsReceiptNote);
+        $this->authorize('approve', $goodsReceiptNote);
         $request->validate([
             'remarks' => 'nullable|max::255',
             'approved' => 'required|boolean'
@@ -138,8 +138,7 @@ class GoodsReceiptNoteApprovalController extends Controller
 
 
     public function destroy(GoodsReceiptNote $goodsReceiptNote, GoodsReceiptNoteService $service)
-    {
-        //$this->authorize('approve', $goodsReceiptNote);
+    {$this->authorize('approve', $goodsReceiptNote);
 
         DB::beginTransaction();
         $service->syncQtyInBalanceToB2B($goodsReceiptNote);
