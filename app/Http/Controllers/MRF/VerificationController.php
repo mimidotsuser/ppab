@@ -89,7 +89,7 @@ class VerificationController extends Controller
                 new MRFApprovalRequestedNotification($materialRequisition));
         }
         //notify requester
-        Notification::send(Auth::user(),
+        Notification::send($materialRequisition->createdBy,
             new MRFVerifiedNotification($materialRequisition, !$hasOkayedQty));
 
         return ['data' => $materialRequisition];

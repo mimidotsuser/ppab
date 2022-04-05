@@ -87,7 +87,7 @@ class ApprovalController extends Controller
                 new MRFIssueRequestedNotification($materialRequisition));
         }
         //notify requester
-        Notification::send(Auth::user(),
+        Notification::send($materialRequisition->createdBy,
             new MRFApprovedNotification($materialRequisition, !$hasOkayedQty));
 
         return ['data' => $materialRequisition];
