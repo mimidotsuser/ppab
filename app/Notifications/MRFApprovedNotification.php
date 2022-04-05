@@ -59,7 +59,7 @@ class MRFApprovedNotification extends Notification implements ShouldQueue
                 $mail->action('View Request', $url);
             })
             ->when(!$this->rejected, function ($mail) use ($url) {
-                $mail->action('Generate Store Issue Note', $url);
+                $mail->action('Generate Material Requisition Note', $url);
                 $mail->line('The request is now pending issuance.');
             })
             ->withSymfonyMessage(function ($mail) {
