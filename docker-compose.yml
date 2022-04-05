@@ -7,7 +7,7 @@ services:
             - $PWD:/var/www/html
         restart: on-failure
         ports:
-            - "9000:9000"
+            - "127.0.0.1:9000:9000"
         extra_hosts:
             - "host.docker.internal:host-gateway"
         networks:
