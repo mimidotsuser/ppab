@@ -33,6 +33,11 @@ class GoodsReceiptNote extends Model
         return $this->hasOne(GoodsReceiptNoteActivity::class)->latestOfMany();
     }
 
+    public function InspectionNote(): HasOne
+    {
+        return $this->hasOne(InspectionNote::class, 'goods_receipt_note_id');
+    }
+
     /**
      * Author relationship
      * @return BelongsTo
