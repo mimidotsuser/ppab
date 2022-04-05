@@ -30,8 +30,8 @@ class StoreIssueRequest extends FormRequest
         return [
             'remarks' => 'required|max:250',
             'items' => 'required|array|min:1',
-            'items.spares' => 'requiredIf:machines,null|array|min:1',
-            'items.machines' => 'requiredIf:machines,null|array|min:1',
+            'items.spares' => 'requiredIf:machines,null|nullable|array|min:1',
+            'items.machines' => 'requiredIf:spares,null|nullable|array|min:1',
             'items.spares.*' => Rule::forEach(function () {
                 return function ($attribute, $value, $fail) {
 
