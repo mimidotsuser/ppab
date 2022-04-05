@@ -5,8 +5,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\GoodsReceiptNoteApprovalController;
-use App\Http\Controllers\GoodsReceiptNoteController;
+use App\Http\Controllers\GRN\GoodsReceiptNoteApprovalController;
+use App\Http\Controllers\GRN\GoodsReceiptNoteController;
+use App\Http\Controllers\GRN\GoodsReceiptNoteInspectionController;
 use App\Http\Controllers\InspectionNoteController;
 use App\Http\Controllers\MRF\ApprovalController as MRFApproveController;
 use App\Http\Controllers\MRF\IssueController as MRFIssueController;
@@ -127,6 +128,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         [GoodsReceiptNoteApprovalController::class, 'update']);
     Route::delete('goods-receipt-note/{goods_receipt_note}/approval',
         [GoodsReceiptNoteApprovalController::class, 'destroy']);
+
+    Route::get('goods-receipt-note/inspection',
+        [GoodsReceiptNoteInspectionController::class, 'index']);
+    Route::get('goods-receipt-note/{goods_receipt_note}/inspection',
+        [GoodsReceiptNoteInspectionController::class, 'show']);
+
     Route::apiResource('goods-receipt-note', GoodsReceiptNoteController::class);
 
     Route::apiResource('inspection-note', InspectionNoteController::class);

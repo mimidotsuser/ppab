@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\GRN;
 
+use App\Http\Controllers\Controller;
 use App\Models\GoodsReceiptNote;
 use App\Models\GoodsReceiptNoteActivity;
 use App\Services\GoodsReceiptNoteService;
@@ -10,6 +11,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use function response;
 
 class GoodsReceiptNoteApprovalController extends Controller
 {

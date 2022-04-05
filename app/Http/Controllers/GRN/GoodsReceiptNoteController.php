@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\GRN;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGoodsReceiptNoteRequest;
 use App\Http\Requests\UpdateGoodsReceiptNoteRequest;
 use App\Models\GoodsReceiptNote;
