@@ -53,18 +53,18 @@ class PurchaseOrderController extends Controller
             })
             ->when($request->boolean('withDeliveredQty', false), function (Builder $builder) {
                 $builder->with(['items' => function ($query) {
-                    $query->joinSub(PurchaseOrderUtils::deliveredItemsSubQuery(),
+                    $query->leftJoinSub(PurchaseOrderUtils::deliveredItemsSubQuery(),
                         'deliveredItems', 'purchase_order_items.id', '=', 'deliveredItems.po_item_id');
                 }]);
             })
             ->when($request->boolean('undeliveredQtyOnly', false), function (Builder $builder) {
                 $builder->whereExists(function (QueryBuilder $builder) {
                     $builder->from(PurchaseOrderItem::query()->from)
-                        ->joinSub(PurchaseOrderUtils::deliveredItemsSubQuery(),
+                        ->leftJoinSub(PurchaseOrderUtils::deliveredItemsSubQuery(),
                             'deliveredItems', 'purchase_order_items.id', '=', 'deliveredItems.po_item_id')
                         ->joinSub(PurchaseOrderUtils::purchaseOrderTotalQtySubQuery(),
                             'total_ordered', 'purchase_order_items.id', '=', 'total_ordered.id')
-                        ->whereRaw('`total_qty`-`delivered_qty`>0');
+                        ->whereRaw('(`total_qty`- IFNULL(`delivered_qty`,0))>0');
                 });
             })
             ->paginate($meta->limit, '*', $meta->page);
