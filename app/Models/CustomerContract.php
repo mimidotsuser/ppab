@@ -39,7 +39,7 @@ class CustomerContract extends Model
      */
     public function trackingLogs(): HasMany
     {
-        return $this->hasMany(ProductTrackingLog::class, 'customer_contract_id');
+        return $this->hasMany(ProductItemActivity::class, 'customer_contract_id');
     }
 
     /**

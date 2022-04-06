@@ -7,12 +7,12 @@ use App\Http\Requests\MRF\StoreIssueRequest;
 use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
-use App\Models\ProductTrackingLog;
-use App\Models\ProductWarrant;
+use App\Models\ProductItemActivity;
+use App\Models\ProductItemWarrant;
 use App\Notifications\MRFIssuedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
-use App\Utils\ProductTrackingUtils;
+use App\Utils\ProductItemActivityUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
@@ -46,11 +46,13 @@ class IssueController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return MaterialRequisition[]
+     * @param StoreIssueRequest $request
+     * @param MaterialRequisition $materialRequisition
+     * @param MaterialRequisitionService $requisitionService
+     * @return array
      */
     public function store(StoreIssueRequest          $request, MaterialRequisition $materialRequisition,
-                          MaterialRequisitionService $requisitionService)
+                          MaterialRequisitionService $requisitionService): array
     {
 
         /**
@@ -101,28 +103,28 @@ class IssueController extends Controller
 
                 foreach ($item['allocation'] as $allotment) {
                     $category_code = 'MATERIAL_REQUISITION_ISSUED';
-                    $category_title = ProductTrackingUtils::getLogCategories()[$category_code];
+                    $category_title = ProductItemActivityUtils::activityCategories()[$category_code];
 
-                    $trackingEntry = new ProductTrackingLog;
-                    $trackingEntry->log_category_code = $category_code;
-                    $trackingEntry->log_category_title = $category_title;
+                    $productItemActivity = new ProductItemActivity;
+                    $productItemActivity->log_category_code = $category_code;
+                    $productItemActivity->log_category_title = $category_title;
 
-                    $trackingEntry->product_item_id = $allotment['product_item_id'];
-                    $trackingEntry->location()->associate($itemModel->customer);
+                    $productItemActivity->product_item_id = $allotment['product_item_id'];
+                    $productItemActivity->location()->associate($itemModel->customer);
 
                     // create a warrant item
                     if ($allotment['warrant_start']) {
-                        $warranty = new ProductWarrant;
+                        $warranty = new ProductItemWarrant;
                         $warranty->product_item_id = $allotment['product_item_id'];
                         $warranty->customer()->associate($itemModel->customer);
                         $warranty->warrant_start = $allotment['warrant_start'];
                         $warranty->warrant_end = $allotment['warrant_end'];
                         $warranty->save();
 
-                        $trackingEntry->warrant()->associate($warranty);
+                        $productItemActivity->warrant()->associate($warranty);
                     }
-                    $trackingEntry->eventable()->associate($materialRequisition);
-                    $trackingEntry->save();
+                    $productItemActivity->eventable()->associate($materialRequisition);
+                    $productItemActivity->save();
                 }
 
                 //call unrelated logic [called here to reduce fetching data again]
@@ -133,13 +135,11 @@ class IssueController extends Controller
         //3) create the activity log
 
         //check if it was a partial issue
-        $notIssuedItemsTotal = $materialRequisition->items()
-            ->where(DB::raw('COALESCE(approved_qty)-COALESCE(issued_qty,0)'), '>', 0)
-            ->count('id');
+        $hasPartiallyIssued = $materialRequisition->items()
+            ->whereRaw('COALESCE(approved_qty,0)-COALESCE(issued_qty,0)>0')
+            ->exists();
 
-        $stage = $notIssuedItemsTotal > 0
-            ? MRFUtils::stage()['PARTIAL_ISSUE']
-            : MRFUtils::stage()['ISSUED'];
+        $stage = $hasPartiallyIssued ? MRFUtils::stage()['PARTIAL_ISSUE'] : MRFUtils::stage()['ISSUED'];
 
         $activity = new MaterialRequisitionActivity;
         $activity->stage = $stage;
@@ -153,7 +153,7 @@ class IssueController extends Controller
         //emit email notification to user
         //notify requester
         Notification::send(Auth::user(),
-            new MRFIssuedNotification($materialRequisition, $notIssuedItemsTotal ==0));
+            new MRFIssuedNotification($materialRequisition, $hasPartiallyIssued == 0));
 
         return ['data' => $materialRequisition];
 

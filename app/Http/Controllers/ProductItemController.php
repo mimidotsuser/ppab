@@ -8,10 +8,10 @@ use App\Http\Requests\UpdateProductItemRequest;
 use App\Models\Customer;
 use App\Models\EntryRemark;
 use App\Models\ProductItem;
-use App\Models\ProductTrackingLog;
-use App\Models\ProductWarrant;
+use App\Models\ProductItemActivity;
+use App\Models\ProductItemWarrant;
 use App\Models\Warehouse;
-use App\Utils\ProductTrackingUtils;
+use App\Utils\ProductItemActivityUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -37,9 +37,11 @@ class ProductItemController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
-            ['createdBy', 'updatedBy', 'product', 'latestEntryLog', 'latestEntryLog.location',
-                'latestEntryLog.warrant', 'entryLogs', 'entryLogs.location', 'entryLogs.warrant',
-                'entryLogs.createdBy', 'entryLogs.remark', 'entryLogs.repair.sparesUtilized', 'entryLogs.repair.sparesUtilized.product']);
+            ['createdBy', 'updatedBy', 'product', 'latestActivity', 'latestActivity.location',
+                'latestActivity.warrant', 'activities', 'activities.location', 'activities.warrant',
+                'activities.createdBy', 'activities.remark', 'activities.repair.products',
+                'activeWarrant', 'activeWarrants', 'oldestActivity']);
+
 
         return ProductItem::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -51,9 +53,9 @@ class ProductItemController extends Controller
             })
             ->when($request->get('warehouse_id'), function ($query, $warehouseId) {
                 //should only issue items in specified warehouse
-                $query->whereRelation('latestEntryLog', 'location_id', $warehouseId);
+                $query->whereRelation('latestActivity', 'location_id', $warehouseId);
                 $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Warehouse::class));
-                $query->whereRelation('latestEntryLog', 'location_type', $morphKey);
+                $query->whereRelation('latestActivity', 'location_type', $morphKey);
             })
             ->when($request->get('outOfOrder'), function ($query) {
                 //should only issue items in warehouse
@@ -61,16 +63,16 @@ class ProductItemController extends Controller
             })
             ->when($request->get('customer_id'), function ($query, $customer_id) {
                 //should only issue items in specified warehouse
-                $query->whereRelation('latestEntryLog', 'location_id', $customer_id);
+                $query->whereRelation('latestActivity', 'location_id', $customer_id);
                 $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
-                $query->whereRelation('latestEntryLog', 'location_type', $morphKey);
+                $query->whereRelation('latestActivity', 'location_type', $morphKey);
             })
             ->when($request->get('product_id'), function ($query, $productId) {
                 //only return of specific model
                 $query->where('product_id', $productId);
             })
             ->when($request->get('total'), function ($query) {
-                $query->withCount('entryLogs');
+                $query->withCount('activities');
             })
             ->paginate($meta->limit, '*', 'page', $meta->page);
     }
@@ -91,52 +93,60 @@ class ProductItemController extends Controller
         $productItem->product_id = $request->get('product_id');
         $productItem->serial_number = $request->get('serial_number');
         $productItem->purchase_order_id = $request->get('purchase_order_id');
-        $productItem->out_of_order = $request->get('out_of_order') ?? false;
+        $productItem->out_of_order = $request->boolean('out_of_order', false);
         $productItem->save();
 
         $categoryCode = $request->get('category_code');
-        $categoryTitle = ProductTrackingUtils::getLogCategories()[$categoryCode];
+        $categoryTitle = ProductItemActivityUtils::activityCategories()[$categoryCode];
 
-        $trackingEntry = new ProductTrackingLog;
-        $trackingEntry->customer_contract_id = $request->get('contract_id');
-        $trackingEntry->log_category_code = $categoryCode;
-        $trackingEntry->log_category_title = $categoryTitle;
-        $trackingEntry->productItem()->associate($productItem);
+        $productItemActivity = new ProductItemActivity;
+        $productItemActivity->customer_contract_id = $request->get('contract_id');
+        $productItemActivity->log_category_code = $categoryCode;
+        $productItemActivity->log_category_title = $categoryTitle;
+        $productItemActivity->productItem()->associate($productItem);
 
         if ($request->filled('warrant_start')) {
-            $warrant = new ProductWarrant;
+            $warrant = new ProductItemWarrant;
             $warrant->customer_id = $request->get('customer_id');
             $warrant->warrant_start = $request->get('warrant_start');
             $warrant->warrant_end = $request->get('warrant_end');
             $warrant->productItem()->associate($productItem);
             $warrant->save();
-            $trackingEntry->warrant()->associate($warrant);
+            $productItemActivity->warrant()->associate($warrant);
         }
 
         if ($request->filled('warehouse_id')) {
-            $trackingEntry->location()->associate(Warehouse::find($request->get('warehouse_id')));
+            $productItemActivity->location()
+                ->associate(Warehouse::find($request->get('warehouse_id')));
         } else {
-            $trackingEntry->location()->associate(Customer::find($request->get('customer_id')));
+            $productItemActivity->location()
+                ->associate(Customer::find($request->get('customer_id')));
 
         }
 
         if ($request->filled('description')) {
             $remark = new EntryRemark;
             $remark->description = $request->filled('description');
-            $trackingEntry->remark()->associate($remark);
+            $productItemActivity->remark()->associate($remark);
         }
 
-        $trackingEntry->save();
+        $productItemActivity->save();
+
+        /**
+         * Increment Quantity In by one if:
+         * -item is in good shape
+         * - is in warehouse
+         * - has no PO
+         */
+
+        if (!$request->boolean('out_of_order', false) &&
+            !$request->filled('purchase_order_id') && $request->filled('warehouse_id')) {
+            ProductItemUpsert::dispatch($productItem->product, 1);
+        }
+
         DB::commit();
 
-        //if increment by is not zero,fire product item upsert event
-        if (!empty($request->get('increment_stock_by'))
-            && $request->get('increment_stock_by') != 0) {
-            ProductItemUpsert::dispatch($productItem->product,
-                $request->get('increment_stock_by'));
-        }
-
-        $productItem->load(['latestEntryLog.location', 'latestEntryLog.warrant', 'product']);
+        $productItem->load(['latestActivity.location', 'latestActivity.warrant', 'product']);
 
         return ['data' => $productItem];
     }
@@ -150,9 +160,12 @@ class ProductItemController extends Controller
     #[ArrayShape(['data' => "\App\Models\ProductItem"])]
     public function show(ProductItem $productItem): array
     {
-        $meta = $this->queryMeta([],
-            ['createdBy', 'updatedBy', 'product', 'entryLogs', 'latestEntryLog',
-                'latestEntryLog.location', 'latestEntryLog.warrant']);
+        $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'product', 'latestActivity',
+            'latestActivity.location', 'latestActivity.warrant', 'activities',
+            'activities.location', 'activities.warrant', 'activities.createdBy',
+            'activities.remark', 'activities.repair.products', 'activeWarrant', 'activeWarrants',
+            'oldestActivity']);
+
         $productItem->load($meta->include);
 
         return ['data' => $productItem];
@@ -161,7 +174,7 @@ class ProductItemController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \App\Http\Requests\UpdateProductItemRequest $request
+     * @param UpdateProductItemRequest $request
      * @param ProductItem $productItem
      * @return ProductItem[]
      */
@@ -169,22 +182,41 @@ class ProductItemController extends Controller
     public function update(UpdateProductItemRequest $request, ProductItem $productItem)
     {
 
-        $productItem->product_id = $request->get('product_id') ?? $productItem->product_id;
-        $productItem->serial_number = $request->get('serial_number') ??
-            $productItem->serial_number;
-        $productItem->purchase_order_id = $request->get('purchase_order_id') ??
-            $productItem->purchase_order_id;
+        DB::beginTransaction();
+
+
+        $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Warehouse::class));
+
+        //If the item is currently in warehouse:
+        if ($productItem->latestActivity->location_type == $morphKey) {
+
+            // If the item didn't have PO and was not out_of order
+            if (!isset($productItem->purchase_order_id) && $productItem->out_of_order) {
+                // if  now we have PO or  is out of order, decrement Qty In
+                if ($request->boolean('out_of_order', false) ||
+                    $request->filled('purchase_order_id')) {
+                    ProductItemUpsert::dispatch($productItem->product, -1);
+                }
+
+            } //if item had PO or was out of order
+            elseif (!isset($productItem->purchase_order_id) || $productItem->out_of_order == true) {
+                //if the item now is in order and has no purchase order, increment Qty In
+                if (!$request->boolean('out_of_order', false) &&
+                    !$request->filled('purchase_order_id')) {
+                    ProductItemUpsert::dispatch($productItem->product, 1);
+                }
+            }
+        }
+
+        $productItem->product_id = $request->get('product_id', $productItem->product_id);
+        $productItem->serial_number = $request->get('serial_number', $productItem->serial_number);
+        $productItem->purchase_order_id = $request->get('purchase_order_id', $productItem->purchase_order_id);
+        $productItem->out_of_order = $request->boolean('out_of_order', $productItem->out_of_order);
 
         $productItem->update();
         $productItem->refresh();
 
-        //if increment by is not zero,fire product item upsert event
-        if (!empty($request->get('increment_stock_by'))
-            && $request->get('increment_stock_by') != 0) {
-            ProductItemUpsert::dispatch($productItem->product,
-                $request->get('increment_stock_by'));
-        }
-        $productItem->load(['latestEntryLog.location', 'latestEntryLog.warrant', 'product']);
+        DB::commit();
 
         return ['data' => $productItem];
     }

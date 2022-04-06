@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MRF;
 
 use App\Models\MaterialRequisitionItem;
+use App\Models\ProductItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -87,15 +88,16 @@ class StoreIssueRequest extends FormRequest
                     foreach ($value['allocation'] as $index => $allotted) {
 
                         $subRules = [
-                            'product_item_id' => ['required', 'exists:App\Models\ProductItem,id'],
+                            'product_item_id' => ['required',
+                                Rule::exists(ProductItem::class, 'id')],
                             'warrant_start' => 'nullable|date|required_unless:warrant_end,null',
-                            'warrant_end' => 'nullable|date|required_unless:warrant_start,null',
+                            'warrant_end' => 'nullable|date',
                         ];
 
                         $x = $attribute . '.allocation.' . $index;
 
                         $subRulesMessages = [
-                            'product_item_id.required' => ':attribute is not a valid date at ' . $x,
+                            'product_item_id.required' => ':attribute is not a valid at ' . $x,
                             'product_item_id.exists' => ':attribute does not exists at ' . $x,
                             'warrant_start.date' => ':attribute is not a valid date at ' . $x,
                             'warrant_end.date' => ':attribute is not a valid date at ' . $x

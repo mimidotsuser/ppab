@@ -18,7 +18,7 @@ class Warehouse extends Model
      */
     public function productTrackingLogs(): MorphMany
     {
-        return $this->morphMany(ProductTrackingLog::class,
+        return $this->morphMany(ProductItemActivity::class,
             'location', 'location_type', 'location_id');
     }
 

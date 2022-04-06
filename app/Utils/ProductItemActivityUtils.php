@@ -5,7 +5,7 @@ namespace App\Utils;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
-abstract class ProductTrackingUtils
+abstract class ProductItemActivityUtils
 {
 
     /**
@@ -15,7 +15,7 @@ abstract class ProductTrackingUtils
         'GENERAL_SERVICING' => "string", 'TRAINING_AND_INSTALLATION' => "string",
         'DELIVERY_AND_INSTALLATION' => "string", 'TECHNICAL_REPORT' => "string",
         'OTHER' => "string", 'MATERIAL_REQUISITION_ISSUED' => 'string'])]
-    public static function getLogCategories(): array
+    public static function activityCategories(): array
     {
         return array_merge(WorksheetUtils::getWorksheetCategories(), [
             'CONTRACT_ASSIGNED' => 'Contract Created',

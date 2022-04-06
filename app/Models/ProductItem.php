@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 use JetBrains\PhpStorm\ArrayShape;
 use Laravel\Scout\Searchable;
 
@@ -16,8 +17,7 @@ class ProductItem extends Model
 {
     use HasFactory, AutofillAuthorFields, Searchable;
 
-    protected $table = 'product_items';
-    protected $casts=['out_of_order'=>'boolean'];
+    protected $casts = ['out_of_order' => 'boolean'];
 
 
     /**
@@ -33,19 +33,18 @@ class ProductItem extends Model
      * All logs pertaining this product
      * @return HasMany
      */
-    public function entryLogs(): HasMany
+    public function activities(): HasMany
     {
-        return $this->hasMany(ProductTrackingLog::class, 'product_item_id');
+        return $this->hasMany(ProductItemActivity::class);
     }
 
     /**
      * The last tracking log entry
      * @return HasOne
      */
-    public function latestEntryLog(): HasOne
+    public function latestActivity(): HasOne
     {
-        return $this->hasOne(ProductTrackingLog::class, 'product_item_id')
-            ->latestOfMany();
+        return $this->hasOne(ProductItemActivity::class)->latestOfMany();
     }
 
 
@@ -53,10 +52,9 @@ class ProductItem extends Model
      * The first tacking log entry
      * @return HasOne
      */
-    public function oldestEntryLog(): HasOne
+    public function oldestActivity(): HasOne
     {
-        return $this->hasOne(ProductTrackingLog::class, 'product_item_id')
-            ->oldestOfMany();
+        return $this->hasOne(ProductItemActivity::class)->oldestOfMany();
     }
 
 
@@ -66,7 +64,17 @@ class ProductItem extends Model
      */
     public function warrants(): HasMany
     {
-        return $this->hasMany(ProductWarrant::class, 'product_item_id');
+        return $this->hasMany(ProductItemWarrant::class, 'product_item_id');
+    }
+
+    public function activeWarrant()
+    {
+        return $this->hasOne(ProductItemWarrant::class)->latestOfMany()
+            ->whereDate('warrant_start', '<=', Carbon::today())
+            ->where(function ($query) {
+                $query->orWhere('warrant_end', null);
+                $query->orWhereDate('warrant_end', '<=', Carbon::today());
+            });
     }
 
     /**
@@ -75,7 +83,7 @@ class ProductItem extends Model
      */
     public function lastWarrant(): HasOne
     {
-        return $this->hasOne(ProductWarrant::class, 'product_item_id')
+        return $this->hasOne(ProductItemWarrant::class, 'product_item_id')
             ->latestOfMany();
     }
 
@@ -88,10 +96,9 @@ class ProductItem extends Model
         return $this->belongsToMany(CustomerContract::class, 'customer_contract_items');
     }
 
-    public function scopeLastContract()
+    public function lastContract()
     {
-        return $this->contracts()->latest()->first();
-
+        return $this->contracts()->latest()->take(1);
     }
 
     /**

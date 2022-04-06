@@ -4,32 +4,23 @@ namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class ProductWarrant extends Model
+class RepairItem extends Pivot
 {
     use HasFactory, AutofillAuthorFields;
 
-    /**
-     * Item to which this warrant belongs to
-     * @return BelongsTo
-     */
-    public function productItem(): BelongsTo
-    {
-        return $this->belongsTo(ProductItem::class, 'product_item_id');
-    }
+    public $incrementing = true;
 
     /**
-     * Customer to which this warrant belongs to
+     * Spare product utilized
      * @return BelongsTo
      */
-    public function customer(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
-
 
     /**
      * Author relationship

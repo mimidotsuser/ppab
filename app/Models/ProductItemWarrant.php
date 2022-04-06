@@ -8,29 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
 
-class ProductRepairItem extends Model
+class ProductItemWarrant extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    protected $fillable = ['old_total', 'product_id', 'brand_new_total'];
-
     /**
-     * Spare product.
+     * Item to which this warrant belongs to
      * @return BelongsTo
      */
-    public function spare(): BelongsTo
+    public function productItem(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(ProductItem::class, 'product_item_id');
     }
 
     /**
-     * Same as spare product above
+     * Customer to which this warrant belongs to
      * @return BelongsTo
      */
-    public function product(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
+
 
     /**
      * Author relationship

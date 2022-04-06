@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Laravel\Scout\Searchable;
 
-class ProductTrackingLog extends Model
+class ProductItemActivity extends Model
 {
     use HasFactory, AutofillAuthorFields, Searchable;
 
@@ -38,10 +38,8 @@ class ProductTrackingLog extends Model
      */
     public function warrant(): BelongsTo
     {
-        return $this->belongsTo(ProductWarrant::class, 'product_warrant_id');
+        return $this->belongsTo(ProductItemWarrant::class, 'product_item_warrant_id');
     }
-
-
 
     /**
      * Work done description
@@ -78,7 +76,7 @@ class ProductTrackingLog extends Model
      */
     public function repair(): BelongsTo
     {
-        return $this->belongsTo(ProductRepair::class, 'product_repair_id');
+        return $this->belongsTo(ProductItemRepair::class);
     }
 
 

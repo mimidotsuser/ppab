@@ -12,12 +12,14 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('product_repair_items', function (Blueprint $table) {
+        Schema::create('product_item_warrants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_repair_id')->constrained('product_repairs');
-            $table->foreignId('product_id')->constrained('products');//spare id utilized
-            $table->unsignedInteger('old_total')->default(0);
-            $table->unsignedInteger('brand_new_total')->default(0);
+            $table->foreignId('product_item_id')->constrained('product_items')
+            ->cascadeOnDelete();
+            $table->foreignId('customer_id')->constrained('customers')
+            ->cascadeOnDelete();
+            $table->date('warrant_start')->nullable();
+            $table->date('warrant_end')->nullable();
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')
@@ -33,6 +35,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('product_repair_items');
+        Schema::dropIfExists('product_item_warrants');
     }
 };

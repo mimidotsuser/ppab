@@ -34,7 +34,7 @@ class UpdateProductItemRequest extends FormRequest
             'purchase_order_id' => ['nullable'], //TODO check exist on PO
 
             //stock adjustment should be done only if PO does not exist
-            'increment_stock_by' => ['numeric', 'prohibited_unless:purchase_order_id,null',],
+            'out_of_order' => ['numeric', 'prohibited_unless:purchase_order_id,null',],
         ];
     }
 }

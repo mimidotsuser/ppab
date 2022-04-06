@@ -12,24 +12,25 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('product_tracking_logs', function (Blueprint $table) {
+        Schema::create('product_item_activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_item_id')->constrained('product_items');
+            $table->foreignId('product_item_id')->constrained('product_items')
+                ->cascadeOnDelete();
 
             $table->foreignId('location_id'); //id of customer or warehouse
             $table->string('location_type'); //class name to parent
 
             $table->foreignId('customer_contract_id')->nullable()
-                ->constrained('customer_contracts');
+                ->constrained('customer_contracts')->nullOnDelete();
 
-            $table->foreignId('product_warrant_id')->nullable()
-                ->constrained('product_warrants');
+            $table->foreignId('product_item_warrant_id')->nullable()
+                ->constrained('product_item_warrants')->nullOnDelete();
 
             $table->foreignId('entry_remark_id')->nullable()
-                ->constrained('entry_remarks');
+                ->constrained('entry_remarks')->nullOnDelete();
 
-            $table->foreignId('product_repair_id')->nullable()
-                ->constrained('product_repairs');
+            $table->foreignId('product_item_repair_id')->nullable()
+                ->constrained('product_item_repairs')->nullOnDelete();
 
             $table->string('log_category_code');
             $table->string('log_category_title');
@@ -52,6 +53,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('product_tracking_logs');
+        Schema::dropIfExists('product_item_activities');
     }
 };

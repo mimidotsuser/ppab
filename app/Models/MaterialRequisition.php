@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class MaterialRequisition extends Model
 {
@@ -21,7 +22,8 @@ class MaterialRequisition extends Model
      */
     public function items(): HasMany
     {
-        return $this->hasMany(MaterialRequisitionItem::class, 'material_requisition_id');
+        return $this->hasMany(MaterialRequisitionItem::class,
+            'material_requisition_id');
     }
 
     /**
@@ -29,12 +31,19 @@ class MaterialRequisition extends Model
      */
     public function activities(): HasMany
     {
-        return $this->hasMany(MaterialRequisitionActivity::class, 'material_requisition_id');
+        return $this->hasMany(MaterialRequisitionActivity::class,
+            'material_requisition_id');
     }
 
     public function latestActivity(): HasOne
     {
-        return $this->hasOne(MaterialRequisitionActivity::class, 'material_requisition_id')->latestOfMany();
+        return $this->hasOne(MaterialRequisitionActivity::class,
+            'material_requisition_id')->latestOfMany();
+    }
+
+    public function allocationActivities(): MorphMany
+    {
+        return $this->morphMany(ProductItemActivity::class, 'eventable');
     }
 
     /**

@@ -41,7 +41,7 @@ class StoreWorksheetRequest extends FormRequest
             'entries.*.repair_items' => ['array', 'required_if:entries.*.category_code,' . $repairCode],
             'entries.*.repair_items.*.product_id' => 'required|exists:App\Models\Product,id',
             'entries.*.repair_items.*.old_total' => 'required|numeric|min:0',
-            'entries.*.repair_items.*.brand_new_total' => 'required|numeric|min:0',
+            'entries.*.repair_items.*.new_total' => 'required|numeric|min:0',
             'entries.*.description' => 'required|max:6000',
         ];
     }

@@ -3,20 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorksheetRequest;
-use App\Http\Requests\UpdateWorksheetRequest;
 use App\Models\Customer;
 use App\Models\EntryRemark;
 use App\Models\ProductItem;
-use App\Models\ProductRepair;
-use App\Models\ProductRepairItem;
-use App\Models\ProductTrackingLog;
+use App\Models\ProductItemActivity;
+use App\Models\ProductItemRepair;
 use App\Models\Worksheet;
 use App\Utils\WorksheetUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WorksheetController extends Controller
@@ -28,10 +25,11 @@ class WorksheetController extends Controller
      */
     public function index(Request $request)
     {
-        $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
-            ['createdBy', 'customer', 'entries','entries.createdBy', 'entries.productItem', 'entries.warrant',
-                'entries.repair', 'entries.repair.sparesUtilized',
-                'entries.repair.sparesUtilized.product']);
+        $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
+            ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
+                'entries.warrant', 'entries.location', 'entries.warrant',
+                'entries.createdBy', 'entries.remark', 'entries.repair.products'
+            ]);
 
         return Worksheet::with($meta->include)
             ->when($request->search, function ($query) use ($request) {
@@ -41,16 +39,16 @@ class WorksheetController extends Controller
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entries');
             })
-            ->paginate($meta->limit, '*', 'page',$meta->page);
+            ->paginate($meta->limit, '*', 'page', $meta->page);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param StoreWorksheetRequest $request
-     * @return Worksheet[]
+     * @return array
      */
-    public function store(StoreWorksheetRequest $request)
+    public function store(StoreWorksheetRequest $request): array
     {
         DB::beginTransaction();
 
@@ -68,17 +66,19 @@ class WorksheetController extends Controller
             $repair = null;
             //save any repair logs if available
             if (!empty($entry['repair_items'])) {
-                $repair = new ProductRepair;
+                $repair = new ProductItemRepair;
                 $repair->save();
-                $repairParts = [];
-                foreach ($entry['repair_items'] as $item) {
-                    $partModel = new  ProductRepairItem($item);
-                    $partModel->created_by_id = Auth::id();
-                    $partModel->updated_by_id = Auth::id();
-                    $repairParts[] = $partModel;
-                }
 
-                $repair->sparesUtilized()->saveMany($repairParts);
+                $repairParts = array_map(function ($row) {
+                    return [
+                        $row['product_id'] => [
+                            'old_total' => $row['old_total'],
+                            'new_total' => $row['new_total'],
+                        ]
+                    ];
+                }, $entry['repair_items']);
+
+                $repair->products()->sync($repairParts);
             }
 
 
@@ -86,39 +86,45 @@ class WorksheetController extends Controller
             $categoryCode = $entry['category_code'];
             $categoryTitle = WorksheetUtils::getWorksheetCategories()[$categoryCode];
 
-            foreach ($entry['product_items'] as $item) {
-                $productItem = ProductItem::findOrFail($item['id']);
+            if (isset($entry['product_items'])) {
+                $activities = [];
+                foreach ($entry['product_items'] as $item) {
+                    $productItem = ProductItem::findOrFail($item['id']);
 
-                $trackingEntry = new ProductTrackingLog;
-                $trackingEntry->log_category_code = $categoryCode;
-                $trackingEntry->log_category_title = $categoryTitle;
-                $trackingEntry->productItem()->associate($productItem);
-                $trackingEntry->location()
-                    ->associate(Customer::find($request->get('customer_id')));
-                $trackingEntry->remark()->associate($remark);
+                    $activity = new ProductItemActivity;
+                    $activity->log_category_code = $categoryCode;
+                    $activity->log_category_title = $categoryTitle;
+                    $activity->remark()->associate($remark);
+                    $activity->productItem()->associate($productItem);
+                    $activity->location()
+                        ->associate(Customer::find($request->get('customer_id')));
 
-                //carry over warrant if not expired
-                $warrant = $productItem->lastWarrant;
-                if ($warrant && Carbon::parse($warrant->warrant_end)->addDay()->isFuture()) {
-                    $trackingEntry->product_warrant_id = $warrant->id;
+                    //carry over warrant if not expired
+                    $warrant = $productItem->activeWarrants()->latest()->first();
+                    if (isset($warrant)) {
+                        $activity->warrant()->associate($warrant);
+                    }
+
+                    //carry over contract if is active
+                    $contract = $productItem->lastContract;
+                    if (isset($contract)) {
+                        if (Carbon::parse($contract->start_date)->addDay()->isPast()
+                            && Carbon::parse($contract->expiry_date)->addDay()->isFuture()) {
+                            $activity->contract()->associate($contract);
+                        }
+                    }
+
+                    $activity->eventable()->associate($worksheet);
+
+                    $activity->repair()->associate($repair);
+
+                    $activities[] = $activity;
                 }
 
-                //carry over contract if not expired
-                $contract = $productItem->lastContract;
-                if ($contract && Carbon::parse($contract->expiry_date)->addDay()->isFuture()) {
-                    $trackingEntry->customer_contract_id = $contract->id;
-                }
-
-                $trackingEntry->eventable()->associate($worksheet);
-
-                $trackingEntry->repair()->associate($repair);
-
-                $trackingEntry->save();
+                $worksheet->entries()->saveMany($activities);
             }
         }
         DB::commit();
-
-        $worksheet->load(['customer', 'entries', 'createdBy', 'entries', 'entries.repair.sparesUtilized']);
 
         return ['data' => $worksheet];
     }
@@ -131,31 +137,17 @@ class WorksheetController extends Controller
      */
     public function show(Worksheet $worksheet)
     {
-        $meta = $this->queryMeta([],
-            ['createdBy', 'customer', 'entries', 'entries.productItem', 'entries.warrant',
-                'entries.repair', 'entries.repair.sparesUtilized',
-                'entries.repair.sparesUtilized.product']);
+        $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
+            ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
+                'entries.warrant', 'entries.location', 'entries.warrant',
+                'entries.createdBy', 'entries.remark', 'entries.repair.products'
+            ]);
 
         $worksheet->load($meta->include);
+
         return ['data' => $worksheet];
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param UpdateWorksheetRequest $request
-     * @param Worksheet $worksheet
-     * @return Worksheet[]
-     */
-    public function update(UpdateWorksheetRequest $request, Worksheet $worksheet)
-    {
-        //TODO
-
-
-        $worksheet->refresh();
-        return ['data' => $worksheet];
-
-    }
 
     /**
      * Remove the specified resource from storage.

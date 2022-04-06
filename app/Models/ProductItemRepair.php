@@ -6,20 +6,25 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class ProductRepair extends Model
+class ProductItemRepair extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $with = ['products'];
+
     /**
      * Spares used in repair
-     * @return HasMany
+     * @return BelongsToMany
      */
-    public function sparesUtilized(): HasMany
+    public function products(): BelongsToMany
     {
-        return $this->hasMany(ProductRepairItem::class, 'product_repair_id');
+        return $this->belongsToMany(Product::class,)
+            ->as('sparesUtilized')
+            ->using(RepairItem::class)
+            ->withPivot(['old_total', 'new_total'])
+            ->withTimestamps();
     }
 
     /**

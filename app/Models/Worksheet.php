@@ -29,7 +29,7 @@ class Worksheet extends Model
      */
     public function entries(): MorphMany
     {
-        return $this->morphMany(ProductTrackingLog::class, 'eventable');
+        return $this->morphMany(ProductItemActivity::class, 'eventable');
 
     }
 
