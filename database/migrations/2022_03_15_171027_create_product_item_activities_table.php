@@ -37,7 +37,7 @@ return new class extends Migration {
 
             $table->foreignId('eventable_id')->nullable(); //process creating the log
             $table->string('eventable_type')->nullable();
-
+            $table->string('covenant')->nullable(); //demo,lease,purchase,
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();
             $table->foreignId('updated_by_id')->constrained('users')

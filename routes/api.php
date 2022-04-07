@@ -20,6 +20,7 @@ use App\Http\Controllers\PR\VerificationController as PRVerificationController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductCategoryFilterController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductItemActivityController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RequestForQuotationController;
@@ -72,6 +73,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('stock-balances/{stock_balance}', [StockBalanceController::class, 'show']);
     Route::patch('stock-balances/{stock_balance}', [StockBalanceController::class, 'update']);
 
+    Route::apiResource('product-items.activities', ProductItemActivityController::class)
+    ->parameters(['activities'=>'product_item_activity'])->except(['show','update']);
     Route::apiResource('product-items', ProductItemController::class);
     Route::apiResource('worksheets', WorksheetController::class);
 
