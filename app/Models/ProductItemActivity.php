@@ -76,7 +76,7 @@ class ProductItemActivity extends Model
      */
     public function repair(): BelongsTo
     {
-        return $this->belongsTo(ProductItemRepair::class);
+        return $this->belongsTo(ProductItemRepair::class, 'product_item_repair_id');
     }
 
 

@@ -4,14 +4,14 @@ namespace App\Models;
 
 use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class RepairItem extends Pivot
+class RepairItem extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    public $incrementing = true;
+    protected $with = ['product:id,item_code,local_description,description'];
 
     /**
      * Spare product utilized

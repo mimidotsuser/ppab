@@ -14,6 +14,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WorksheetController extends Controller
@@ -28,7 +29,8 @@ class WorksheetController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair'
+                'entries.createdBy', 'entries.remark', 'entries.repair','entries.repair.products',
+                'entries.repair.sparesUtilized'
             ]);
 
         return Worksheet::with($meta->include)
@@ -69,14 +71,16 @@ class WorksheetController extends Controller
                 $repair = new ProductItemRepair;
                 $repair->save();
 
-                $repairParts = array_map(function ($row) {
-                    return [
-                        $row['product_id'] => [
-                            'old_total' => $row['old_total'],
-                            'new_total' => $row['new_total'],
-                        ]
+
+                $repairParts = array_reduce($entry['repair_items'], function ($acc, $row) {
+                    $acc[$row['product_id']] = [
+                        'old_total' => $row['old_total'],
+                        'new_total' => $row['new_total'],
+                        'created_by_id' => Auth::id(),
+                        'updated_by_id' => Auth::id(),
                     ];
-                }, $entry['repair_items']);
+                    return $acc;
+                }, []);
 
                 $repair->products()->sync($repairParts);
             }
@@ -103,14 +107,14 @@ class WorksheetController extends Controller
                     $activity->covenant = $productItem->latestActivity->covenant;
 
                     //carry over warrant if not expired
-                    $warrant = $productItem->activeWarrants()->latest()->first();
+                    $warrant = $productItem->activeWarrant;
                     if (isset($warrant)) {
                         $activity->warrant()->associate($warrant);
                     }
 
                     //carry over contract if is active
                     $contract = $productItem->lastContract;
-                    if (isset($contract)) {
+                    if (!$contract->isEmpty()) {
                         if (Carbon::parse($contract->start_date)->addDay()->isPast()
                             && Carbon::parse($contract->expiry_date)->addDay()->isFuture()) {
                             $activity->contract()->associate($contract);

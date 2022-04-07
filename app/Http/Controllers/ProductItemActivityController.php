@@ -33,7 +33,7 @@ class ProductItemActivityController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
             ['createdBy', 'updatedBy', 'product', 'location', 'warrant', 'remark', 'repair',
-                'eventable', 'productItem', 'contract']);
+                'eventable', 'productItem', 'contract',  'repair.sparesUtilized']);
 
         return $productItem->activities()
             ->with($meta->include)

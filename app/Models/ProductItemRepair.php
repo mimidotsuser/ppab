@@ -12,7 +12,6 @@ class ProductItemRepair extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    protected $with = ['products'];
 
     /**
      * Spares used in repair
@@ -20,11 +19,15 @@ class ProductItemRepair extends Model
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class,)
-            ->as('sparesUtilized')
-            ->using(RepairItem::class)
+        return $this->belongsToMany(Product::class, RepairItem::query()->from)
             ->withPivot(['old_total', 'new_total'])
             ->withTimestamps();
+    }
+
+
+    public function sparesUtilized()
+    {
+        return $this->hasMany(RepairItem::class);
     }
 
     /**
