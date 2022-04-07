@@ -52,7 +52,7 @@ class StoreProductItemRequest extends FormRequest
                 'prohibited_unless:customer_id,null'],
             'description' => ['nullable', 'max:255'],
             'category_code' => ['required',
-                Rule::in(array_keys(ProductItemActivityUtils::activityCategories()))]
+                Rule::in([ProductItemActivityUtils::activityCategoryCodes()['INITIAL_ENTRY']])]
         ];
     }
 }

@@ -102,12 +102,13 @@ class IssueController extends Controller
                 $itemModel->update();
 
                 foreach ($item['allocation'] as $allotment) {
-                    $category_code = 'MATERIAL_REQUISITION_ISSUED';
-                    $category_title = ProductItemActivityUtils::activityCategories()[$category_code];
+                    $category_code = ProductItemActivityUtils::activityCategoryCodes()['MATERIAL_REQUISITION_ISSUED'];
+                    $category_title = ProductItemActivityUtils::activityCategoryCodes()[$category_code];
 
                     $productItemActivity = new ProductItemActivity;
                     $productItemActivity->log_category_code = $category_code;
                     $productItemActivity->log_category_title = $category_title;
+                    $productItemActivity->covenant = $itemModel->purpose_code;
 
                     $productItemActivity->product_item_id = $allotment['product_item_id'];
                     $productItemActivity->location()->associate($itemModel->customer);

@@ -28,11 +28,9 @@ class ProductCategoryFilterController extends Controller
 
         return $productCategory
             ->products()
-            ->when(!empty($meta->include), function ($query) use ($meta) {
-                $query->with($meta->include);
-            })
-            ->when(!empty($request->search), function ($query) use ($request) {
-                $query->where('parent_id', $request->query('parent_id'));
+            ->with($meta->include)
+            ->when($request->get('parent_id'), function ($query,$parentId) {
+                $query->where('parent_id', $parentId);
             })
             ->when(!$request->get('variants'), function ($query) {
                 $query->whereNull('variant_of_id');

@@ -28,7 +28,7 @@ class WorksheetController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair.products'
+                'entries.createdBy', 'entries.remark', 'entries.repair'
             ]);
 
         return Worksheet::with($meta->include)
@@ -84,7 +84,7 @@ class WorksheetController extends Controller
 
             //create entry logs for each product item
             $categoryCode = $entry['category_code'];
-            $categoryTitle = WorksheetUtils::getWorksheetCategories()[$categoryCode];
+            $categoryTitle = WorksheetUtils::worksheetCategoryTitles()[$categoryCode];
 
             if (isset($entry['product_items'])) {
                 $activities = [];
@@ -98,6 +98,9 @@ class WorksheetController extends Controller
                     $activity->productItem()->associate($productItem);
                     $activity->location()
                         ->associate(Customer::find($request->get('customer_id')));
+
+                    //carry over covenant
+                    $activity->covenant = $productItem->latestActivity->covenant;
 
                     //carry over warrant if not expired
                     $warrant = $productItem->activeWarrants()->latest()->first();
@@ -140,7 +143,7 @@ class WorksheetController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair.products'
+                'entries.createdBy', 'entries.remark', 'entries.repair'
             ]);
 
         $worksheet->load($meta->include);

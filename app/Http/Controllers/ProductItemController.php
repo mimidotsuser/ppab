@@ -39,7 +39,7 @@ class ProductItemController extends Controller
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
             ['createdBy', 'updatedBy', 'product', 'latestActivity', 'latestActivity.location',
                 'latestActivity.warrant', 'activities', 'activities.location', 'activities.warrant',
-                'activities.createdBy', 'activities.remark', 'activities.repair.products',
+                'activities.createdBy', 'activities.remark', 'activities.repair',
                 'activeWarrant', 'activeWarrants', 'oldestActivity']);
 
 
@@ -97,7 +97,7 @@ class ProductItemController extends Controller
         $productItem->save();
 
         $categoryCode = $request->get('category_code');
-        $categoryTitle = ProductItemActivityUtils::activityCategories()[$categoryCode];
+        $categoryTitle = ProductItemActivityUtils::activityCategoryCodes()[$categoryCode];
 
         $productItemActivity = new ProductItemActivity;
         $productItemActivity->customer_contract_id = $request->get('contract_id');
@@ -146,8 +146,6 @@ class ProductItemController extends Controller
 
         DB::commit();
 
-        $productItem->load(['latestActivity.location', 'latestActivity.warrant', 'product']);
-
         return ['data' => $productItem];
     }
 
@@ -163,7 +161,7 @@ class ProductItemController extends Controller
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'product', 'latestActivity',
             'latestActivity.location', 'latestActivity.warrant', 'activities',
             'activities.location', 'activities.warrant', 'activities.createdBy',
-            'activities.remark', 'activities.repair.products', 'activeWarrant', 'activeWarrants',
+            'activities.remark', 'activities.repair', 'activeWarrant', 'activeWarrants',
             'oldestActivity']);
 
         $productItem->load($meta->include);
@@ -217,7 +215,7 @@ class ProductItemController extends Controller
         $productItem->refresh();
 
         DB::commit();
-
+        $productItem->load(['product', 'latestActivity.location', 'latestActivity.warrant']);
         return ['data' => $productItem];
     }
 

@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\ProductItem;
 use App\Utils\WorksheetUtils;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 
 class StoreWorksheetRequest extends FormRequest
@@ -26,20 +28,25 @@ class StoreWorksheetRequest extends FormRequest
      */
     public function rules()
     {
-        $repairCode = Arr::has(WorksheetUtils::getWorksheetCategories(), 'REPAIR') ?
-            'REPAIR' : null;
 
         return [
             'reference' => 'required',
-            'customer_id' => ['required', 'exists:App\Models\Customer,id'],
+            'customer_id' => ['required', Rule::exists(Customer::class, 'id')],
             'entries' => ['required', 'array', 'min:1'],
             'entries.*' => 'required',
             'entries.*.category_code' => ['required',
-                Rule::in(array_keys(WorksheetUtils::getWorksheetCategories()))],
-            'entries.*.product_items.*.id' => 'required|min:1|exists:App\Models\ProductItem,id',
+                Rule::in(array_keys(WorksheetUtils::worksheetCategoryCodes()))],
+            'entries.*.product_items.*.id' => ['required', 'min:1',
+                Rule::exists(ProductItem::class, 'id')],
 
-            'entries.*.repair_items' => ['array', 'required_if:entries.*.category_code,' . $repairCode],
-            'entries.*.repair_items.*.product_id' => 'required|exists:App\Models\Product,id',
+            'entries.*.repair_items' => ['array',
+                Rule::requiredIf(function () {
+                    return $this->request->get('category_code') ==
+                        WorksheetUtils::worksheetCategoryCodes()['REPAIR'];
+                })
+            ],
+            'entries.*.repair_items.*.product_id' => ['required',
+                Rule::exists(Product::class, 'id')],
             'entries.*.repair_items.*.old_total' => 'required|numeric|min:0',
             'entries.*.repair_items.*.new_total' => 'required|numeric|min:0',
             'entries.*.description' => 'required|max:6000',
