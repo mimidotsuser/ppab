@@ -29,14 +29,20 @@ class WorksheetController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair','entries.repair.products',
+                'entries.createdBy', 'entries.remark', 'entries.repair', 'entries.repair.products',
                 'entries.repair.sparesUtilized'
             ]);
 
         return Worksheet::with($meta->include)
-            ->when($request->search, function ($query) use ($request) {
-                $query->whereLike('sn', $request->search);
-                $query->orWhereLike('reference', $request->search);
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('sn', $searchTerm);
+                    $query->orWhereLike('sn', $searchTerm);
+
+                    $query->orWhereBeginsWith('reference', $searchTerm);
+                    $query->orWhereLike('reference', $searchTerm);
+                });
+
             })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entries');
