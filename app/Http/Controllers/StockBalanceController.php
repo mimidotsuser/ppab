@@ -26,15 +26,14 @@ class StockBalanceController extends Controller
         $meta = $this->queryMeta(['out_of_stock'],
             ['createdBy', 'updatedBy', 'product', 'warehouse']);
 
-        return StockBalance::when(!empty($meta->include), function ($query) use ($meta) {
-            $query->with($meta->include);
-        })->when($request->boolean('exclude_variants', false), function ($query) {
-            $query->whereRelation('product', 'variant_of_id', null);
-        })->when($meta, function ($query, $meta) {
-            foreach ($meta->orderBy as $sortKey) {
-                $query->orderBy($sortKey, $meta->direction);
-            }
-        })
+        return StockBalance::with($meta->include)
+            ->when($request->boolean('exclude_variants', false), function ($query) {
+                $query->whereRelation('product', 'variant_of_id', null);
+            })->when($meta, function ($query, $meta) {
+                foreach ($meta->orderBy as $sortKey) {
+                    $query->orderBy($sortKey, $meta->direction);
+                }
+            })
             ->paginate($meta->limit, '*', 'page', $meta->page);
     }
 

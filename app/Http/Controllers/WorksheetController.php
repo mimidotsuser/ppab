@@ -46,6 +46,10 @@ class WorksheetController extends Controller
             })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entries');
+            })->when($meta, function ($query, $meta) {
+                foreach ($meta->orderBy as $sortKey) {
+                    $query->orderBy($sortKey, $meta->direction);
+                }
             })
             ->paginate($meta->limit, '*', 'page', $meta->page);
     }

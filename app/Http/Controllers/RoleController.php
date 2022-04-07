@@ -6,7 +6,6 @@ use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -33,13 +32,22 @@ class RoleController extends Controller
         $meta = $this->queryMeta(['created_at', 'name', 'description'],
             ['permissions', 'createdBy']);
 
-        return Role::search($request->search)
-            ->query(function ($query) use ($meta) {
+        return Role::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('name', $searchTerm);
+                    $query->orWhereLike('name', $searchTerm);
+
+                    $query->orWhereBeginsWith('description', $searchTerm);
+                    $query->orWhereLike('description', $searchTerm);
+                });
+            })
+            ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->query(fn(Builder $query) => $query->with($meta->include))
+            ->when($request->search)
             ->paginate($meta->limit, 'page', $meta->page);
 
     }

@@ -35,13 +35,21 @@ class UserController extends Controller
 
         $meta = $this->queryMeta(['created_at', 'first_name', 'last_name'], ['role', 'createdBy']);
 
-        return User::search($request->search)
-            ->query(function ($query) use ($meta) {
+        return User::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->orWhereBeginsWith('first_name', $searchTerm);
+                    $query->orWhereLike('first_name', $searchTerm);
+
+                    $query->orWhereBeginsWith('last_name', $searchTerm);
+                    $query->orWhereLike('last_name', $searchTerm);
+                });
+            })
+            ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->query(fn(Builder $query) => $query->with($meta->include))
             ->paginate($meta->limit, 'page', $meta->page);
 
     }
