@@ -19,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\Rule;
 use JetBrains\PhpStorm\ArrayShape;
 
 class IssueController extends Controller
@@ -55,6 +56,37 @@ class IssueController extends Controller
                           MaterialRequisitionService $requisitionService): array
     {
 
+        //quantity issued extra rules to ensure they don't issue above approved quantity
+        $request->validate([
+            'items.spares.*' => Rule::forEach(function () use ($materialRequisition) {
+                return function ($attribute, $value, $fail) use ($materialRequisition) {
+
+                    $model = MaterialRequisitionItem::without(['customer', 'product'])
+                        ->whereBelongsTo($materialRequisition, 'request')
+                        ->find($value['item_id']);
+
+                    if ($model->approved_qty + ($model->issued_qty || 0) < $value['old_total'] + $value['new_total']) {
+                        return $fail($attribute . ' exceeds quantity approved');
+                    }
+                    return true;
+                };
+            }),
+            'items.machines.*' => Rule::forEach(function () use ($materialRequisition) {
+
+                return function ($attribute, $value, $fail) use ($materialRequisition) {
+
+                    $model = MaterialRequisitionItem::without(['customer', 'product'])
+                        ->whereBelongsTo($materialRequisition, 'request')
+                        ->find($value['item_id']);
+
+                    if ($model->approved_qty + ($model->issued_qty || 0) < count($value['allocation'])) {
+                        return $fail($attribute . 'allocation exceeds quantity approved');
+                    }
+                    return true;
+                };
+            })
+        ]);
+
         /**
          * 1. update item issued qty
          * 2. For each machine,:
@@ -69,12 +101,12 @@ class IssueController extends Controller
             $sparesIssued = $request->get('items')['spares'];
 
             //use whereIn to reduce database load
-            $ids = Arr::pluck($sparesIssued, 'id');
+            $ids = Arr::pluck($sparesIssued, 'item_id');
             $itemModels = MaterialRequisitionItem::whereIn('id', $ids)->get();
 
             foreach ($itemModels as $itemModel) {
                 //will raise error if item is not found
-                $item = Arr::first($sparesIssued, fn($v) => $v['id'] == $itemModel->id);
+                $item = Arr::first($sparesIssued, fn($v) => $v['item_id'] == $itemModel->id);
 
                 $qty = $item['old_total'] + $item['new_total'];
 
@@ -90,11 +122,11 @@ class IssueController extends Controller
             $machinesIssued = $request->get('items')['machines'];
 
             //use whereIn to reduce database load
-            $ids = Arr::pluck($machinesIssued, 'id');
+            $ids = Arr::pluck($machinesIssued, 'item_id');
             $itemModels = MaterialRequisitionItem::whereIn('id', $ids)->get();
 
             foreach ($itemModels as $itemModel) {
-                $item = Arr::first($machinesIssued, fn($item) => $item['id'] == $itemModel->id);
+                $item = Arr::first($machinesIssued, fn($item) => $item['item_id'] == $itemModel->id);
 
                 $qty = count($item['allocation']);
 
