@@ -38,7 +38,7 @@ class MaterialRequisitionController extends Controller
         $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity']);
 
         return MaterialRequisition::with($meta->include)
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

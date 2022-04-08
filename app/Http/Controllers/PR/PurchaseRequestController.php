@@ -48,7 +48,7 @@ class PurchaseRequestController extends Controller
             ->when($request->get('stage'), function (Builder $query, string $stage,) {
                 $query->whereRelation('latestActivity', 'stage', $stage);
             })
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

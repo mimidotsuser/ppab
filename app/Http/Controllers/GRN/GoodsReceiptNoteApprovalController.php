@@ -43,7 +43,7 @@ class GoodsReceiptNoteApprovalController extends Controller
                 }
             })
             ->whereRelation('latestActivity', 'stage', $stage)
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

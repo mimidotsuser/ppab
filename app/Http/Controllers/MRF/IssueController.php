@@ -40,7 +40,7 @@ class IssueController extends Controller
         return MaterialRequisition::with($meta->include)
             ->whereRelation('latestActivity', 'stage', $stage)
             ->orWhereRelation('latestActivity', 'stage', $partialIssued)
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

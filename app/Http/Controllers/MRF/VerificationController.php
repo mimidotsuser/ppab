@@ -37,7 +37,7 @@ class VerificationController extends Controller
 
         return MaterialRequisition::with($meta->include)
             ->whereRelation('latestActivity', 'stage', $stage)
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

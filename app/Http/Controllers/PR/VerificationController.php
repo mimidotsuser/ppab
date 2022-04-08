@@ -32,7 +32,7 @@ class VerificationController extends Controller
 
         return PurchaseRequest::with($meta->include)
             ->whereRelation('latestActivity', 'stage', $stage)
-            ->paginate($meta->limit, '*', 'page', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

@@ -67,7 +67,7 @@ class PurchaseOrderController extends Controller
                         ->whereRaw('(`total_qty`- IFNULL(`delivered_qty`,0))>0');
                 });
             })
-            ->paginate($meta->limit, '*', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**

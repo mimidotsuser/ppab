@@ -34,7 +34,7 @@ class StockBalanceController extends Controller
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->paginate($meta->limit, '*',  $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
 

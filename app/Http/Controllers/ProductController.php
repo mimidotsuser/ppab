@@ -52,7 +52,7 @@ class ProductController extends Controller
             ->when(!$request->get('variants'), function ($query) {
                 $query->whereNull('variant_of_id');
             })
-            ->paginate($meta->limit, '*', $meta->page);
+            ->paginate($meta->limit, '*', null, $meta->page);
     }
 
     /**
