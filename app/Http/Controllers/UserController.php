@@ -50,7 +50,7 @@ class UserController extends Controller
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->paginate($meta->limit, 'page', $meta->page);
+            ->paginate($meta->limit, '*', $meta->page);
 
     }
 

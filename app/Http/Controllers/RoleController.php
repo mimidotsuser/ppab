@@ -47,8 +47,7 @@ class RoleController extends Controller
                     $query->orderBy($sortKey, $meta->direction);
                 }
             })
-            ->when($request->search)
-            ->paginate($meta->limit, 'page', $meta->page);
+            ->paginate($meta->limit, '*', $meta->page);
 
     }
 
