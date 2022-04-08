@@ -185,7 +185,7 @@ class IssueController extends Controller
 
         //emit email notification to user
         //notify requester
-        Notification::send(Auth::user(),
+        Notification::send($materialRequisition->createdBy,
             new MRFIssuedNotification($materialRequisition, $hasPartiallyIssued == 0));
 
         return ['data' => $materialRequisition];
