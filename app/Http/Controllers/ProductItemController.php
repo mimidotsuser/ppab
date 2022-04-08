@@ -71,6 +71,9 @@ class ProductItemController extends Controller
                 //only return of specific model
                 $query->where('product_id', $productId);
             })
+            ->when($request->get('excludedItems'), function ($query, $excluded) {
+                $query->whereNotIn('id', explode(',', $excluded));
+            })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('activities');
             })->when($meta, function ($query, $meta) {
