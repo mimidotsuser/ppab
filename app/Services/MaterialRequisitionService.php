@@ -134,7 +134,7 @@ class MaterialRequisitionService
             //distribute the remainder Qty  to variants
             foreach ($model->variants as $variant) {
                 if ($remainderQty + $variant->balance->virtual_balance <= $variant->balance->stock_balance) {
-                    B2CRequestQtyModified::dispatch($variant, $remainderQty);
+                    B2CRequestQtyModified::dispatch($variant, $remainderQty * -1);
                     $remainderQty = 0;
                     break;
                 } else {
