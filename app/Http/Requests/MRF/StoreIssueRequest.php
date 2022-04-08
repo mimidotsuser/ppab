@@ -6,7 +6,6 @@ use App\Models\MaterialRequisitionItem;
 use App\Models\ProductItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class StoreIssueRequest extends FormRequest
@@ -31,87 +30,21 @@ class StoreIssueRequest extends FormRequest
         return [
             'remarks' => 'required|max:250',
             'items' => 'required|array|min:1',
-            'items.spares' => 'requiredIf:machines,null|nullable|array|min:1',
-            'items.machines' => 'requiredIf:spares,null|nullable|array|min:1',
-            'items.spares.*' => Rule::forEach(function () {
-                return function ($attribute, $value, $fail) {
+            'items.spares' => 'requiredIf:machines,null|nullable|array',
+            'items.spares.*.item_id' => ['required',
+                Rule::exists(MaterialRequisitionItem::class, 'id')],
+            'items.spares.*.old_total' => ['required', 'numeric', 'integer', 'min:0'],
+            'items.spares.*.new_total' => ['required', 'numeric', 'integer', 'min:0'],
 
-                    if (empty($value['id'])) {
-                        return $fail($attribute . '.id field is required.');
-                    }
-                    if (!is_numeric($value['old_total'])) {
-                        return $fail($attribute . '.old_total field is required.');
-                    }
-                    if (!is_numeric($value['new_total'])) {
-                        return $fail($attribute . '.new_total field is required.');
-                    }
-
-                    $model = MaterialRequisitionItem::without(['customer', 'product'])
-                        ->whereBelongsTo($this->route('material_requisition'), 'request')
-                        ->find($value['id']);
-
-                    if (empty($model)) {
-                        return $fail($attribute . '.id item does not exists');
-                    }
-
-                    if ($model->approved_qty < $value['old_total'] + $value['new_total']) {
-                        return $fail($attribute . ' exceeds quantity approved');
-                    }
-                    return true;
-                };
-            }),
-
-            'items.machines.*' => Rule::forEach(function () {
-
-                return function ($attribute, $value, $fail) {
-                    if (empty($value['id'])) {
-                        return $fail($attribute . '.id field is required.');
-                    }
-                    if (empty($value['allocation'])) {
-                        return $fail($attribute . '.allocation field is required.');
-                    }
-
-
-                    $model = MaterialRequisitionItem::without(['customer', 'product'])
-                        ->whereBelongsTo($this->route('material_requisition'), 'request')
-                        ->find($value['id']);
-
-                    if (empty($model)) {
-                        return $fail($attribute . '.id item does not exists');
-                    }
-
-                    if ($model->approved_qty < count($value['allocation'])) {
-                        return $fail($attribute . 'allocation exceeds quantity approved');
-                    }
-
-                    //validate the allocation items
-                    foreach ($value['allocation'] as $index => $allotted) {
-
-                        $subRules = [
-                            'product_item_id' => ['required',
-                                Rule::exists(ProductItem::class, 'id')],
-                            'warrant_start' => 'nullable|date|required_unless:warrant_end,null',
-                            'warrant_end' => 'nullable|date',
-                        ];
-
-                        $x = $attribute . '.allocation.' . $index;
-
-                        $subRulesMessages = [
-                            'product_item_id.required' => ':attribute is not a valid at ' . $x,
-                            'product_item_id.exists' => ':attribute does not exists at ' . $x,
-                            'warrant_start.date' => ':attribute is not a valid date at ' . $x,
-                            'warrant_end.date' => ':attribute is not a valid date at ' . $x
-                        ];
-
-                        $validator = Validator::make($allotted, $subRules, $subRulesMessages);
-                        if ($validator->fails()) {
-                            return $fail($validator->errors()->first());
-                        }
-                    }
-                    return true;
-                };
-
-            })
+            'items.machines' => 'requiredIf:spares,null|nullable|array',
+            'items.machines.*.item_id' => ['required',
+                Rule::exists(MaterialRequisitionItem::class, 'id')],
+            'items.machines.*.allocation' => ['required', 'array'],
+            'items.machines.*.allocation.*.product_item_id' => ['required',
+                Rule::exists(ProductItem::class, 'id')],
+            'items.machines.*.allocation.*.warrant_start' => ['nullable', 'date',
+                'required_unless:warrant_end,null'],
+            'items.machines.*.allocation.*.warrant_end' => ['nullable', 'date']
         ];
     }
 }
