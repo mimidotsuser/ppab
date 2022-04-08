@@ -150,6 +150,7 @@ class ProductItemController extends Controller
 
         DB::commit();
 
+        $productItem->load(['product', 'latestActivity.location', 'latestActivity.warrant']);
         return ['data' => $productItem];
     }
 
