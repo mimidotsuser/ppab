@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerProductItemController;
 use App\Http\Controllers\GRN\GoodsReceiptNoteApprovalController;
 use App\Http\Controllers\GRN\GoodsReceiptNoteController;
 use App\Http\Controllers\GRN\GoodsReceiptNoteInspectionController;
@@ -61,6 +62,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('users', UserController::class);
     Route::apiResource('roles', RoleController::class);
     Route::get('permissions', [PermissionController::class, 'index']);
+
+    Route::apiResource('customers.product-items',
+        CustomerProductItemController::class)->only('index');
     Route::apiResource('customers', CustomerController::class);
 
     Route::get('product-categories', [ProductCategoryController::class, 'index']);
