@@ -13,6 +13,7 @@ use App\Models\ProductItemWarrant;
 use App\Models\Warehouse;
 use App\Utils\ProductItemActivityUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -52,17 +53,17 @@ class ProductItemController extends Controller
                 });
             })
             ->when($request->get('warehouse_id'), function ($query, $warehouseId) {
-                //should only issue items in specified warehouse
+                //should only return items in a specified warehouse
                 $query->whereRelation('latestActivity', 'location_id', $warehouseId);
                 $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Warehouse::class));
                 $query->whereRelation('latestActivity', 'location_type', $morphKey);
             })
             ->when($request->get('outOfOrder'), function ($query) {
-                //should only issue items in warehouse
+                //should only include items with specified out of order status
                 $query->where('out_of_order', \request()->boolean('outOfOrder'));
             })
             ->when($request->get('customer_id'), function ($query, $customer_id) {
-                //should only issue items in specified warehouse
+                //should only include items in specified customer
                 $query->whereRelation('latestActivity', 'location_id', $customer_id);
                 $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
                 $query->whereRelation('latestActivity', 'location_type', $morphKey);
@@ -76,7 +77,8 @@ class ProductItemController extends Controller
             })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('activities');
-            })->when($meta, function ($query, $meta) {
+            })
+            ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
