@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -41,7 +42,15 @@ class CustomerController extends Controller
                     $query->orWhereLike('branch', $searchTerm);
                 });
 
-            })->when($meta, function ($query, $meta) {
+            })
+            ->when($request->boolean('parentsOnly', false), function (Builder $query) {
+                return $query->whereNull('parent_id');
+
+            })
+            ->when($request->boolean('childrenOnly', false), function (Builder $query) {
+                return $query->whereNotNull('parent_id');
+            })
+            ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
