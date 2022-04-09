@@ -32,7 +32,7 @@ class CustomerProductItemController extends Controller
                     $query->whereIn('id', $customer->children->pluck('id')
                         ->merge($customer->id));
                 } else {
-                    $query->whereIn('id', $customer);
+                    $query->whereIn('id', [$customer->id]);
                 }
             })
             ->orderBy('created_at', 'desc')
