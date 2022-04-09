@@ -6,6 +6,7 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Attributes\SearchUsingFullText;
 use Laravel\Scout\Searchable;
@@ -18,7 +19,7 @@ class Customer extends Model
     /**
      * @return MorphMany
      */
-    public function productTrackingLogs(): MorphMany
+    public function productItemActivities(): MorphMany
     {
         return $this->morphMany(ProductItemActivity::class,
             'location', 'location_type', 'location_id');
@@ -32,6 +33,11 @@ class Customer extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Customer::class, 'parent_id','id');
     }
 
     /**
