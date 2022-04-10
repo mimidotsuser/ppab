@@ -5,10 +5,12 @@ namespace App\Utils;
 abstract class PermissionUtils
 {
     const  Permissions = [
-        ['name' => 'organizationSettings.view', 'group' => 'organization',
-            'description' => 'User can view organization settings'],
-        ['name' => 'organizationSettings.edit', 'group' => 'organization',
-            'description' => 'User can edit organization settings'],
+        ['name' => 'company.view', 'group' => 'company',
+            'description' => 'User can view company details and settings'],
+        ['name' => 'company.create', 'group' => 'company',
+            'description' => 'User can create company details and settings'],
+        ['name' => 'company.', 'group' => 'company',
+            'description' => 'User can edit company details and settings'],
 
         ['name' => 'roles.view', 'group' => 'roles',
             'description' => 'User can view all roles'],
@@ -100,7 +102,7 @@ abstract class PermissionUtils
 
         ['name' => 'goodsReceiptNote.view', 'group' => 'goods receipt note',
             'description' => 'User can view all RGA and GRN documents'],
-       ['name' => 'goodsReceiptNote.create', 'group' => 'goods receipt note',
+        ['name' => 'goodsReceiptNote.create', 'group' => 'goods receipt note',
             'description' => 'User can create  goods receipt note (GRN) for respective PO'],
         ['name' => 'goodsReceiptNote.approve', 'group' => 'goods receipt note',
             'description' => 'User can approve RGA and GRN documents'],

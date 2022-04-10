@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomerContractController;
 use App\Http\Controllers\CustomerContractProductItemController;
@@ -151,6 +152,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
         CustomerContractProductItemController::class)->only('index');
 
     Route::apiResource('customer-contracts', CustomerContractController::class);
+
+    Route::post('companies/{company}/logo', [CompanyController::class, 'uploadLogo']);
+    Route::apiResource('companies', CompanyController::class);
 });
 
 Route::fallback(function () {
