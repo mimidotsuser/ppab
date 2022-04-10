@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Utils\CustomerUtils;
+use App\Models\Customer;
+use App\Models\CustomerContract;
+use App\Models\ProductItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class StoreCustomerContractRequest extends FormRequest
@@ -15,7 +18,7 @@ class StoreCustomerContractRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Auth::user()->can('create', CustomerContract::class);
     }
 
     /**
@@ -23,15 +26,17 @@ class StoreCustomerContractRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:App\Models\Customer:id',
-            'category_code' => ['required', Rule::in(array_keys(CustomerUtils::getContractTypes()))],
-            'start_date' => 'required',
-            'expiry_date' => 'required',
-            'contract_items' => 'sometimes|array',
-            'contract_items.*.id' => 'exists:App\Models\ProductTracking,id',
+            'customer_id' => ['required', Rule::exists(Customer::class, 'id')],
+            'category_code' => ['required', 'max:250'],
+            'category_title' => ['required', 'max:250'],
+            'start_date' => ['required', 'date'],
+            'expiry_date' => ['required', 'date', 'after:start_date'],
+            'contract_items' => ['required', 'array', 'min:1'],
+            'contract_items.*.product_item_id' => ['required',
+                Rule::exists(ProductItem::class, 'id')],
         ];
     }
 }

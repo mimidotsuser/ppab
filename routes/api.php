@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\CustomerContractController;
+use App\Http\Controllers\CustomerContractProductItemController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerProductItemController;
 use App\Http\Controllers\GRN\GoodsReceiptNoteApprovalController;
@@ -78,7 +80,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::patch('stock-balances/{stock_balance}', [StockBalanceController::class, 'update']);
 
     Route::apiResource('product-items.activities', ProductItemActivityController::class)
-    ->parameters(['activities'=>'product_item_activity'])->except(['show','update']);
+        ->parameters(['activities' => 'product_item_activity'])->except(['show', 'update']);
     Route::apiResource('product-items', ProductItemController::class);
     Route::apiResource('worksheets', WorksheetController::class);
 
@@ -144,6 +146,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('goods-receipt-note', GoodsReceiptNoteController::class);
 
     Route::apiResource('inspection-note', InspectionNoteController::class);
+
+    Route::apiResource('customer-contracts.product-items',
+        CustomerContractProductItemController::class)->only('index');
+
+    Route::apiResource('customer-contracts', CustomerContractController::class);
 });
 
 Route::fallback(function () {

@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Customer;
+use App\Models\ProductItem;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UpdateCustomerContractRequest extends FormRequest
 {
@@ -13,7 +17,7 @@ class UpdateCustomerContractRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return Auth::user()->can('update', $this->route('customer_contract'));
     }
 
     /**
@@ -24,7 +28,13 @@ class UpdateCustomerContractRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'customer_id' => ['required', Rule::exists(Customer::class, 'id')],
+            'category_code' => ['required', 'max:250'],
+            'start_date' => ['required', 'date'],
+            'expiry_date' => ['required', 'date', 'after:start_date'],
+            'contract_items' => ['required', 'array', 'min:1'],
+            'contract_items.*.product_item_id' => ['required',
+                Rule::exists(ProductItem::class, 'id')],
         ];
     }
 }

@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Laravel\Scout\Searchable;
 
 class CustomerContract extends Model
 {
-    use HasFactory, AutofillAuthorFields, Searchable;
+    use HasFactory, AutofillAuthorFields;
 
 
     /**
@@ -22,6 +21,11 @@ class CustomerContract extends Model
     public function productItems(): BelongsToMany
     {
         return $this->belongsToMany(ProductItem::class, 'customer_contract_items');
+    }
+
+    public function contractItems()
+    {
+        return $this->hasMany(CustomerContractItem::class);
     }
 
     /**
@@ -37,7 +41,7 @@ class CustomerContract extends Model
      * Tracking logs created by items under this log
      * @return HasMany
      */
-    public function trackingLogs(): HasMany
+    public function productItemActivities(): HasMany
     {
         return $this->hasMany(ProductItemActivity::class, 'customer_contract_id');
     }
@@ -60,10 +64,4 @@ class CustomerContract extends Model
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function toSearchableArray()
-    {
-        return [
-            ''
-        ];
-    }
 }

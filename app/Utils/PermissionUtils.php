@@ -68,6 +68,8 @@ abstract class PermissionUtils
         ['name' => 'customers.delete', 'group' => 'customers',
             'description' => 'User can delete a customers'],
 
+        ['name' => 'customerContracts.search', 'group' => 'contracts',
+            'description' => 'User can search for a contract'],
         ['name' => 'customerContracts.view', 'group' => 'contracts',
             'description' => 'User can view all contracts'],
         ['name' => 'customerContracts.create', 'group' => 'contracts',
