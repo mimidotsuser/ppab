@@ -111,9 +111,18 @@ class GoodsReceiptNoteController extends Controller
      */
     public function show(GoodsReceiptNote $goodsReceiptNote): array
     {
-        $meta = $this->queryMeta([],
-            ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder']);
+        $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'latestActivity',
+            'purchaseOrder', 'purchaseOrder.currency', 'items', 'items.product',
+            'items.purchaseOrderItem.uom', 'activities', 'activities.createdBy',
+            'inspectionNote','inspectionNote.checklist',]);
         $goodsReceiptNote->load($meta->include);
+        if (\request()->boolean('hasRejectedItems')) {
+
+            $goodsReceiptNote['has_rejected_items'] =
+                GoodsReceiptNoteItem::where('rejected_qty', '>', 0)
+                    ->where('goods_receipt_note_id', $goodsReceiptNote->id)
+                    ->exists();
+        }
         return ['data' => $goodsReceiptNote];
     }
 
@@ -193,12 +202,11 @@ class GoodsReceiptNoteController extends Controller
         $approvalStage = GoodsReceiptNoteUtils::stage()['APPROVAL_OKAYED'];
         $verificationStage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
 
-        $hasRejected = $goodsReceiptNote
-            ->withExists(['items' => fn($q) => $q->where('rejected_qty', '>', 0)])
-            ->whereRelation('latestActivity', 'stage', $approvalStage)
+        $hasRejected = GoodsReceiptNoteItem::where('rejected_qty', '>', 0)
+            ->where('goods_receipt_note_id', $goodsReceiptNote->id)
             ->exists();
 
-        if (!$hasRejected) {
+        if (!$hasRejected || $goodsReceiptNote->latestActivity->stage != $approvalStage) {
             return response()->noContent(404);
         }
 
