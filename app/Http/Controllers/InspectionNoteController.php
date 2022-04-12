@@ -32,7 +32,8 @@ class InspectionNoteController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn'],
             ['createdBy', 'updatedBy', 'goodsReceiptNote', 'goodsReceiptNote.purchaseOrder',
-                'goodsReceiptNote.latestActivity', 'goodsReceiptNote.items']);
+                'goodsReceiptNote.latestActivity', 'goodsReceiptNote.items',
+                'goodsReceiptNote.items']);
 
         return InspectionNote::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -110,7 +111,7 @@ class InspectionNoteController extends Controller
 
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'goodsReceiptNote',
             'goodsReceiptNote.purchaseOrder', 'goodsReceiptNote.latestActivity',
-            'goodsReceiptNote.items']);
+            'goodsReceiptNote.items', 'goodsReceiptNote.items.product']);
 
         $inspectionNote->load($meta->include);
         return ['data' => $inspectionNote];
