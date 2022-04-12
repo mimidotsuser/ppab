@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateInspectionNoteDoc;
 use App\Http\Requests\StoreInspectionNoteRequest;
 use App\Http\Requests\UpdateInspectionNoteRequest;
 use App\Models\GoodsReceiptNoteActivity;
@@ -9,6 +10,7 @@ use App\Models\GoodsReceiptNoteItem;
 use App\Models\InspectionChecklist;
 use App\Models\InspectionNote;
 use App\Utils\GoodsReceiptNoteUtils;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -164,5 +166,28 @@ class InspectionNoteController extends Controller
     {
         $inspectionNote->delete();
         return \response()->noContent();
+    }
+
+    /**
+     * @param InspectionNote $inspectionNote
+     * @param GenerateInspectionNoteDoc $noteDoc
+     * @return void
+     * @throws AuthorizationException
+     */
+    public function downloadInspectionNoteDoc(InspectionNote            $inspectionNote,
+                                              GenerateInspectionNoteDoc $noteDoc)
+    {
+
+        $this->authorize('view', $inspectionNote);
+
+        $inspectionNote->load(['checklist', 'goodsReceiptNote.items.product',
+            'goodsReceiptNote.items.purchaseOrderItem.uom',
+            'goodsReceiptNote.activities' => fn($query) => $query->latest()]);
+
+        $inspection = $inspectionNote->goodsReceiptNote
+            ->activities->firstWhere('stage', GoodsReceiptNoteUtils::stage()['INSPECTION_DONE']);
+
+        $noteDoc($inspectionNote, $inspection)
+            ->stream('inspection-note-' . strtolower($inspectionNote->sn) . ".pdf");
     }
 }

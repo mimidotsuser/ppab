@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GeneratePODoc;
 use App\Http\Requests\StorePurchaseOrderRequest;
 use App\Http\Requests\UpdatePurchaseOrderRequest;
 use App\Models\PurchaseOrder;
@@ -10,6 +11,7 @@ use App\Models\RequestForQuotationItem;
 use App\Models\UnitOfMeasure;
 use App\Services\PurchaseOrderService;
 use App\Utils\PurchaseOrderUtils;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -128,10 +130,6 @@ class PurchaseOrderController extends Controller
         $service->updateProductB2BBalance($productsItemWithBalDiff);
 
         DB::commit();
-
-        if ($request->boolean('download', false)) {
-            //TODO generate the docs, zip and download
-        }
 
         return ['data' => $purchaseOrder];
     }
@@ -260,10 +258,6 @@ class PurchaseOrderController extends Controller
         }
         DB::commit();
 
-        if ($request->boolean('download', false)) {
-            //TODO generate the docs, zip and download
-        }
-
         return ['data' => $purchaseOrder];
     }
 
@@ -305,5 +299,25 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->delete();
         DB::commit();
         return \response()->noContent();
+    }
+
+    /**
+     * @param PurchaseOrder $purchaseOrder
+     * @param GeneratePODoc $PODoc
+     * @return void
+     * @throws AuthorizationException
+     */
+    public function downloadPurchaseOrderDocs(PurchaseOrder $purchaseOrder, GeneratePODoc $PODoc)
+    {
+
+        $this->authorize('view', $purchaseOrder);
+        $purchaseOrder->load(['items.uom', 'items.product', 'vendor']);
+
+        $total = $purchaseOrder->items->reduce(function ($acc, $item) {
+            return $acc += $item->qty * $item->uom->unit * $item->unit_price;
+        }, 0);
+
+        $PODoc($purchaseOrder, $total,)
+            ->stream('po-' . strtolower($purchaseOrder->sn) . ".pdf");
     }
 }

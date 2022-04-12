@@ -86,6 +86,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::apiResource('worksheets', WorksheetController::class);
 
 
+    Route::get('material-requisitions/{material_requisition}/download-mrn-doc',
+        [MRFController::class, 'downloadMaterialRequisitionNote']);
+
+    Route::get('material-requisitions/{material_requisition}/download-siv-doc',
+        [MRFController::class, 'downloadStoreIssueNote']);
+
     Route::get('material-requisitions/verification', [MRFVerifyController::class, 'index']);
     Route::get('material-requisitions/{material_requisition}/verification',
         [MRFVerifyController::class, 'show']);
@@ -119,14 +125,22 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::post('purchase-requests/{purchase_request}/approval',
         [ApprovalController::class, 'store']);
 
+    Route::get('purchase-requests/{purchase_request}/download-doc',
+        [PurchaseRequestController::class, 'downloadPurchaseRequestDoc']);
     Route::apiResource('purchase-requests', PurchaseRequestController::class)
         ->only(['index', 'show', 'store', 'delete']);
 
     Route::apiResource('vendors', VendorController::class);
     Route::apiResource('unit-of-measures', UnitOfMeasureController::class);
+
+    Route::get('request-for-quotation/{request_for_quotation}/download-docs',
+        [RequestForQuotationController::class, 'downloadRFQDocs']);
     Route::apiResource('request-for-quotation', RequestForQuotationController::class);
 
     Route::get('currencies', [CurrencyController::class, 'index']);
+
+    Route::get('purchase-orders/{purchase_order}/download-doc',
+        [PurchaseOrderController::class, 'downloadPurchaseOrderDocs']);
     Route::apiResource('purchase-orders', PurchaseOrderController::class);
 
     Route::get('goods-receipt-note/approval', [GoodsReceiptNoteApprovalController::class, 'index']);
@@ -144,7 +158,15 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('goods-receipt-note/{goods_receipt_note}/inspection',
         [GoodsReceiptNoteInspectionController::class, 'show']);
 
+    Route::get('goods-receipt-note/{goods_receipt_note}/download-doc',
+        [GoodsReceiptNoteController::class, 'downloadGoodsReceiptNote']);
+    Route::get('goods-receipt-note/{goods_receipt_note}/download-rga-doc',
+        [GoodsReceiptNoteController::class, 'downloadGoodsRejectedNote']);
+
     Route::apiResource('goods-receipt-note', GoodsReceiptNoteController::class);
+
+    Route::get('inspection-note/{inspection_note}/download-doc',
+        [InspectionNoteController::class, 'downloadInspectionNoteDoc']);
 
     Route::apiResource('inspection-note', InspectionNoteController::class);
 

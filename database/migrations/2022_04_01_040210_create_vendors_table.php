@@ -15,8 +15,11 @@ return new class extends Migration {
         Schema::create('vendors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('address')->nullable();
+            $table->text('street_address')->nullable();
+            $table->string('postal_address')->nullable();
             $table->string('telephone')->nullable();
+            $table->string('mobile_phone')->nullable();
+            $table->string('website')->nullable();
             $table->string('email')->nullable();
             $table->foreignId('created_by_id')->constrained('users')
                 ->restrictOnDelete();

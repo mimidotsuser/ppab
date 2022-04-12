@@ -1,0 +1,39 @@
+.sub-header .doc-title {
+    text-align: center;
+    font-weight: 600;
+    color: #0974B3;
+}
+.sub-header .meta-section .meta-table {
+    page-break-inside: avoid;
+}
+.sub-header .meta-section .meta-table .left {
+    width: 70%;
+}
+.sub-header .meta-section .meta-table .title-col {
+    font-size: 12px;
+    line-height: 1.8;
+    font-weight: 600;
+    padding-bottom: 5px;
+}
+.sub-header .meta-section .meta-table .value-col {
+    min-width: 180px;
+}
+
+.main-content .table td {
+    font-size: 13px;
+}
+
+.activities table.activities-table {
+    page-break-inside: avoid;
+}
+.activities table.activities-table .title-col {
+    line-height: 1.4;
+    width: 100px;
+}
+.activities table.activities-table .val-col {
+    min-width: 150px;
+}
+.activities table.activities-table tr, .activities table.activities-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 14px;
+}

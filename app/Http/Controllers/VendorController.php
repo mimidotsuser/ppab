@@ -46,9 +46,11 @@ class VendorController extends Controller
 
         $vendor = new Vendor;
         $vendor->name = $request->get('name');
-        $vendor->address = $request->get('address');
+        $vendor->street_address = $request->get('street_address');
         $vendor->telephone = $request->get('telephone');
         $vendor->email = $request->get('email');
+        $vendor->mobile_phone = $request->get('mobile_phone');
+        $vendor->postal_address = $request->get('postal_address');
 
         $vendor->save();
 
@@ -92,9 +94,11 @@ class VendorController extends Controller
     public function update(UpdateVendorRequest $request, Vendor $vendor)
     {
         $vendor->name = $request->get('name') ?? $vendor->name;
-        $vendor->address = $request->get('address') ?? $vendor->address;
-        $vendor->telephone = $request->get('telephone') ?? $vendor->telephone;
-        $vendor->email = $request->get('email') ?? $vendor->email;
+        $vendor->street_address = $request->get('street_address');
+        $vendor->telephone = $request->get('telephone');
+        $vendor->email = $request->get('email');
+        $vendor->mobile_phone = $request->get('mobile_phone');
+        $vendor->postal_address = $request->get('postal_address');
 
         $vendor->update();
 

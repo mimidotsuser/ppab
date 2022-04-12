@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\GRN;
 
+use App\Actions\GenerateGRNDoc;
+use App\Actions\GenerateRGADoc;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGoodsReceiptNoteRequest;
 use App\Http\Requests\UpdateGoodsReceiptNoteRequest;
@@ -9,8 +11,11 @@ use App\Models\GoodsReceiptNote;
 use App\Models\GoodsReceiptNoteActivity;
 use App\Models\GoodsReceiptNoteItem;
 use App\Utils\GoodsReceiptNoteUtils;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class GoodsReceiptNoteController extends Controller
@@ -28,7 +33,12 @@ class GoodsReceiptNoteController extends Controller
     public function index(Request $request)
     {
         $meta = $this->queryMeta(['created_at', 'sn'],
-            ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder']);
+            ['createdBy', 'updatedBy', 'items', 'latestActivity', 'purchaseOrder', 'inspectionNote']);
+
+        if (!Arr::has($meta->include, 'inspectionNote')) {
+            $meta->include = array_merge($meta->include,
+                ['inspectionNote:id,goods_receipt_note_id']);
+        }
 
         return GoodsReceiptNote::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -41,6 +51,12 @@ class GoodsReceiptNoteController extends Controller
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
+
+            })
+            ->when($request->boolean('hasRejectedItems', false), function (Builder $builder) {
+                $builder->withExists(['items as has_rejected_items' => function ($query) {
+                    $query->where('rejected_qty', '>', 0);
+                }]);
             })
             ->paginate($meta->limit, '*', null, $meta->page);
     }
@@ -130,5 +146,71 @@ class GoodsReceiptNoteController extends Controller
     {
         $goodsReceiptNote->delete();
         return \response()->noContent();
+    }
+
+    /**
+     * @param GoodsReceiptNote $goodsReceiptNote
+     * @param GenerateGRNDoc $generateGRNDoc
+     * @return Response|void
+     * @throws AuthorizationException
+     */
+    public function downloadGoodsReceiptNote(GoodsReceiptNote $goodsReceiptNote,
+                                             GenerateGRNDoc   $generateGRNDoc)
+    {
+        $this->authorize('view', $goodsReceiptNote);
+
+        $approvalStage = GoodsReceiptNoteUtils::stage()['APPROVAL_OKAYED'];
+        $verificationStage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
+
+        $stage = $goodsReceiptNote->latestActivity->stage;
+        if ($stage != $approvalStage) {
+            return response()->noContent(404);
+        }
+
+        $goodsReceiptNote->load(['purchaseOrder.currency', 'items', 'items.product',
+            'items.purchaseOrderItem.uom', 'activities' => function ($query) {
+                $query->latest();
+            }]);
+
+        $verification = $goodsReceiptNote->activities->firstWhere('stage', $verificationStage);
+        $approval = $goodsReceiptNote->activities->firstWhere('stage', $approvalStage);
+
+        $generateGRNDoc($goodsReceiptNote, $verification, $approval)
+            ->stream('g-r-n-' . strtolower($goodsReceiptNote->sn) . ".pdf");
+    }
+
+    /**
+     * @param GoodsReceiptNote $goodsReceiptNote
+     * @param GenerateRGADoc $generateRGADoc
+     * @return Response|void
+     * @throws AuthorizationException
+     */
+    public function downloadGoodsRejectedNote(GoodsReceiptNote $goodsReceiptNote,
+                                              GenerateRGADoc   $generateRGADoc)
+    {
+        $this->authorize('view', $goodsReceiptNote);
+
+        $approvalStage = GoodsReceiptNoteUtils::stage()['APPROVAL_OKAYED'];
+        $verificationStage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
+
+        $hasRejected = $goodsReceiptNote
+            ->withExists(['items' => fn($q) => $q->where('rejected_qty', '>', 0)])
+            ->whereRelation('latestActivity', 'stage', $approvalStage)
+            ->exists();
+
+        if (!$hasRejected) {
+            return response()->noContent(404);
+        }
+
+        $goodsReceiptNote->load(['purchaseOrder.currency', 'items', 'items.product',
+            'items.purchaseOrderItem.uom', 'activities' => function ($query) {
+                $query->latest();
+            }]);
+
+        $verification = $goodsReceiptNote->activities->firstWhere('stage', $verificationStage);
+        $approval = $goodsReceiptNote->activities->firstWhere('stage', $approvalStage);
+
+        $generateRGADoc($goodsReceiptNote, $verification, $approval)
+            ->stream('r-g-a-' . strtolower($goodsReceiptNote->sn) . ".pdf");
     }
 }

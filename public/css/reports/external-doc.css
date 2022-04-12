@@ -1,0 +1,85 @@
+header {
+    margin-top: 40px;
+}
+
+header, section.sub-header,
+section.main-content, section.activities {
+    margin-right: 40px;
+    margin-left: 40px;
+}
+
+section.activities {
+    margin-bottom: 3px;
+}
+
+header .vendor-address {
+    max-width: 400px;
+    min-width: 400px;
+    min-height: 105px;
+    line-height: 1.8;
+    padding-right: 1rem;
+}
+header .vendor-address .col-12 {
+    font-size: 14px;
+}
+header .company-address {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.8;
+}
+
+.sub-header .meta-section {
+    width: 30%;
+}
+.sub-header .meta-section .meta-table .title-col {
+    font-size: 11px;
+    line-height: 1.8;
+    font-weight: 700;
+    padding-bottom: 5px;
+}
+.sub-header .meta-section .meta-table .value-col {
+    min-width: 180px;
+}
+.sub-header .doc-title {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 50px;
+}
+
+.main-content .instructions {
+    font-size: 14px;
+}
+.main-content .instructions .list {
+    line-height: 1.8;
+}
+.main-content .subtitle {
+    font-size: 12px;
+    font-weight: 600;
+}
+.main-content .main-content-table th, .main-content .main-content-table td {
+    font-size: 12px;
+}
+.main-content .amount-in-words-table .title-col {
+    width: 150px;
+    font-size: 13px;
+}
+.main-content .amount-in-words-table .value-col {
+    font-size: 14px;
+}
+
+.activities table.activities-table {
+    page-break-inside: avoid;
+}
+.activities table.activities-table .title-col {
+    line-height: 1.4;
+    width: 100px;
+}
+.activities table.activities-table .val-col {
+    min-width: 150px;
+}
+.activities table.activities-table tr, .activities table.activities-table td {
+    padding: 0.9rem 0.4rem;
+    font-size: 14px;
+}
+
+/*# sourceMappingURL=external-doc.css.map */

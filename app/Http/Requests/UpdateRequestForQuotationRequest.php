@@ -33,7 +33,6 @@ class UpdateRequestForQuotationRequest extends FormRequest
         return [
             'purchase_request_id' => ['required',
                 Rule::exists(PurchaseRequest::class, 'id')],
-            'download' => 'nullable|boolean',
             'closing_date' => 'required|date',
             'vendors' => 'required|array|min:1',
             'vendors.*.id' => ['required', Rule::exists(Vendor::class, 'id')],

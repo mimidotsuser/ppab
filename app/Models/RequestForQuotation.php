@@ -13,6 +13,7 @@ class RequestForQuotation extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $casts=['closing_date'=>'date'];
 
     public function purchaseRequest(): BelongsTo
     {

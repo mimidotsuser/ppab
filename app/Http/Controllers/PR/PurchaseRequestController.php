@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\PR;
 
+use App\Actions\GeneratePRDoc;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PR\StorePurchaseRequisitionRequest;
 use App\Models\PurchaseRequest;
@@ -128,5 +129,23 @@ class PurchaseRequestController extends Controller
     {
         $purchaseRequest->delete();
         return response()->noContent();
+    }
+
+    public function downloadPurchaseRequestDoc(PurchaseRequest $purchaseRequest, GeneratePRDoc $PRFile)
+    {
+        $verificationStage = PurchaseRequestUtils::stage()['VERIFIED_OKAYED'];
+        $approvalStage = PurchaseRequestUtils::stage()['APPROVAL_OKAYED'];
+
+
+        $purchaseRequest->load(['items.product.balance', 'createdBy', 'activities' => function ($query) {
+            $query->latest();
+        }]);
+
+
+        $verification = $purchaseRequest->activities->firstWhere('stage', $verificationStage);
+        $approval = $purchaseRequest->activities->firstWhere('stage', $approvalStage);
+
+
+        return $PRFile($purchaseRequest, $verification, $approval);
     }
 }

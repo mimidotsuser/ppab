@@ -22,7 +22,7 @@ class GoodsReceiptNoteItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function POItem()
+    public function purchaseOrderItem()
     {
         return $this->belongsTo(PurchaseOrderItem::class, 'po_item_id');
     }

@@ -34,7 +34,6 @@ class StorePurchaseOrderRequest extends FormRequest
     {
         return [
             'rfq_id' => ['nullable', Rule::exists(RequestForQuotation::class, 'id')],
-            'download' => 'sometimes|boolean',
             'doc_validity' => 'required|date',
             'vendor_id' => ['required', Rule::exists(Vendor::class, 'id')],
             'currency_id' => ['required', Rule::exists(Currency::class, 'id')],

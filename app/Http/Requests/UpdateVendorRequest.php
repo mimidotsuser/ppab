@@ -26,10 +26,12 @@ class UpdateVendorRequest extends FormRequest
     {
         return [
             'name' => 'required|max:250',
-            'address' => 'nullable|max:250',
             'telephone' => 'nullable|max:250',
             'email' => 'nullable|email|max:250',
-            'contactPersons' => 'nullable|array',
+            'street_address' => 'nullable|email|max:250',
+            'mobile_phone' => 'nullable|email|max:250',
+            'postal_address' => 'nullable|email|max:250',
+        'contactPersons' => 'nullable|array',
             'contactPersons.*.first_name' => 'required|max:250',
             'contactPersons.*.last_name' => 'nullable|max:250',
             'contactPersons.*.email' => ['nullable', 'email', 'max:250',

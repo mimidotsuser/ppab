@@ -13,6 +13,7 @@ class PurchaseOrder extends Model
     use HasFactory, AutofillAuthorFields;
 
     protected $with = ['currency', 'vendor'];
+    protected $casts=['doc_validity'=>'date'];
 
     public function currency(): BelongsTo
     {

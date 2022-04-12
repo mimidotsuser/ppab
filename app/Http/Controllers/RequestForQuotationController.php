@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateRFQDocs;
 use App\Http\Requests\StoreRequestForQuotationRequest;
 use App\Http\Requests\UpdateRequestForQuotationRequest;
 use App\Models\PurchaseRequestItem;
@@ -10,12 +11,14 @@ use App\Models\RequestForQuotationItem;
 use App\Models\UnitOfMeasure;
 use App\Services\RequestForQuotationService;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RequestForQuotationController extends Controller
 {
@@ -116,10 +119,6 @@ class RequestForQuotationController extends Controller
         }
 
         DB::commit();
-
-        if ($request->boolean('download', false)) {
-            //TODO generate the doc
-        }
 
         return ['data' => $rfq];
     }
@@ -238,10 +237,6 @@ class RequestForQuotationController extends Controller
 
         DB::commit();
 
-        if ($request->boolean('download', false)) {
-            //TODO generate the doc
-        }
-
         return ['data' => $requestForQuotation];
     }
 
@@ -283,5 +278,24 @@ class RequestForQuotationController extends Controller
         DB::commit();
 
         return \response()->noContent();
+    }
+
+    /**
+     * @param RequestForQuotation $requestForQuotation
+     * @param GenerateRFQDocs $RFQDocs
+     * @return BinaryFileResponse
+     * @throws AuthorizationException
+     */
+    public function downloadRFQDocs(RequestForQuotation $requestForQuotation,
+                                    GenerateRFQDocs     $RFQDocs): BinaryFileResponse
+    {
+        $this->authorize('view', $requestForQuotation);
+
+        $requestForQuotation->load(['purchaseRequest', 'items.product', 'items.uom', 'createdBy']);
+
+        return response()
+            ->download($RFQDocs($requestForQuotation),
+                'rfq-' . strtolower($requestForQuotation->sn) . '.zip')
+            ->deleteFileAfterSend();
     }
 }
