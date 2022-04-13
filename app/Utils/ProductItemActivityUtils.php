@@ -41,7 +41,7 @@ abstract class ProductItemActivityUtils
             'CUSTOMER_TO_WAREHOUSE_TRANSFER' => 'Customer to Warehouse Transfer',
             'WAREHOUSE_TO_WAREHOUSE_TRANSFER' => 'Inter-warehouse Transfer',
             'WARRANTY_UPDATE' => 'Warranty updated',
-            'MATERIAL_REQUISITION_ISSUED' => 'MRN issued',
+            'MATERIAL_REQUISITION_ISSUED' => 'Store Issue Voucher created',
             'CONTRACT_CREATED' => 'Contract created',
             'CONTRACT_UPDATED' => 'Contract updated',
         ];

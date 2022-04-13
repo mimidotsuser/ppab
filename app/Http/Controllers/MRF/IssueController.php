@@ -135,7 +135,7 @@ class IssueController extends Controller
 
                 foreach ($item['allocation'] as $allotment) {
                     $category_code = ProductItemActivityUtils::activityCategoryCodes()['MATERIAL_REQUISITION_ISSUED'];
-                    $category_title = ProductItemActivityUtils::activityCategoryCodes()[$category_code];
+                    $category_title = ProductItemActivityUtils::activityCategoryTitles()[$category_code];
 
                     $productItemActivity = new ProductItemActivity;
                     $productItemActivity->log_category_code = $category_code;

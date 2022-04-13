@@ -106,7 +106,7 @@ class ProductItemController extends Controller
         $productItem->save();
 
         $categoryCode = $request->get('category_code');
-        $categoryTitle = ProductItemActivityUtils::activityCategoryCodes()[$categoryCode];
+        $categoryTitle = ProductItemActivityUtils::activityCategoryTitles()[$categoryCode];
 
         $productItemActivity = new ProductItemActivity;
         $productItemActivity->customer_contract_id = $request->get('contract_id');
