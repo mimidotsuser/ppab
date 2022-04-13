@@ -157,7 +157,7 @@ class WorksheetController extends Controller
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair'
+                'entries.createdBy', 'entries.remark', 'entries.repair' ,'entries.contract'
             ]);
 
         $worksheet->load($meta->include);
