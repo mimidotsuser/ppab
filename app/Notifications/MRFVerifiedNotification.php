@@ -46,7 +46,7 @@ class MRFVerifiedNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.history') . '?id=' . $this->request->id);
+            . config('weburls.material_requests.history') . '/' . $this->request->id);
 
         $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
