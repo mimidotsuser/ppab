@@ -26,7 +26,7 @@ class ProductItemService
         $activity->log_category_title = $productItemActivityContract->categoryTitle;
         $activity->productItem()->associate($productItemActivityContract->productItem);
 
-        if (!empty($productItemActivityContract->customer)) {
+        if (isset($productItemActivityContract->customer)) {
             $activity->location()->associate($productItemActivityContract->customer);
 
             //set any active warrant
@@ -42,16 +42,20 @@ class ProductItemService
                 $activity->contract()->associate($warrant);
             }
 
-        } elseif (!empty($productItemActivityContract->warehouse)) {
+        } elseif (isset($productItemActivityContract->warehouse)) {
             $activity->location()->associate($productItemActivityContract->warehouse);
         }
 
-        if (isset( $productItemActivityContract->eventModel)) {
+        if (isset($productItemActivityContract->eventModel)) {
             $activity->eventable()->associate($productItemActivityContract->eventModel);
         }
 
         if (isset($productItemActivityContract->repairModel)) {
             $activity->repair()->associate($productItemActivityContract->repairModel);
+        }
+
+        if (isset($productItemActivityContract->remark)) {
+            $activity->remark()->associate($productItemActivityContract->remark);
         }
 
         return $activity;
