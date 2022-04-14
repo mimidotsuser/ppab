@@ -97,7 +97,7 @@ class ProductItemService
         /**
          * Check if the contract is active
          */
-        if ($lastContract->start_date->isBefore() &&
+        if ($lastContract->start_date->isPast() &&
             (is_null($lastContract->expiry_date) || $lastContract->expiry_date->addDay()->isFuture())) {
             return $lastContract;
         }

@@ -14,7 +14,7 @@ class CustomerContract extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
-    protected $casts = ['active' => 'boolean'];
+    protected $casts = ['active' => 'boolean','start_date'=>'date','expiry_date'=>'date'];
 
     /**
      * Items under this contract
