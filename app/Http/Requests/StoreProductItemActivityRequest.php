@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Customer;
 use App\Models\ProductItemActivity;
 use App\Models\Warehouse;
+use App\Utils\MRFUtils;
 use App\Utils\ProductItemActivityUtils;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Http\FormRequest;
@@ -44,40 +45,43 @@ class StoreProductItemActivityRequest extends FormRequest
             || $request->get('category_code') ==
             ProductItemActivityUtils::activityCategoryCodes()['WAREHOUSE_TO_WAREHOUSE_TRANSFER'];
 
+        $isCustomerToCustomerTransfer = $request->get('category_code') ===
+            ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_CUSTOMER_TRANSFER'];
+
+        $isWarrantyUpdate = $this->request->get('category_code') ==
+            ProductItemActivityUtils::activityCategoryCodes()['WARRANTY_UPDATE'];
+
         return [
             'description' => 'required|max:250',
             'category_code' => ['required', Rule::in($categories)],
 
             'warrant_end' => 'nullable|date|prohibited_if:warrant_start,null',
-            'warrant_start' => ['nullable', 'date',
-                Rule::requiredIf(function () {
-                    return $this->request->get('category_code') ==
-                        ProductItemActivityUtils::activityCategoryCodes()['WARRANTY_UPDATE'];
-                }),
-                Rule::when($isInWarehouse,'prohibited')
+            'warrant_start' => ['nullable', 'date', Rule::requiredIf($isWarrantyUpdate),
+                Rule::when($isInWarehouse, 'prohibited')
             ],
 
             'out_of_order' => 'nullable|boolean|prohibited_if:warehouse_id,null',
             'warehouse_id' => ['nullable', Rule::requiredIf(fn() => $movingToWarehouse),
                 Rule::exists(Warehouse::class, 'id'),
-                Rule::when($isInWarehouse &&
-                    ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_WAREHOUSE_TRANSFER'],
+                Rule::when(
+                    $isInWarehouse || $isCustomerToCustomerTransfer || $isWarrantyUpdate,
                     'prohibited'),
             ],
 
             'customer_id' => [Rule::exists(Customer::class, 'id'),
-                Rule::requiredIf(function () {
-                    return $this->request->get('category_code') ==
-                        ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_CUSTOMER_TRANSFER'];
-                }),
+                Rule::requiredIf($isCustomerToCustomerTransfer || $isWarrantyUpdate),
                 Rule::when($isInWarehouse, 'prohibited')],
+            'purpose_code' => [Rule::in(array_keys(MRFUtils::purpose())),
+                Rule::requiredIf($isCustomerToCustomerTransfer),
+                Rule::when(!$isCustomerToCustomerTransfer, 'prohibited')]
         ];
     }
+
     public function messages()
     {
         return [
-            'customer_id.prohibited'=>'Action prohibited as item is currently in warehouse premisses',
-            'warehouse_id.prohibited'=>'Action prohibited as item is currently in warehouse premisses'
+            'customer_id.prohibited' => 'Action prohibited as item is currently in warehouse premisses',
+            'warehouse_id.prohibited' => 'Action prohibited as item is currently in warehouse premisses'
         ];
     }
 }

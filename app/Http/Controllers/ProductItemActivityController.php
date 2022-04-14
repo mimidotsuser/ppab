@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ProductItemActivityContract;
 use App\Events\ProductItemUpsert;
 use App\Http\Requests\StoreProductItemActivityRequest;
 use App\Models\Customer;
@@ -10,10 +11,10 @@ use App\Models\ProductItem;
 use App\Models\ProductItemActivity;
 use App\Models\ProductItemWarrant;
 use App\Models\Warehouse;
+use App\Services\ProductItemService;
 use App\Utils\ProductItemActivityUtils;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ProductItemActivityController extends Controller
@@ -33,7 +34,7 @@ class ProductItemActivityController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
             ['createdBy', 'updatedBy', 'product', 'location', 'warrant', 'remark', 'repair',
-                'eventable', 'productItem', 'contract',  'repair.sparesUtilized']);
+                'eventable', 'productItem', 'contract', 'repair.sparesUtilized']);
 
         return $productItem->activities()
             ->with($meta->include)
@@ -52,25 +53,24 @@ class ProductItemActivityController extends Controller
      * @param ProductItem $productItem
      * @return array|\Illuminate\Http\Response
      */
-    public function store(StoreProductItemActivityRequest $request, ProductItem $productItem)
+    public function store(StoreProductItemActivityRequest $request, ProductItem $productItem,
+                          ProductItemService              $productItemService)
     {
         DB::beginTransaction();
 
-        $productItem->replicate();
-
         $latestActivity = $productItem->latestActivity;
 
-        $activity = $latestActivity->replicate(['id']);
 
         $remark = new EntryRemark;
         $remark->description = $request->get('description');
         $remark->save();
 
-        $activity->remark()->associate($remark);
-
-        $activity->log_category_code = $request->get('category_code');
-        $activity->log_category_title = ProductItemActivityUtils::activityCategoryTitles()
-        [$request->get('category_code')];
+        $activity = new ProductItemActivityContract;
+        $activity->remark = $remark;
+        $activity->categoryCode = $request->get('category_code');
+        $activity->categoryTitle = ProductItemActivityUtils::activityCategoryTitles()[$request->get('category_code')];
+        $activity->covenant = $latestActivity->covenant;
+        $activity->productItem = $productItem;
 
         if ($request->get('category_code') ==
             ProductItemActivityUtils::activityCategoryCodes()['WARRANTY_UPDATE']) {
@@ -82,59 +82,41 @@ class ProductItemActivityController extends Controller
             $warrant->customer()->associate($productItem->latestActivity->location);
             $warrant->save();
 
-            $activity->warrant()->associate($warrant);
+            $activity->customer = $productItem->latestActivity->location;
 
+        } elseif ($request->get('category_code') == ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_WAREHOUSE_TRANSFER']) {
 
-            //clone contract only if is active
-            if (isset($latestActivity->customer_contract_id)) {
-                $contract = $latestActivity->contract;
-
-                if (Carbon::parse($contract->start_date)->addDay()->isPast()
-                    && Carbon::parse($contract->expiry_date)->addDay()->isFuture()) {
-                    $activity->contract()->associate($contract);
-                } else {
-                    $activity->customer_contract_id = null;
-                }
+            //update product item status if different
+            if ($productItem->out_of_order != $request->boolean('out_of_order')) {
+                $productItem->out_of_order = $request->boolean('out_of_order', false);
+                $productItem->update();
             }
 
-        } elseif ($request->get('category_code') ==
-            ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_WAREHOUSE_TRANSFER']) {
-
-            $activity->location()
-                ->associate(Warehouse::findOrFail($request->get('warehouse_id')));
-
-            $activity->customer_contract_id = null; //reset contract
-
-            if ($request->filled('out_of_order')) { //just in case 🤗
-                //update product item status if different
-                if ($productItem->out_of_order != $request->boolean('out_of_order')) {
-                    $productItem->out_of_order = $request->boolean('out_of_order', false);
-                    $productItem->update();
-                }
-
-                $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
-                //if item is not out of order and is from customer,
-                if ($request->boolean('out_of_order') === false
-                    && $latestActivity->location_type == $morphKey) {
-                    // increment the product stock balance
-                    ProductItemUpsert::dispatch($productItem->product, -1);
-                }
+            $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
+            //if item is not out of order and is from customer,
+            if ($request->boolean('out_of_order') === false
+                && $latestActivity->location_type == $morphKey) {
+                // increment the product stock balance
+                ProductItemUpsert::dispatch($productItem->product, -1);
             }
 
-        } elseif ($request->get('category_code') ==
-            ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_CUSTOMER_TRANSFER']) {
+            $activity->warehouse = Warehouse::findOrFail($request->get('warehouse_id'));
 
-            $activity->location()
-                ->associate(Customer::findOrFail($request->get('customer_id')));
-            $activity->customer_contract_id = null; //reset contract
+        } elseif ($request->get('category_code') == ProductItemActivityUtils::activityCategoryCodes()['CUSTOMER_TO_CUSTOMER_TRANSFER']) {
 
+            $activity->customer = Customer::findOrFail($request->get('customer_id'));
+            $activity->covenant = $request->get('purpose_code');
         }
 
-        $activity->save();
-        DB::commit();
-        $activity->load(['createdBy','location']);
+        $model = $productItemService->serializeActivity($activity);
 
-        return ['data' => $activity];
+        $model->save();
+        DB::commit();
+
+        $model->refresh();
+        $model->load(['createdBy', 'location']);
+
+        return ['data' => $model];
     }
 
 

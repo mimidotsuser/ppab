@@ -39,7 +39,7 @@ class ProductItemService
             $contract = $this->activeContract($productItemActivityContract->productItem,
                 $productItemActivityContract->customer);
             if (isset($contract)) {
-                $activity->contract()->associate($warrant);
+                $activity->contract()->associate($contract);
             }
 
         } elseif (isset($productItemActivityContract->warehouse)) {
