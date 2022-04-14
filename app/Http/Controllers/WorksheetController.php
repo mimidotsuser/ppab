@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\ProductItemActivityContract;
 use App\Http\Requests\StoreWorksheetRequest;
 use App\Models\Customer;
 use App\Models\EntryRemark;
@@ -9,6 +10,7 @@ use App\Models\ProductItem;
 use App\Models\ProductItemActivity;
 use App\Models\ProductItemRepair;
 use App\Models\Worksheet;
+use App\Services\ProductItemService;
 use App\Utils\WorksheetUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -28,10 +30,10 @@ class WorksheetController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
-                'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair', 'entries.repair.products',
+            'entries.warrant', 'entries.warrant', 'entries.createdBy', 'entries.remark',
+           'entries.productItem.product', 'entries.repair', 'entries.repair.products',
                 'entries.repair.sparesUtilized'
-            ]);
+        ]);
 
         return Worksheet::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -60,7 +62,7 @@ class WorksheetController extends Controller
      * @param StoreWorksheetRequest $request
      * @return array
      */
-    public function store(StoreWorksheetRequest $request): array
+    public function store(StoreWorksheetRequest $request,ProductItemService $productItemService): array
     {
         DB::beginTransaction();
 
@@ -105,37 +107,19 @@ class WorksheetController extends Controller
                 foreach ($entry['product_items'] as $item) {
                     $productItem = ProductItem::findOrFail($item['id']);
 
-                    $activity = new ProductItemActivity;
-                    $activity->log_category_code = $categoryCode;
-                    $activity->log_category_title = $categoryTitle;
-                    $activity->remark()->associate($remark);
-                    $activity->productItem()->associate($productItem);
-                    $activity->location()
-                        ->associate(Customer::find($request->get('customer_id')));
-
-                    //carry over covenant
-                    $activity->covenant = $productItem->latestActivity->covenant;
-
-                    //carry over warrant if not expired
-                    $warrant = $productItem->activeWarrant;
-                    if (isset($warrant)) {
-                        $activity->warrant()->associate($warrant);
+                    $activity = new ProductItemActivityContract;
+                    $activity->categoryCode = $categoryCode;
+                    $activity->categoryTitle = $categoryTitle;
+                    $activity->remark=$remark;
+                    $activity->productItem=$productItem;
+                    $activity->eventModel = $worksheet;
+                    $activity->customer = Customer::find($request->get('customer_id'));
+                    $activity->covenant = $productItem->latestActivity->covenant;;
+                    if(isset($repair)) {
+                        $activity->repairModel = $repair;
                     }
 
-                    //carry over contract if is active
-                    $contract = $productItem->lastContract;
-                    if (!$contract->isEmpty()) {
-                        if (Carbon::parse($contract->start_date)->addDay()->isPast()
-                            && Carbon::parse($contract->expiry_date)->addDay()->isFuture()) {
-                            $activity->contract()->associate($contract);
-                        }
-                    }
-
-                    $activity->eventable()->associate($worksheet);
-
-                    $activity->repair()->associate($repair);
-
-                    $activities[] = $activity;
+                    $activities[] = $productItemService->serializeActivity($activity);
                 }
 
                 $worksheet->entries()->saveMany($activities);
@@ -156,9 +140,9 @@ class WorksheetController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
-                'entries.warrant', 'entries.location', 'entries.warrant',
-                'entries.createdBy', 'entries.remark', 'entries.repair' ,'entries.contract',
-                'entries.productItem','entries.productItem.product',
+                'entries.productItem.product', 'entries.warrant', 'entries.warrant',
+                'entries.createdBy', 'entries.remark', 'entries.repair', 'entries.repair.products',
+                'entries.repair.sparesUtilized'
             ]);
 
         $worksheet->load($meta->include);
