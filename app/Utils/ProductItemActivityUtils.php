@@ -14,7 +14,7 @@ abstract class ProductItemActivityUtils
     #[ArrayShape(['INITIAL_ENTRY' => "string", 'CUSTOMER_TO_CUSTOMER_TRANSFER' => "string",
         'CUSTOMER_TO_WAREHOUSE_TRANSFER' => "string", 'WARRANTY_UPDATE' => "string",
         'MATERIAL_REQUISITION_ISSUED' => "string", 'WAREHOUSE_TO_WAREHOUSE_TRANSFER' => "string",
-        'CONTRACT_CREATED'=>"string",'CONTRACT_UPDATED'=>"string"])]
+        'CONTRACT_CREATED' => "string", 'CONTRACT_UPDATED' => "string", 'CONTRACT_DELETED' => "string"])]
     public static function activityCategoryCodes(): array
     {
         return [
@@ -26,13 +26,14 @@ abstract class ProductItemActivityUtils
             'MATERIAL_REQUISITION_ISSUED' => 'MATERIAL_REQUISITION_ISSUED',
             'CONTRACT_CREATED' => 'CONTRACT_CREATED',
             'CONTRACT_UPDATED' => 'CONTRACT_UPDATED',
+            'CONTRACT_DELETED' => 'CONTRACT_DELETED',
         ];
     }
 
     #[ArrayShape(['INITIAL_ENTRY' => "string", 'CUSTOMER_TO_CUSTOMER_TRANSFER' => "string",
         'CUSTOMER_TO_WAREHOUSE_TRANSFER' => "string", 'WAREHOUSE_TO_WAREHOUSE_TRANSFER' => "string",
         'WARRANTY_UPDATE' => "string", 'MATERIAL_REQUISITION_ISSUED' => "string",
-        'CONTRACT_CREATED'=>"string",'CONTRACT_UPDATED'=>"string"])]
+        'CONTRACT_CREATED' => "string", 'CONTRACT_UPDATED' => "string"])]
     public static function activityCategoryTitles(): array
     {
         return [
@@ -44,6 +45,7 @@ abstract class ProductItemActivityUtils
             'MATERIAL_REQUISITION_ISSUED' => 'Store Issue Voucher created',
             'CONTRACT_CREATED' => 'Contract created',
             'CONTRACT_UPDATED' => 'Contract updated',
+            'CONTRACT_DELETED' => 'Contract deleted',
         ];
     }
 

@@ -2,43 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CustomerProductItemCollection;
 use App\Models\Customer;
 use App\Models\ProductItem;
-use App\Models\ProductItemActivity;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 
 class CustomerProductItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return CustomerProductItemCollection
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function index(Customer $customer, Request $request)
     {
 
-        $meta = $this->queryMeta();
+        $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
+            ['createdBy', 'updatedBy', 'product', 'latestActivity', 'latestActivity.location',
+                'latestActivity.warrant', 'activities', 'activities.location', 'activities.warrant',
+                'activities.createdBy', 'activities.remark', 'activities.repair',
+                'activeWarrant', 'activeWarrants', 'oldestActivity', 'latestActiveContracts']);
 
-        $items = ProductItemActivity::with(['productItem.product'])
-            ->select(['id', 'product_item_id', 'location_id', 'location_type'])
-            ->whereExists(function ($builder) {
-                $builder->selectRaw('product_item_id,MAX(created_at)')
-                    ->groupBy('product_item_id');
+        $lastContractIndex = array_search('latestActiveContracts', $meta->include);
+        if ($lastContractIndex !== false) {
+
+            array_splice($meta->include, $lastContractIndex, 1);
+            $meta->include["latestContracts"] = function ($query) {
+                $query->where('active', true)
+                    ->whereDate('expiry_date', '>', Carbon::yesterday());
+            };
+        }
+
+        return ProductItem::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->whereLike('sn', $searchTerm);
+                    $query->orWhereLike('serial_number', $searchTerm);
+                });
             })
-            ->whereHasMorph('location', Customer::class, function ($query) use ($customer) {
+            ->whereHas('latestActivity', function ($query) use ($customer) {
+
+                $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Customer::class));
+                $query->where('location_type', $morphKey);
+
+                //filter by customer  + children if
                 if (\request()->boolean('includeChildrenItems', false)) {
-                    $query->whereIn('id', $customer->children->pluck('id')
+                    $query->whereIn('location_id', $customer->children->pluck('id')
                         ->merge($customer->id));
                 } else {
-                    $query->whereIn('id', [$customer->id]);
+                    $query->whereIn('location_id', [$customer->id]);
                 }
             })
             ->orderBy('created_at', 'desc')
             ->paginate($meta->limit, '*', null, $meta->page);
-
-        return CustomerProductItemCollection::make($items);
 
     }
 

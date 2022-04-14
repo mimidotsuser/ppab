@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class CustomerContract extends Model
 {
     use HasFactory, AutofillAuthorFields;
 
+    protected $casts = ['active' => 'boolean'];
 
     /**
      * Items under this contract
@@ -44,6 +46,12 @@ class CustomerContract extends Model
     public function productItemActivities(): HasMany
     {
         return $this->hasMany(ProductItemActivity::class, 'customer_contract_id');
+    }
+
+    public function productItemEventActivities(): MorphMany
+    {
+        return $this->morphMany(ProductItemActivity::class, 'eventable');
+
     }
 
     /**

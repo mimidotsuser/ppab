@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Contracts\ProductItemActivityContract;
+use App\Models\CustomerContract;
 use App\Models\EntryRemark;
 use App\Models\ProductItemActivity;
 use App\Utils\ProductItemActivityUtils;
@@ -9,37 +11,41 @@ use App\Utils\ProductItemActivityUtils;
 class CustomerContractService
 {
 
-    public function createItemsContractActivities(array  $itemIds, int $contractId,
+    public function createItemsContractActivities(array  $itemIds, CustomerContract $contract,
                                                   string $categoryCode, string $remarks)
     {
-        $itemModels = ProductItemActivity::with(['productItem.product'])
-            ->whereExists(function ($builder) {
-                $builder->selectRaw('product_item_id,MAX(created_at)')
-                    ->groupBy('product_item_id');
-            })->whereIn('product_item_id', $itemIds)
+        $itemModels = ProductItemActivity::with(['productItem'])
+            ->joinSub(function ($builder) use ($itemIds) {
+                $builder->from(ProductItemActivity::query()->from)
+                    ->selectRaw('MAX(id) as id')
+                    ->groupBy(['product_item_id']);
+            }, 'latest', 'latest.id', '=', ProductItemActivity::query()->from . '.id')
+            ->whereIn('product_item_id', $itemIds)
             ->get();
 
         $remark = new EntryRemark;
         $remark->description = $remarks ?? 'N/A';
         $remark->save();
 
+        $service = new ProductItemService();
+        $activities = [];
 
         foreach ($itemModels as $model) {
-            $activity = $model->replicate([]);
-            $activity->remark()->associate($remark);
-            $activity->log_category_code = $categoryCode;
-            $activity->log_category_title = ProductItemActivityUtils::activityCategoryTitles()[$categoryCode];
 
-            if (isset($contractId)) {
-                $activity->customer_contract_id = $contractId;
-            }
-            $activity->warrant()->associate($activity->productItem->activeWarrant);
+            $activity = new ProductItemActivityContract;
+            $activity->categoryCode = $categoryCode;
+            $activity->categoryTitle = ProductItemActivityUtils::activityCategoryTitles()[$categoryCode];
+            $activity->remark = $remark;
+            $activity->eventModel = $contract;
+            $activity->productItem = $model->productItem;
+            $activity->customer = $model->location;
+            $activity->covenant = $model->covenant;
 
-            $activity->location()->associate($activity->location);
+            $activities[] = $service->serializeActivity($activity);
 
-            $activity->save();
         }
 
+        $contract->productItemEventActivities()->saveMany($activities);
 
     }
 

@@ -6,11 +6,12 @@ use App\Traits\AutofillAuthorFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravel\Scout\Searchable;
 
 class ProductItemWarrant extends Model
 {
     use HasFactory, AutofillAuthorFields;
+
+    protected $casts = ['warrant_start' => 'date', 'warrant_end' => 'date'];
 
     /**
      * Item to which this warrant belongs to

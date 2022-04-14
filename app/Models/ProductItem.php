@@ -96,9 +96,9 @@ class ProductItem extends Model
         return $this->belongsToMany(CustomerContract::class, 'customer_contract_items');
     }
 
-    public function lastContract()
+    public function latestContracts()
     {
-        return $this->contracts()->latest()->take(1);
+        return $this->contracts()->latest();
     }
 
     /**
