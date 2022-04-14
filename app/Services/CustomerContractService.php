@@ -12,7 +12,7 @@ class CustomerContractService
 {
 
     public function createItemsContractActivities(array  $itemIds, CustomerContract $contract,
-                                                  string $categoryCode, string $remarks)
+                                                  string $categoryCode, string $remarks=null)
     {
         $itemModels = ProductItemActivity::with(['productItem'])
             ->joinSub(function ($builder) use ($itemIds) {
@@ -23,10 +23,6 @@ class CustomerContractService
             ->whereIn('product_item_id', $itemIds)
             ->get();
 
-        $remark = new EntryRemark;
-        $remark->description = $remarks ?? 'N/A';
-        $remark->save();
-
         $service = new ProductItemService();
         $activities = [];
 
@@ -35,7 +31,6 @@ class CustomerContractService
             $activity = new ProductItemActivityContract;
             $activity->categoryCode = $categoryCode;
             $activity->categoryTitle = ProductItemActivityUtils::activityCategoryTitles()[$categoryCode];
-            $activity->remark = $remark;
             $activity->eventModel = $contract;
             $activity->productItem = $model->productItem;
             $activity->customer = $model->location;

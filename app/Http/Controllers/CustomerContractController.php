@@ -82,7 +82,7 @@ class CustomerContractController extends Controller
             'updated_by_id' => Auth::id()]);
 
         $service->createItemsContractActivities($itemIds, $contract,
-            ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_CREATED'], 'N/A');
+            ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_CREATED']);
 
         DB::commit();
         return ['data' => $contract];
@@ -148,12 +148,12 @@ class CustomerContractController extends Controller
 
         if (count($detached) > 0) {
             $service->createItemsContractActivities($detached, $newContract,
-                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_UPDATED'], 'N/A');
+                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_UPDATED'], );
         }
 
         if (count($attached) > 0) {
             $service->createItemsContractActivities($attached, $newContract,
-                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_CREATED'], 'N/A');
+                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_CREATED']);
         }
 
         DB::commit();
