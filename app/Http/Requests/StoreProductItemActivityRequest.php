@@ -69,7 +69,7 @@ class StoreProductItemActivityRequest extends FormRequest
             ],
 
             'customer_id' => [Rule::exists(Customer::class, 'id'),
-                Rule::requiredIf($isCustomerToCustomerTransfer || $isWarrantyUpdate),
+                Rule::requiredIf($isCustomerToCustomerTransfer),
                 Rule::when($isInWarehouse, 'prohibited')],
             'purpose_code' => [Rule::in(array_keys(MRFUtils::purpose())),
                 Rule::requiredIf($isCustomerToCustomerTransfer),
