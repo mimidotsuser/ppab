@@ -47,8 +47,8 @@
             <th>ITEM DESCRIPTION</th>
             <th>UOM</th>
             <th>QTY</th>
-            <th>UNIT PRICE</th>
-            <th>TOTAL PRICE</th>
+            <th colspan="2">UNIT PRICE</th>
+            <th colspan="2">TOTAL PRICE</th>
         </tr>
         </thead>
         <tbody>
@@ -58,48 +58,30 @@
                 <td>{{$item->product->item_code}}</td>
                 <td>{{$item->product->manufacturer_part_number}}</td>
                 <td>{{$item->product->description}}</td>
-                <td>{{$item->uom->title}}</td>
-                <td>{{$item->qty}}</td>
-                <td style="padding:0;vertical-align: top" align="top">
-                    <table>
-                        <tr>
-                            <td  align="center">
-                                {{formatCurrency($item->unit_price)}}
-                            </td>
-                            <td  align="center">
-                                {{$purchaseOrder->currency->code}}
-                            </td>
-                        </tr>
-                    </table>
+                <td  align="center">{{$item->uom->title}}</td>
+                <td  align="center">{{$item->qty}}</td>
+                <td  align="center">
+                    {{formatCurrency($item->unit_price)}}
                 </td>
-                <td style="padding:0;vertical-align: top" align="top">
-                    <table class="currency-table">
-                        <tr>
-                            <td  align="center">
-                                {{formatCurrency($item->unit_price * $item->qty)}}
-                            </td>
-                            <td  align="center">
-                                {{$purchaseOrder->currency->code}}
-                            </td>
-                        </tr>
-                    </table>
+                <td>
+                    {{$purchaseOrder->currency->code}}
+                </td>
+                <td  align="center">
+                    {{formatCurrency($item->unit_price * $item->qty)}}
+                </td>
+                <td>
+                    {{$purchaseOrder->currency->code}}
                 </td>
             </tr>
         @endforeach
 
         <tr>
-            <td colspan="7">TOTAL</td>
-            <td style="padding:0;vertical-align: top;margin:0" align="top">
-                <table align="center">
-                    <tr>
-                        <td align="center">
-                            {{formatCurrency($total)}}
-                        </td>
-                        <td align="center">
-                            {{$purchaseOrder->currency->code}}
-                        </td>
-                    </tr>
-                </table>
+            <td colspan="8">TOTAL</td>
+            <td align="center">
+                {{formatCurrency($total)}}
+            </td>
+            <td>
+                {{$purchaseOrder->currency->code}}
             </td>
         </tr>
         </tbody>
