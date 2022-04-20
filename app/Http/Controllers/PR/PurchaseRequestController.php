@@ -23,7 +23,8 @@ class PurchaseRequestController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(PurchaseRequest::class, 'purchase_request');
+        $this->authorizeResource(PurchaseRequest::class, 'purchase_request',
+            ['except' => ['index']]);
     }
 
     /**
@@ -33,6 +34,13 @@ class PurchaseRequestController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+
+        if ($request->search) {
+            $this->authorize('search', PurchaseRequest::class);
+        } else {
+            $this->authorize('viewAny', PurchaseRequest::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'id', 'warehouse_id'],
             ['items', 'activities', 'latestActivity', 'items.product.balance']);
 

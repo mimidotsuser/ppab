@@ -16,7 +16,6 @@ use App\Utils\ProductItemActivityUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
@@ -50,11 +49,19 @@ class IssueController extends Controller
      * @param StoreIssueRequest $request
      * @param MaterialRequisition $materialRequisition
      * @param MaterialRequisitionService $requisitionService
-     * @return array
+     * @return MaterialRequisition[]|\Illuminate\Http\Response
      */
     public function store(StoreIssueRequest          $request, MaterialRequisition $materialRequisition,
-                          MaterialRequisitionService $requisitionService): array
+                          MaterialRequisitionService $requisitionService)
     {
+
+        $partialIssueStage = MRFUtils::stage()['PARTIAL_ISSUE'];
+        $approvalStage = MRFUtils::stage()['APPROVAL_OKAYED'];
+
+        if ($materialRequisition->latestActivity->stage != $partialIssueStage &&
+            $materialRequisition->latestActivity->stage != $approvalStage) {
+            return \response()->noContent(404);
+        }
 
         //quantity issued extra rules to ensure they don't issue above approved quantity
         $request->validate([
@@ -196,13 +203,21 @@ class IssueController extends Controller
      * Display the specified resource.
      *
      * @param MaterialRequisition $materialRequisition
-     * @return MaterialRequisition[]
+     * @return MaterialRequisition[]|array|\Illuminate\Http\Response
      * @throws AuthorizationException
      */
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
-    public function show(MaterialRequisition $materialRequisition): array
+    public function show(MaterialRequisition $materialRequisition)
     {
         $this->authorize('issue', $materialRequisition);
+
+        $partialIssueStage = MRFUtils::stage()['PARTIAL_ISSUE'];
+        $approvalStage = MRFUtils::stage()['APPROVAL_OKAYED'];
+
+        if ($materialRequisition->latestActivity->stage != $partialIssueStage &&
+            $materialRequisition->latestActivity->stage != $approvalStage) {
+            return \response()->noContent(404);
+        }
 
         $meta = $this->queryMeta([], ['items', 'activities']);
         $materialRequisition->load($meta->include);

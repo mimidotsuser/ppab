@@ -24,7 +24,8 @@ class RequestForQuotationController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(RequestForQuotation::class, 'request_for_quotation');
+        $this->authorizeResource(RequestForQuotation::class, 'request_for_quotation',
+            ['except' => ['index']]);
     }
 
     /**
@@ -35,6 +36,12 @@ class RequestForQuotationController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+        if ($request->search) {
+            $this->authorize('search', RequestForQuotation::class);
+        } else {
+            $this->authorize('viewAny', RequestForQuotation::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'sn'], ['createdBy', 'updatedBy',
             'items', 'vendors', 'purchaseRequest', 'purchaseOrder', 'items.product.balance']);
 

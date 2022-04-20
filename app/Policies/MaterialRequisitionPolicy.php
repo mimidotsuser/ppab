@@ -11,6 +11,11 @@ class MaterialRequisitionPolicy
 {
     use HandlesAuthorization;
 
+    public function search(User $user): bool
+    {
+        return $user->role->permissions->contains('name', 'materialRequisition.search');
+    }
+
     public function viewAnyPendingVerification(User $user): bool
     {
         return $user->role->permissions->contains('name', 'materialRequisition.verify');

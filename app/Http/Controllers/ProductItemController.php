@@ -13,7 +13,6 @@ use App\Models\ProductItemWarrant;
 use App\Models\Warehouse;
 use App\Utils\ProductItemActivityUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -26,7 +25,8 @@ class ProductItemController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(ProductItem::class, 'product_item');
+        $this->authorizeResource(ProductItem::class, 'product_item',
+            ['except' => ['index']]);
     }
 
     /**
@@ -37,6 +37,12 @@ class ProductItemController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+        if ($request->search) {
+            $this->authorize('search', ProductItem::class);
+        } else {
+            $this->authorize('viewAny', ProductItem::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],
             ['createdBy', 'updatedBy', 'product', 'latestActivity', 'latestActivity.location',
                 'latestActivity.warrant', 'activities', 'activities.location', 'activities.warrant',

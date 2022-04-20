@@ -144,6 +144,8 @@ abstract class PermissionUtils
         ['name' => 'purchaseRequests.approve', 'group' => 'purchase requests',
             'description' => 'User can approve purchase requests'],
 
+        ['name' => 'materialRequisition.search', 'group' => 'material requisition',
+            'description' => 'User can search material requisition requests'],
         ['name' => 'materialRequisition.view', 'group' => 'material requisition',
             'description' => 'User can view all material requisition requests (report)'],
         ['name' => 'materialRequisition.create', 'group' => 'material requisition',

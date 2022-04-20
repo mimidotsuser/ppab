@@ -28,7 +28,8 @@ class MaterialRequisitionController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(MaterialRequisition::class, 'material_requisition');
+        $this->authorizeResource(MaterialRequisition::class, 'material_requisition',
+        ['except'=>['index']]);
     }
 
     /**
@@ -38,8 +39,14 @@ class MaterialRequisitionController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+        if ($request->search) {
+            $this->authorize('search', MaterialRequisition::class);
+        } else {
+            $this->authorize('viewAny', MaterialRequisition::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity',
-            'items.product', 'items.product.variants', 'balanceActivities']);
+            'items.product', 'items.product.variants', 'items.worksheet', 'balanceActivities']);
 
         return MaterialRequisition::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -72,7 +79,7 @@ class MaterialRequisitionController extends Controller
                 if ($stage === 'verified') {
                     $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['VERIFIED_OKAYED']);
                 }
-                    if ($stage === 'created') {
+                if ($stage === 'created') {
                     $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['REQUEST_CREATED']);
                 }
 
@@ -144,7 +151,7 @@ class MaterialRequisitionController extends Controller
     public function show(MaterialRequisition $materialRequisition): array
     {
         $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity', 'items.product',
-            'items.product.variants', 'balanceActivities']);
+            'items.product.variants', 'balanceActivities', 'items.worksheet']);
 
         $materialRequisition->load($meta->include);
         return ['data' => $materialRequisition];

@@ -22,7 +22,8 @@ class GoodsReceiptNoteController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(GoodsReceiptNote::class, 'goods_receipt_note');
+        $this->authorizeResource(GoodsReceiptNote::class, 'goods_receipt_note',
+            ['except' => ['index']]);
     }
 
     /**
@@ -114,7 +115,7 @@ class GoodsReceiptNoteController extends Controller
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'latestActivity',
             'purchaseOrder', 'purchaseOrder.currency', 'items', 'items.product',
             'items.purchaseOrderItem.uom', 'activities', 'activities.createdBy',
-            'inspectionNote','inspectionNote.checklist',]);
+            'inspectionNote', 'inspectionNote.checklist',]);
         $goodsReceiptNote->load($meta->include);
         if (\request()->boolean('hasRejectedItems')) {
 

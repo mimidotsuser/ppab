@@ -52,12 +52,19 @@ class GoodsReceiptNoteApprovalController extends Controller
      * @param Request $request
      * @param GoodsReceiptNote $goodsReceiptNote
      * @param GoodsReceiptNoteService $service
-     * @return array
+     * @return array|\Illuminate\Http\Response
      */
     public function store(Request                 $request, GoodsReceiptNote $goodsReceiptNote,
-                          GoodsReceiptNoteService $service): array
+                          GoodsReceiptNoteService $service)
     {
         $this->authorize('approve', $goodsReceiptNote);
+
+        $stage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
+
+        if ($goodsReceiptNote->latestActivity->stage != $stage) {
+            return response()->noContent(404);
+        }
+
         $request->validate([
             'remarks' => 'nullable|max::255',
             'approved' => 'required|boolean'
@@ -94,7 +101,7 @@ class GoodsReceiptNoteApprovalController extends Controller
     {
         $this->authorize('approve', $goodsReceiptNote);
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'items', 'activities',
-            'purchaseOrder', 'InspectionNote','items.product']);
+            'purchaseOrder', 'InspectionNote', 'items.product']);
         $stage = GoodsReceiptNoteUtils::stage()['INSPECTION_DONE'];
 
         if ($goodsReceiptNote->latestActivity->stage != $stage) {

@@ -18,6 +18,11 @@ class ProductCategoryFilterController extends Controller
      */
     public function index(Request $request, ProductCategory $productCategory): LengthAwarePaginator
     {
+        if ($request->search) {
+            $this->authorize('search', Product::class);
+        } else {
+            $this->authorize('viewAny', Product::class);
+        }
 
         $meta = $this->queryMeta(['created_at', 'item_code', 'economic_order_qty', 'min_level',
             'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent', 'balance',
@@ -29,7 +34,7 @@ class ProductCategoryFilterController extends Controller
         return $productCategory
             ->products()
             ->with($meta->include)
-            ->when($request->get('parent_id'), function ($query,$parentId) {
+            ->when($request->get('parent_id'), function ($query, $parentId) {
                 $query->where('parent_id', $parentId);
             })
             ->when(!$request->get('variants'), function ($query) {
@@ -63,6 +68,8 @@ class ProductCategoryFilterController extends Controller
     #[ArrayShape(['data' => "\Illuminate\Database\Eloquent\Collection"])]
     public function productBalances(Request $request, Product $product): array
     {
+        $this->authorize('viewAny', Product::class);
+
         $data = $product->meldedBalances()
             ->with(['product:id,item_code,variant_of_id,parent_id,product_category_id'])
             ->get();

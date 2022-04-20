@@ -30,7 +30,7 @@ class WorksheetController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
-            'entries.warrant', 'entries.warrant', 'entries.createdBy', 'entries.remark',
+            'entries.warrant', 'entries.contract', 'entries.createdBy', 'entries.remark',
            'entries.productItem.product', 'entries.repair', 'entries.repair.products',
                 'entries.repair.sparesUtilized'
         ]);
@@ -140,7 +140,7 @@ class WorksheetController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
-                'entries.productItem.product', 'entries.warrant', 'entries.warrant',
+                'entries.productItem.product', 'entries.warrant', 'entries.contract',
                 'entries.createdBy', 'entries.remark', 'entries.repair', 'entries.repair.products',
                 'entries.repair.sparesUtilized'
             ]);

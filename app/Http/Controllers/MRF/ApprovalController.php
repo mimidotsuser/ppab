@@ -30,7 +30,8 @@ class ApprovalController extends Controller
     {
         $this->authorize('viewAnyPendingApproval', MaterialRequisition::class);
 
-        $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity',
+            'items.worksheet']);
 
         $stage = MRFUtils::stage()['VERIFIED_OKAYED'];
 
@@ -43,11 +44,17 @@ class ApprovalController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreApprovalRequest $request
-     * @return MaterialRequisition[]
+     * @return MaterialRequisition[]|\Illuminate\Http\Response
      */
     public function store(StoreApprovalRequest       $request, MaterialRequisition $materialRequisition,
                           MaterialRequisitionService $materialRequisitionService)
     {
+
+        $stage = MRFUtils::stage()['VERIFIED_OKAYED'];
+
+        if ($materialRequisition->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
 
         $rejected = [];
         $hasOkayedQty = false;
@@ -97,15 +104,21 @@ class ApprovalController extends Controller
      * Display the specified resource.
      *
      * @param MaterialRequisition $materialRequisition
-     * @return MaterialRequisition[]
+     * @return MaterialRequisition[]|array|\Illuminate\Http\Response
      * @throws AuthorizationException
      */
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
-    public function show(MaterialRequisition $materialRequisition): array
+    public function show(MaterialRequisition $materialRequisition)
     {
         $this->authorize('approve', $materialRequisition);
 
-        $meta = $this->queryMeta([], ['items', 'activities']);
+        $stage = MRFUtils::stage()['VERIFIED_OKAYED'];
+
+        if ($materialRequisition->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
+
+        $meta = $this->queryMeta([], ['items', 'activities','items.worksheet']);
         $materialRequisition->load($meta->include);
 
         return ['data' => $materialRequisition];

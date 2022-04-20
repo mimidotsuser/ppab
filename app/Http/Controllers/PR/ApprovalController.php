@@ -41,11 +41,19 @@ class ApprovalController extends Controller
      * @param StoreApprovalRequest $request
      * @param PurchaseRequest $purchaseRequest
      * @param PurchaseRequestService $service
-     * @return PurchaseRequest[]
+     * @return PurchaseRequest[]|array|\Illuminate\Http\Response
      */
     public function store(StoreApprovalRequest   $request, PurchaseRequest $purchaseRequest,
-                          PurchaseRequestService $service): array
+                          PurchaseRequestService $service)
     {
+
+        $stage = PurchaseRequestUtils::stage()['VERIFIED_OKAYED'];
+
+        if ($purchaseRequest->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
+
+
         DB::beginTransaction();
 
         $itemModels = $purchaseRequest->items;
@@ -96,13 +104,19 @@ class ApprovalController extends Controller
      * Display the specified resource.
      *
      * @param PurchaseRequest $purchaseRequest
-     * @return PurchaseRequest[]
+     * @return PurchaseRequest[]|array|\Illuminate\Http\Response
      * @throws AuthorizationException
      */
     #[ArrayShape(['data' => "\App\Models\PurchaseRequest"])]
-    public function show(PurchaseRequest $purchaseRequest): array
+    public function show(PurchaseRequest $purchaseRequest)
     {
         $this->authorize('approve', $purchaseRequest);
+
+        $stage = PurchaseRequestUtils::stage()['VERIFIED_OKAYED'];
+
+        if ($purchaseRequest->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
 
         $meta = $this->queryMeta([],
             ['items', 'activities', 'items.product.balance', 'latestActivity']);

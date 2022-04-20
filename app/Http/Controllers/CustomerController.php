@@ -16,7 +16,9 @@ class CustomerController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(Customer::class, 'customer');
+        $this->authorizeResource(Customer::class, 'customer', [
+            'except' => ['index']
+        ]);
     }
 
     /**
@@ -27,6 +29,12 @@ class CustomerController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+        if ($request->search) {
+            $this->authorize('search', Customer::class);
+        } else {
+            $this->authorize('viewAny', Customer::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'name', 'region', 'branch'],
             ['createdBy', 'parent'], 'name');
 

@@ -24,7 +24,8 @@ class PurchaseOrderController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(PurchaseOrder::class, 'purchase_order');
+        $this->authorizeResource(PurchaseOrder::class, 'purchase_order',
+            ['except' => ['index']]);
 
     }
 
@@ -35,6 +36,13 @@ class PurchaseOrderController extends Controller
      */
     public function index(Request $request)
     {
+
+        if ($request->search) {
+            $this->authorize('search', PurchaseOrder::class);
+        } else {
+            $this->authorize('viewAny', PurchaseOrder::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'sn'], ['createdBy', 'updatedBy', 'rfq', 'items']);
 
 

@@ -41,11 +41,18 @@ class VerificationController extends Controller
      * @param StoreVerificationRequest $request
      * @param PurchaseRequest $purchaseRequest
      * @param PurchaseRequestService $service
-     * @return PurchaseRequest[]
+     * @return PurchaseRequest[]|\Illuminate\Http\Response
      */
     public function store(StoreVerificationRequest $request, PurchaseRequest $purchaseRequest,
                           PurchaseRequestService   $service)
     {
+
+        $stage = PurchaseRequestUtils::stage()['REQUEST_CREATED'];
+
+        if ($purchaseRequest->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
+
         DB::beginTransaction();
 
         $itemModels = $purchaseRequest->items;
@@ -99,12 +106,18 @@ class VerificationController extends Controller
      * Display the specified resource.
      *
      * @param PurchaseRequest $purchaseRequest
-     * @return PurchaseRequest[]
+     * @return PurchaseRequest[]|\Illuminate\Http\Response
      * @throws AuthorizationException
      */
     public function show(PurchaseRequest $purchaseRequest)
     {
         $this->authorize('verify', $purchaseRequest);
+
+        $stage = PurchaseRequestUtils::stage()['REQUEST_CREATED'];
+
+        if ($purchaseRequest->latestActivity->stage != $stage) {
+            return \response()->noContent(404);
+        }
 
         $meta = $this->queryMeta([],
             ['items', 'activities', 'items.product.balance', 'latestActivity']);
