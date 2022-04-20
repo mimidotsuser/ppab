@@ -29,6 +29,8 @@ use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\RequestForQuotationController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StandbySpareCheckinController;
+use App\Http\Controllers\StockBalanceActivityController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UnitOfMeasureController;
 use App\Http\Controllers\UserController;
@@ -177,6 +179,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
     Route::post('companies/{company}/logo', [CompanyController::class, 'uploadLogo']);
     Route::apiResource('companies', CompanyController::class);
+
+    Route::apiResource('stock-balance-activities', StockBalanceActivityController::class)
+        ->only(['show', 'index']);
+
+    Route::get('standby-spare-checkin', [StandbySpareCheckinController::class, 'index']);
+    Route::post('standby-spare-checkin', [StandbySpareCheckinController::class, 'store']);
+
 });
 
 Route::fallback(function () {

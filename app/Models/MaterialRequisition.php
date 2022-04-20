@@ -17,6 +17,11 @@ class MaterialRequisition extends Model
     protected $with = ['createdBy'];
     protected $hidden = ['email_thread_id'];
 
+    public function balanceActivities()
+    {
+        return $this->morphMany(StockBalanceActivity::class, 'event');
+    }
+
     /**
      * @return HasMany
      */

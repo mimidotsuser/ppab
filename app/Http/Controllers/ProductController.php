@@ -27,7 +27,7 @@ class ProductController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
         $meta = $this->queryMeta(['created_at', 'item_code', 'economic_order_qty', 'min_level',
-            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent','balance']);
+            'reorder_level', 'max_level'], ['createdBy', 'updatedBy', 'parent','balance','variants']);
 
         array_push($meta->include, 'category'); //category relationship load always
 

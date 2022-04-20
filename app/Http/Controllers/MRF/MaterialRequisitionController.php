@@ -16,6 +16,7 @@ use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,11 +36,47 @@ class MaterialRequisitionController extends Controller
      *
      * @return LengthAwarePaginator
      */
-    public function index(): LengthAwarePaginator
+    public function index(Request $request): LengthAwarePaginator
     {
-        $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta(['created_at', 'id'], ['items', 'activities', 'latestActivity',
+            'items.product', 'items.product.variants', 'balanceActivities']);
 
         return MaterialRequisition::with($meta->include)
+            ->when($request->search, function ($query, $searchTerm) {
+                $query->where(function ($query) use ($searchTerm) {
+
+                    $query->orWhereBeginsWith('sn', $searchTerm);
+                    $query->orWhereLike('sn', $searchTerm);
+
+                    $query->orWhereRelationBeginsWith('createdBy', 'first_name', $searchTerm);
+                    $query->orWhereRelationLike('createdBy', 'first_name', $searchTerm);
+
+                    $query->orWhereRelationBeginsWith('createdBy', 'last_name', $searchTerm);
+                    $query->orWhereRelationLike('createdBy', 'last_name', $searchTerm);
+
+                });
+
+            })
+            ->when($request->get('stage', false), function ($builder, $stage) {
+
+                if ($stage === 'issued') {
+                    $stage = MRFUtils::stage()['ISSUED'];
+                    $partialIssued = MRFUtils::stage()['PARTIAL_ISSUE'];
+
+                    $builder->whereRelation('latestActivity', 'stage', $stage);
+                    $builder->orWhereRelation('latestActivity', 'stage', $partialIssued);
+                }
+                if ($stage === 'approved') {
+                    $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['APPROVAL_OKAYED']);
+                }
+                if ($stage === 'verified') {
+                    $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['VERIFIED_OKAYED']);
+                }
+                    if ($stage === 'created') {
+                    $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['REQUEST_CREATED']);
+                }
+
+            })
             ->paginate($meta->limit, '*', null, $meta->page);
     }
 
@@ -106,7 +143,8 @@ class MaterialRequisitionController extends Controller
     #[ArrayShape(['data' => "\App\Models\MaterialRequisition"])]
     public function show(MaterialRequisition $materialRequisition): array
     {
-        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity']);
+        $meta = $this->queryMeta([], ['items', 'activities', 'latestActivity', 'items.product',
+            'items.product.variants', 'balanceActivities']);
 
         $materialRequisition->load($meta->include);
         return ['data' => $materialRequisition];

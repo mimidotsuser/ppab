@@ -96,7 +96,7 @@ abstract class PermissionUtils
             'description' => 'User can adjust stock balances'],
 
         ['name' => 'standByCheckIn.view', 'group' => 'product checkin',
-            'description' => 'User can view standby reminder products'],
+            'description' => 'User can view standby reminder checkins'],
         ['name' => 'standByCheckIn.create', 'group' => 'product checkin',
             'description' => 'User can receive standby reminder products'],
 

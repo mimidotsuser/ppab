@@ -9,7 +9,7 @@ return new class extends Migration {
     function __construct()
     {
         $this->adminRole = [
-            'name' => 'super admin',
+            'name' => 'Super admin',
             'editable' => false,
             'description' => 'Gives a user access to all system services',
             'updated_at' => Date::now(),
