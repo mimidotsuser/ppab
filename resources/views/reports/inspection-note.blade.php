@@ -116,7 +116,7 @@
                 <td>
                     {{($item->delivered_qty??0- $item->rejected_qty??0)/$item->purchaseOrderItem->uom->unit }}
                 </td>
-                <td>{{ ($item->rejected??0)/$item->purchaseOrderItem->uom->unit }}</td>
+                <td>{{ ($item->rejected_qty??0)/$item->purchaseOrderItem->uom->unit }}</td>
             </tr>
         @endforeach
 
