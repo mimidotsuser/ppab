@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductItemActivity;
 use App\Models\StockBalance;
+use App\Models\User;
 use App\Models\Worksheet;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -65,6 +66,52 @@ class AnalyticsController extends Controller
                 DB::raw('DATE(`' . Worksheet::query()->from . '`.`created_at`)')
             ])
             ->orderByDesc('created_at')
+            ->get();
+
+        return ['data' => $data];
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function worksheetsCountByAuthor(Request $request): array
+    {
+        $from = Carbon::now()->subMonths(6);
+        $to = Carbon::now();
+
+        if ($request->filled('between')) {
+            $between = explode(',', $request->get('between'));
+            if (!empty($between[0]) && (bool)strtotime($between[0])) {
+                $from = $between[0];
+            }
+
+            if (!empty($between[1]) && (bool)strtotime($between[1])) {
+                $to = $between[1];
+            }
+        }
+
+        $data = Worksheet::query()
+            ->select([
+                DB::raw('COUNT(`' . Worksheet::query()->from . '`.`id`) AS `total`'),
+                DB::raw('CONCAT(`'.User::query()->from .'`.`first_name`," ",`'. User::query()->from.'`.`last_name`) AS `name`')
+            ])
+            ->when(!$request->get('createdByIds'), function (Builder $builder) {
+                $builder->from(function (QueryBuilder $query) {
+                    $query->selectRaw('COUNT(id) as toto,created_by_id')
+                        ->from(Worksheet::query()->from)
+                        ->groupBy('created_by_id')
+                        ->orderByDesc('toto')
+                        ->limit(10); //top 10
+                }, 'worksheet_temp')
+                    ->leftJoin(Worksheet::query()->from, 'worksheet_temp.created_by_id', '=', Worksheet::query()->from . '.created_by_id');
+            })
+            ->whereBetween(Worksheet::query()->from . '.created_at', [$from, $to])
+            ->when($request->get('createdByIds'), function (Builder $builder, $authorsIds) {
+                $builder->whereIn('created_by_id', explode(',', $authorsIds));
+            })
+            ->leftJoin(User::query()->from, Worksheet::query()->from . '.created_by_id', '=', User::query()->from . '.id')
+            ->groupBy([Worksheet::query()->from . '.created_by_id'])
             ->get();
 
         return ['data' => $data];

@@ -191,6 +191,7 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1/analytics'], function () {
     Route::get('worksheets/count-by-customer', [AnalyticsController::class, 'worksheetsCountByCustomer']);
+    Route::get('worksheets/count-by-author', [AnalyticsController::class, 'worksheetsCountByAuthor']);
     Route::get('products/count-by-category', [AnalyticsController::class, 'productsCountByCategory']);
     Route::get('products/count-out-of-stock', [AnalyticsController::class, 'productsOutOfStockCount']);
     Route::get('product-items/count-by-location', [AnalyticsController::class, 'productItemsCountByLocation']);
