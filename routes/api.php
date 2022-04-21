@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -186,6 +187,13 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('standby-spare-checkin', [StandbySpareCheckinController::class, 'index']);
     Route::post('standby-spare-checkin', [StandbySpareCheckinController::class, 'store']);
 
+});
+
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1/analytics'], function () {
+    Route::get('worksheets/count-by-customer', [AnalyticsController::class, 'worksheetsCountByCustomer']);
+    Route::get('products/count-by-category', [AnalyticsController::class, 'productsCountByCategory']);
+    Route::get('products/count-out-of-stock', [AnalyticsController::class, 'productsOutOfStockCount']);
+    Route::get('product-items/count-by-location', [AnalyticsController::class, 'productItemsCountByLocation']);
 });
 
 Route::fallback(function () {
