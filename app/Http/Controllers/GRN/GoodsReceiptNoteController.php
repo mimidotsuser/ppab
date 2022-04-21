@@ -178,7 +178,7 @@ class GoodsReceiptNoteController extends Controller
         }
 
         $goodsReceiptNote->load(['purchaseOrder.currency', 'items', 'items.product',
-            'items.purchaseOrderItem.uom', 'activities' => function ($query) {
+            'items.purchaseOrderItem.uom', 'purchaseOrder.vendor', 'activities' => function ($query) {
                 $query->latest();
             }]);
 

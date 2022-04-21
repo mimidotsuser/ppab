@@ -23,7 +23,15 @@
                 </td>
             </tr>
             <tr>
-                <td class="title-col">Date</td>
+                <td class="title-col">SUPPLIER</td>
+                <td class="value-col">
+                    <div class="underlined">
+                        {{$receipt->purchaseOrder->vendor->name}}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="title-col">DATE</td>
                 <td class="value-col">
                     <div class="underlined">
                         {{\Illuminate\Support\Carbon::now()->format('F d, Y')}}
