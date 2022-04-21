@@ -53,8 +53,8 @@
             <th>ITEM DESCRIPTION</th>
             <th>UOM</th>
             <th>QTY</th>
-            <th>UNIT PRICE</th>
-            <th>TOTAL PRICE</th>
+            <th colspan="2">UNIT PRICE</th>
+            <th colspan="2">TOTAL PRICE</th>
         </tr>
         </thead>
         <tbody>
@@ -66,22 +66,10 @@
                 <td>{{$item->product->description}}</td>
                 <td>{{$item->uom->title}}</td>
                 <td>{{$item->qty}}</td>
-                <td style="padding:0;vertical-align: top" align="top" class="amount-col">
-                    <table>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                        </tr>
-                    </table>
-                </td>
-                <td style="padding:0;vertical-align: top" align="top" class="amount-col">
-                    <table>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td>&nbsp;</td>
-                        </tr>
-                    </table>
-                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
             </tr>
         @endforeach
 

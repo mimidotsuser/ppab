@@ -5,7 +5,7 @@
 
 @section('body')
 
-    <header  class="ps-4 ms-5">
+    <header class="ps-4 ms-5">
         <div class="vendor-address float-left">
             <strong>To:</strong>
             @if(!empty($vendor))
@@ -32,6 +32,19 @@
             @endif
         </div>
 
+        <div class="logo-container float-left pe-4">
+            @if(!empty($company) && isset($company->logo_url))
+
+                @if(\Illuminate\Support\Facades\Storage::exists($company->logo_url))
+                    <img alt="" class="logo"
+                         src="{{asset( \Illuminate\Support\Facades\Storage::url($company->logo_url))}}">
+                @else
+                    <img src="{{$company->logo_url}}" class="logo" alt="">
+                @endif
+            @else
+                <img src="{{asset('images/main-logo.png')}}" class="logo" alt="">
+            @endif
+        </div>
         <div class="address-container ps-2">
             @if(!empty($company))
                 @if(isset( $company->name ))

@@ -9,7 +9,7 @@ section.main-content, section.activities {
 }
 
 section.activities {
-    margin-bottom: 3px;
+    margin-bottom: 40px;
 }
 
 header .vendor-address {
@@ -21,6 +21,14 @@ header .vendor-address {
 }
 header .vendor-address .col-12 {
     font-size: 14px;
+}
+header .logo-container {
+    height: 110px;
+}
+header .logo-container .logo {
+    height: 125px;
+    width: 150px;
+    margin-top: -20px;
 }
 header .company-address {
     font-size: 16px;
