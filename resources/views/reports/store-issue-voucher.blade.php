@@ -75,15 +75,15 @@
                 <td class="title-col">Raised by</td>
                 <td class="value-col">
                     <div class="underlined">
-                        {{$mrn->createdBy->first_name}}
-                        {{$mrn->createdBy->last_name}}
+                        {{$issue->createdBy->first_name}}
+                        {{$issue->createdBy->last_name}}
                     </div>
                 </td>
                 <td class="title-col">Approved by</td>
                 <td class="value-col">
                     <div class="underlined">
-                        {{$issue->createdBy->first_name}}
-                        {{$issue->createdBy->last_name}}
+                        {{$approval->createdBy->first_name}}
+                        {{$approval->createdBy->last_name}}
                     </div>
                 </td>
                 <td class="title-col">Received by</td>

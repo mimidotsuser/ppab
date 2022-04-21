@@ -42,6 +42,8 @@ class AnalyticsController extends Controller
                 DB::raw('DATE(`' . Worksheet::query()->from . '`.`created_at`) AS `created_at`'),
                 DB::raw('COUNT(`' . Worksheet::query()->from . '`.`id`) AS `total`'),
                 Customer::query()->from . '.name',
+                Customer::query()->from . '.branch',
+                Customer::query()->from . '.region',
             ])
             ->when(!$request->get('customerIds'), function (Builder $builder) {
                 $builder->from(function (QueryBuilder $query) {

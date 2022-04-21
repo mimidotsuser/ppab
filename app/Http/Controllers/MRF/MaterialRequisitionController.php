@@ -231,7 +231,10 @@ class MaterialRequisitionController extends Controller
             $issue = $materialRequisition->activities->firstWhere('stage', $partiallyIssuedStage);
         }
 
-        $SIVFile($materialRequisition, $issue)
+        $approvedStage = MRFUtils::stage()['APPROVAL_OKAYED'];
+        $approval = $materialRequisition->activities->firstWhere('stage', $approvedStage);
+
+        $SIVFile($materialRequisition, $approval,$issue)
             ->stream('siv-' . strtolower($materialRequisition->sn) . ".pdf");
     }
 }
