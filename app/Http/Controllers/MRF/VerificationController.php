@@ -52,7 +52,7 @@ class VerificationController extends Controller
                           MaterialRequisitionService $materialRequisitionService)
     {
 
-        $stage = MRFUtils::stage()['VERIFIED_OKAYED'];
+        $stage = MRFUtils::stage()['REQUEST_CREATED'];
 
         if ($materialRequisition->latestActivity->stage != $stage) {
             return \response()->noContent(404);
@@ -115,7 +115,7 @@ class VerificationController extends Controller
     {
         $this->authorize('verify', $materialRequisition);
 
-        $stage = MRFUtils::stage()['VERIFIED_OKAYED'];
+        $stage = MRFUtils::stage()['REQUEST_CREATED'];
 
         if ($materialRequisition->latestActivity->stage != $stage) {
             return \response()->noContent(404);
