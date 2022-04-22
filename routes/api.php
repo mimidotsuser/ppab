@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountPassword;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -35,6 +36,7 @@ use App\Http\Controllers\StockBalanceActivityController;
 use App\Http\Controllers\StockBalanceController;
 use App\Http\Controllers\UnitOfMeasureController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserProfile;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WorksheetController;
@@ -187,6 +189,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1'], function () {
     Route::get('standby-spare-checkin', [StandbySpareCheckinController::class, 'index']);
     Route::post('standby-spare-checkin', [StandbySpareCheckinController::class, 'store']);
 
+    Route::get('/user-profile/{user}', [UserProfile::class, 'show']);
+    Route::patch('/user-profile/{user}', [UserProfile::class, 'update']);
+    Route::patch('/account-password/{user}', [AccountPassword::class, 'update']);
 });
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'v1/analytics'], function () {
