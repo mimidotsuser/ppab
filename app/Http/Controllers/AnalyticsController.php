@@ -65,7 +65,7 @@ class AnalyticsController extends Controller
                 Worksheet::query()->from . '.customer_id',
                 DB::raw('DATE(`' . Worksheet::query()->from . '`.`created_at`)')
             ])
-            ->orderByDesc('created_at')
+            ->orderBy('created_at')
             ->get();
 
         return ['data' => $data];
