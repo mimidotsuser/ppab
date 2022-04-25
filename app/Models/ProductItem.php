@@ -73,7 +73,7 @@ class ProductItem extends Model
             ->whereDate('warrant_start', '<=', Carbon::today())
             ->where(function ($query) {
                 $query->orWhere('warrant_end', null);
-                $query->orWhereDate('warrant_end', '<=', Carbon::today());
+                $query->orWhereDate('warrant_end', '>=', Carbon::today());
             });
     }
 

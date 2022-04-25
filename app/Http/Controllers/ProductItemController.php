@@ -47,7 +47,7 @@ class ProductItemController extends Controller
             ['createdBy', 'updatedBy', 'product', 'latestActivity', 'latestActivity.location',
                 'latestActivity.warrant', 'activities', 'activities.location', 'activities.warrant',
                 'activities.createdBy', 'activities.remark', 'activities.repair',
-                'activeWarrant', 'activeWarrants', 'oldestActivity']);
+                'activeWarrant', 'oldestActivity']);
 
 
         return ProductItem::with($meta->include)
@@ -177,7 +177,7 @@ class ProductItemController extends Controller
         $meta = $this->queryMeta([], ['createdBy', 'updatedBy', 'product', 'latestActivity',
             'latestActivity.location', 'latestActivity.warrant', 'activities',
             'activities.location', 'activities.warrant', 'activities.createdBy',
-            'activities.remark', 'activities.repair', 'activeWarrant', 'activeWarrants',
+            'activities.remark', 'activities.repair', 'activeWarrant',
             'oldestActivity']);
 
         $productItem->load($meta->include);
