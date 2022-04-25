@@ -86,11 +86,14 @@ class ProductItemService
 
     public function activeContract(ProductItem $productItem, Customer $customer): null|CustomerContract
     {
+
+        //contracts belong to parent
+        $customerId = is_null($customer->parent_id) ? $customer->id : $customer->parent_id;
         /**
          * Checking on last product item activity may not work if the
          * contract was to start at a later date
          */
-        $lastContract = CustomerContract::where('customer_id', $customer->id)
+        $lastContract = CustomerContract::where('customer_id', $customerId)
             ->latest()
             ->whereRelation('productItems', 'product_item_id', $productItem->id)
             ->first();
