@@ -45,6 +45,9 @@ class UserController extends Controller
                     $query->orWhereLike('last_name', $searchTerm);
                 });
             })
+            ->when($request->get('exclude'), function (Builder $query, $excluded) {
+                $query->whereNotIn('id', explode(',', $excluded));
+            })
             ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
