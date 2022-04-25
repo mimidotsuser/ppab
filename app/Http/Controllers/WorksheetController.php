@@ -7,15 +7,14 @@ use App\Http\Requests\StoreWorksheetRequest;
 use App\Models\Customer;
 use App\Models\EntryRemark;
 use App\Models\ProductItem;
-use App\Models\ProductItemActivity;
 use App\Models\ProductItemRepair;
 use App\Models\Worksheet;
 use App\Services\ProductItemService;
 use App\Utils\WorksheetUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -30,10 +29,10 @@ class WorksheetController extends Controller
     {
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
-            'entries.warrant', 'entries.contract', 'entries.createdBy', 'entries.remark',
-           'entries.productItem.product', 'entries.repair', 'entries.repair.products',
+                'entries.warrant', 'entries.contract', 'entries.createdBy', 'entries.remark',
+                'entries.productItem.product', 'entries.repair', 'entries.repair.products',
                 'entries.repair.sparesUtilized'
-        ]);
+            ]);
 
         return Worksheet::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
@@ -48,7 +47,20 @@ class WorksheetController extends Controller
             })
             ->when($request->get('total'), function ($query) {
                 $query->withCount('entries');
-            })->when($meta, function ($query, $meta) {
+            })
+            ->when($request->get('start_date'), function (Builder $builder, $startDate) {
+                $builder->whereDate('created_at', '>=', $startDate);
+            })
+            ->when($request->get('end_date'), function (Builder $builder, $endDate) {
+                $builder->whereDate('created_at', '<=', $endDate);
+            })
+            ->when($request->get('customers'), function (Builder $builder, $customerIds) {
+                $builder->whereIn('customer_id', explode(',', $customerIds));
+            })
+            ->when($request->get('created_by'), function (Builder $builder, $authorIds) {
+                $builder->whereIn('created_by_id', explode(',', $authorIds));
+            })
+            ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
                 }
@@ -62,7 +74,7 @@ class WorksheetController extends Controller
      * @param StoreWorksheetRequest $request
      * @return array
      */
-    public function store(StoreWorksheetRequest $request,ProductItemService $productItemService): array
+    public function store(StoreWorksheetRequest $request, ProductItemService $productItemService): array
     {
         DB::beginTransaction();
 
@@ -110,12 +122,12 @@ class WorksheetController extends Controller
                     $activity = new ProductItemActivityContract;
                     $activity->categoryCode = $categoryCode;
                     $activity->categoryTitle = $categoryTitle;
-                    $activity->remark=$remark;
-                    $activity->productItem=$productItem;
+                    $activity->remark = $remark;
+                    $activity->productItem = $productItem;
                     $activity->eventModel = $worksheet;
                     $activity->customer = Customer::find($request->get('customer_id'));
                     $activity->covenant = $productItem->latestActivity->covenant;;
-                    if(isset($repair)) {
+                    if (isset($repair)) {
                         $activity->repairModel = $repair;
                     }
 
