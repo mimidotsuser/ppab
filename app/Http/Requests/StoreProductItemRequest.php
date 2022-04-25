@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\PurchaseOrder;
 use App\Models\Warehouse;
+use App\Utils\MRFUtils;
 use App\Utils\ProductItemActivityUtils;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
@@ -48,6 +49,8 @@ class StoreProductItemRequest extends FormRequest
             'warrant_end' => ['nullable', 'prohibited_unless:warehouse_id,null', 'date'],
             'contract_id' => ['nullable', 'prohibited_unless:warehouse_id,null',
                 Rule::exists(CustomerContract::class, 'id')],
+            'nature_of_release' => ['required_without:warehouse_id',
+                'prohibited_unless:warehouse_id,null', Rule::in(array_keys(MRFUtils::purpose()))],
             'out_of_order' => ['required_without:customer_id', 'boolean',
                 'prohibited_unless:customer_id,null'],
             'description' => ['nullable', 'max:255'],

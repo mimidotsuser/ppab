@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
     private $unitsOfMeasure = [
-        ['code' => 'PCS', 'title' => '1 Piece', 'unit' => 1],
-        ['code' => 'BOX', 'title' => '4 @ Box', 'unit' => 4],
-        ['code' => 'BOX', 'title' => '12 @ Box', 'unit' => 12],
+        ['code' => 'PCS', 'title' => 'Pieces', 'unit' => 1],
     ];
 
     /**

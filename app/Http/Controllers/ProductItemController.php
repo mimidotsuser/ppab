@@ -134,6 +134,8 @@ class ProductItemController extends Controller
             $productItemActivity->location()
                 ->associate(Warehouse::find($request->get('warehouse_id')));
         } else {
+            $productItemActivity->covenant = $request->get('nature_of_release');
+
             $productItemActivity->location()
                 ->associate(Customer::find($request->get('customer_id')));
 
