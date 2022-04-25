@@ -117,7 +117,7 @@ class CustomerContractController extends Controller
 
         DB::beginTransaction();
 
-        $newContractIds = Arr::pluck($request->get('contract_items'), 'product_item_id');
+        $newContractIds = Arr::pluck($request->get('contract_items', []), 'product_item_id');
         $oldContractIds = Arr::pluck($customerContract->contractItems, 'product_item_id');
 
         //find the items that have been removed
@@ -128,6 +128,20 @@ class CustomerContractController extends Controller
         //set current contract as in-active
         $customerContract->active = false;
         $customerContract->update();
+
+        //if the items were removed from current contract,
+        if (count($newContractIds) === 0) {
+
+            //update items activity
+            if (count($detached) > 0) {
+                $service->createItemsContractActivities($detached, $customerContract,
+                    ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_UPDATED'],);
+            }
+
+            DB::commit();
+            //stop further logic execution
+            return ['data' => $customerContract];
+        }
 
         //save the contract as new
         $newContract = new CustomerContract;
@@ -148,7 +162,7 @@ class CustomerContractController extends Controller
 
         if (count($detached) > 0) {
             $service->createItemsContractActivities($detached, $newContract,
-                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_UPDATED'], );
+                ProductItemActivityUtils::activityCategoryCodes()['CONTRACT_UPDATED'],);
         }
 
         if (count($attached) > 0) {
@@ -166,7 +180,7 @@ class CustomerContractController extends Controller
      * @param CustomerContract $customerContract
      * @return Response
      */
-    public function destroy(CustomerContract $customerContract, CustomerContractService       $service)
+    public function destroy(CustomerContract $customerContract, CustomerContractService $service)
     {
         $service->createItemsContractActivities(
             Arr::pluck($customerContract->contractItems, 'product_item_id'),
