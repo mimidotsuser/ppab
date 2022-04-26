@@ -255,9 +255,9 @@ class MaterialRequisitionController extends Controller
         if ($stage != $partiallyIssuedStage && $stage != $issuedStage) {
             return response()->noContent(404);
         }
-        $materialRequisition->load(['items', 'createdBy', 'activities' => function ($query) {
-            $query->latest();
-        }]);
+
+        $materialRequisition->load(['items','items.customer', 'createdBy',
+            'allocationActivities.productItem', 'activities' => fn($query) => $query->latest()]);
 
         $issue = $materialRequisition->activities->firstWhere('stage', $issuedStage);
         if (empty($issue)) {

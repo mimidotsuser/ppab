@@ -46,6 +46,7 @@
             <th>DESCRIPTION</th>
             <th>REQUESTED</th>
             <th>ISSUED</th>
+            <th>CUSTOMER</th>
             <th>REMARKS</th>
         </tr>
         </thead>
@@ -58,12 +59,25 @@
                 <td>{{$item->product->description}}</td>
                 <td>{{$item->requested_qty}}</td>
                 <td>{{$item->issued_qty}}</td>
+                <td>{{$item->customer->name}} | {{$item->customer->branch??$item->customer->region}}</td>
                 <td>{{$item->purpose_title}}</td>
             </tr>
         @endforeach
 
         </tbody>
     </table>
+
+    <div class="mt-3 ms-3 me-3">
+        <span class="title pb-2" style="font-size: 14px">Machines Serial Numbers Issued</span>
+        <div style="font-size: 12px;line-height: 2em">
+            @foreach($mrn->allocationActivities as $allocation)
+                {{$allocation->productItem->serial_number}}
+                @if (!$loop->last)
+                    ,
+                @endif
+            @endforeach
+        </div>
+    </div>
 @endsection
 
 
