@@ -49,10 +49,10 @@ class WorksheetController extends Controller
                 $query->withCount('entries');
             })
             ->when($request->get('start_date'), function (Builder $builder, $startDate) {
-                $builder->whereDate('created_at', '>=', $startDate);
+                $builder->whereDate('created_at', '>', $startDate);
             })
             ->when($request->get('end_date'), function (Builder $builder, $endDate) {
-                $builder->whereDate('created_at', '<=', $endDate);
+                $builder->whereDate('created_at', '<', $endDate);
             })
             ->when($request->get('customers'), function (Builder $builder, $customerIds) {
                 $builder->whereIn('customer_id', explode(',', $customerIds));
