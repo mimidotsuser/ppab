@@ -16,6 +16,7 @@ use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +30,7 @@ class MaterialRequisitionController extends Controller
     public function __construct()
     {
         $this->authorizeResource(MaterialRequisition::class, 'material_requisition',
-        ['except'=>['index']]);
+            ['except' => ['index']]);
     }
 
     /**
@@ -64,7 +65,7 @@ class MaterialRequisitionController extends Controller
                 });
 
             })
-            ->when($request->get('stage', false), function ($builder, $stage) {
+            ->when($request->get('stage'), function ($builder, $stage) {
 
                 if ($stage === 'issued') {
                     $stage = MRFUtils::stage()['ISSUED'];
@@ -83,6 +84,38 @@ class MaterialRequisitionController extends Controller
                     $builder->whereRelation('latestActivity', 'stage', MRFUtils::stage()['REQUEST_CREATED']);
                 }
 
+            })
+            ->when($request->get('stages'), function (Builder $builder, $stages) {
+
+                $builder->whereHas('latestActivity', function ($query) use ($stages) {
+                    $query->where(function ($query) use ($stages) {
+                        $parsedStages = explode(',', $stages);
+                        foreach ($parsedStages as $stage) {
+                            if ($stage === 'issued') {
+                                $query->orWhere('stage', MRFUtils::stage()['PARTIAL_ISSUE']);
+                                $query->orWhere('stage', MRFUtils::stage()['ISSUED']);
+                            }
+                            if ($stage === 'approved') {
+                                $query->orWhere('stage', MRFUtils::stage()['APPROVAL_OKAYED']);
+                            }
+                            if ($stage === 'verified') {
+                                $query->orWhere('stage', MRFUtils::stage()['VERIFIED_OKAYED']);
+                            }
+                            if ($stage === 'created') {
+                                $query->orWhere('stage', MRFUtils::stage()['REQUEST_CREATED']);
+                            }
+                        }
+                    });
+                });
+            })
+            ->when($request->get('start_date'), function (Builder $builder, $startDate) {
+                $builder->whereDate('created_at', '>', $startDate);
+            })
+            ->when($request->date('end_date'), function (Builder $builder, $endDate) {
+                $builder->whereDate('created_at', '<', $endDate);
+            })
+            ->when($request->get('created_by'), function (Builder $builder, $authorIds) {
+                $builder->whereIn('created_by_id', explode(',', $authorIds));
             })
             ->paginate($meta->limit, '*', null, $meta->page);
     }
@@ -234,7 +267,7 @@ class MaterialRequisitionController extends Controller
         $approvedStage = MRFUtils::stage()['APPROVAL_OKAYED'];
         $approval = $materialRequisition->activities->firstWhere('stage', $approvedStage);
 
-        $SIVFile($materialRequisition, $approval,$issue)
+        $SIVFile($materialRequisition, $approval, $issue)
             ->stream('siv-' . strtolower($materialRequisition->sn) . ".pdf");
     }
 }
