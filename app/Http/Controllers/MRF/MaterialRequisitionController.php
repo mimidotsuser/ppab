@@ -117,6 +117,11 @@ class MaterialRequisitionController extends Controller
             ->when($request->get('created_by'), function (Builder $builder, $authorIds) {
                 $builder->whereIn('created_by_id', explode(',', $authorIds));
             })
+            ->when($meta, function ($query, $meta) {
+                foreach ($meta->orderBy as $sortKey) {
+                    $query->orderBy($sortKey, $meta->direction);
+                }
+            })
             ->paginate($meta->limit, '*', null, $meta->page);
     }
 
