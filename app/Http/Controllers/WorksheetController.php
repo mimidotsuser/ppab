@@ -60,6 +60,17 @@ class WorksheetController extends Controller
             ->when($request->get('created_by'), function (Builder $builder, $authorIds) {
                 $builder->whereIn('created_by_id', explode(',', $authorIds));
             })
+            ->when($request->get('entry_categories'), function (Builder $builder, $entryCat) {
+
+                $builder->whereHas('entries', function ($query) use ($entryCat) {
+                    $query->where(function ($query) use ($entryCat) {
+                        $entryCategories = explode(',', $entryCat);
+                        foreach ($entryCategories as $category) {
+                            $query->orWhere('log_category_code', $category);
+                        }
+                    });
+                });
+            })
             ->when($meta, function ($query, $meta) {
                 foreach ($meta->orderBy as $sortKey) {
                     $query->orderBy($sortKey, $meta->direction);
