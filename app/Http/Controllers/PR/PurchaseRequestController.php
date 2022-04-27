@@ -57,6 +57,35 @@ class PurchaseRequestController extends Controller
             ->when($request->get('stage'), function (Builder $query, string $stage,) {
                 $query->whereRelation('latestActivity', 'stage', $stage);
             })
+            ->when($request->get('stages'), function (Builder $builder, $stages) {
+
+                $builder->whereHas('latestActivity', function ($query) use ($stages) {
+                    $query->where(function ($query) use ($stages) {
+                        $parsedStages = explode(',', $stages);
+                        foreach ($parsedStages as $stage) {
+
+                            if ($stage === 'approved') {
+                                $query->orWhere('stage', PurchaseRequestUtils::stage()['APPROVAL_OKAYED']);
+                            }
+                            if ($stage === 'verified') {
+                                $query->orWhere('stage', PurchaseRequestUtils::stage()['VERIFIED_OKAYED']);
+                            }
+                            if ($stage === 'created') {
+                                $query->orWhere('stage', PurchaseRequestUtils::stage()['REQUEST_CREATED']);
+                            }
+                        }
+                    });
+                });
+            })
+            ->when($request->get('start_date'), function (Builder $builder, $startDate) {
+                $builder->whereDate('created_at', '>', $startDate);
+            })
+            ->when($request->date('end_date'), function (Builder $builder, $endDate) {
+                $builder->whereDate('created_at', '<', $endDate);
+            })
+            ->when($request->get('created_by'), function (Builder $builder, $authorIds) {
+                $builder->whereIn('created_by_id', explode(',', $authorIds));
+            })
             ->paginate($meta->limit, '*', null, $meta->page);
     }
 
