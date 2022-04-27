@@ -61,6 +61,17 @@ class AnalyticsController extends Controller
                 $builder->whereIn('customer_id', explode(',', $customerIds));
             })
             ->leftJoin(Customer::query()->from, Worksheet::query()->from . '.customer_id', '=', Customer::query()->from . '.id')
+            ->when($request->get('entry_categories'), function (Builder $builder, $entryCat) {
+
+                $builder->whereHas('entries', function ($query) use ($entryCat) {
+                    $query->where(function ($query) use ($entryCat) {
+                        $entryCategories = explode(',', $entryCat);
+                        foreach ($entryCategories as $category) {
+                            $query->orWhere('log_category_code', $category);
+                        }
+                    });
+                });
+            })
             ->groupBy([
                 Worksheet::query()->from . '.customer_id',
                 DB::raw('DATE(`' . Worksheet::query()->from . '`.`created_at`)')
