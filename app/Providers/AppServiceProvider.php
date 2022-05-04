@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\CustomerContract;
 use App\Models\MaterialRequisition;
 use App\Models\ProductItemWarrant;
+use App\Models\StockBalance;
 use App\Models\Warehouse;
 use App\Models\Worksheet;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             'material_requisition' => MaterialRequisition::class,
             'customer_contract' => CustomerContract::class,
             'product_item_warrant' => ProductItemWarrant::class,
+            'stock_balance' => StockBalance::class,
         ]);
 
         Builder::mixin(new ModelFilterMixin());
