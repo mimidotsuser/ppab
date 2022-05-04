@@ -32,16 +32,17 @@ class UpdateProductItemRequest extends FormRequest
     public function rules()
     {
         $morphKey = key(Arr::where(Relation::morphMap(), fn($key) => $key == Warehouse::class));
-        $itemInWarehouse=  $this->route('product_item')->latestActivity->location_type == $morphKey;
+        $itemInWarehouse = $this->route('product_item')->latestActivity->location_type == $morphKey;
 
         return [
             'product_id' => ['required', Rule::exists(Product::class, 'id')],
             'serial_number' => ['required', 'max:255',
                 Rule::unique(ProductItem::class, 'serial_number')
+                    ->where('product_id', request()->get('product_id'))
                     ->ignore($this->route('product_item'))],
             'purchase_order_id' => ['nullable', Rule::exists(PurchaseOrder::class, 'id')],
 
-            'out_of_order' => ['boolean', Rule::when(!$itemInWarehouse,'prohibited')],
+            'out_of_order' => ['boolean', Rule::when(!$itemInWarehouse, 'prohibited')],
         ];
     }
 }

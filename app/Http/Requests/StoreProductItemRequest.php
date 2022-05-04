@@ -32,13 +32,14 @@ class StoreProductItemRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(Request $request)
+    public function rules()
     {
         //if the product is not on customer premises, it's in a warehouse
         return [
             'product_id' => ['required', Rule::exists(Product::class, 'id')],
             'serial_number' => ['required', 'max:255',
-                Rule::unique(ProductItem::class, 'serial_number')],
+                Rule::unique(ProductItem::class, 'serial_number')
+                    ->where('product_id', request()->get('product_id'))],
 
             'customer_id' => ['required_without:warehouse_id', 'prohibited_unless:warehouse_id,null',
                 Rule::exists(Customer::class, 'id')],

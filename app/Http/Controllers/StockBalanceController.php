@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateStockBalanceRequest;
 use App\Models\StockBalance;
+use App\Models\StockBalanceActivity;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 
 class StockBalanceController extends Controller
@@ -66,14 +68,34 @@ class StockBalanceController extends Controller
     {
         $this->authorize('update', $stockBalance);
 
-        $stockBalance->qty_in = $request->get('total_qty_in') ?? $stockBalance->qty_in;
-        $stockBalance->qty_out = $request->get('total_qty_out') ?? $stockBalance->qty_out;
-        $stockBalance->b2c_qty_in_pipeline = $request->get('issue_requests_total') ??
-            $stockBalance->b2c_qty_in_pipeline;
-        $stockBalance->b2b_qty_in_pipeline = $request->get('reorder_requests_total') ??
-            $stockBalance->b2b_qty_in_pipeline;
+        DB::beginTransaction();
+        $qty_in_before = $stockBalance->qty_in;
+
+        if ($request->get('total_qty_in')) {
+            //update by adjustment
+            $stockBalance->qty_in = $stockBalance->qty_in + ($request->get('total_qty_in') - $stockBalance->stock_balance);
+        }
+
         $stockBalance->update();
         $stockBalance->refresh();
+
+        $activity = new StockBalanceActivity;
+        $activity->product_id = $stockBalance->product_id;
+        $activity->stock_balance_id = $stockBalance->id;
+        $activity->qty_in_before = $qty_in_before;
+        $activity->qty_in_after = $stockBalance->qty_in;
+        $activity->qty_out_before = $stockBalance->qty_out;
+        $activity->qty_out_after = $stockBalance->qty_out;
+        $activity->restock_qty_before = $stockBalance->b2b_qty_in_pipeline;
+        $activity->restock_qty_after = $stockBalance->b2b_qty_in_pipeline;
+        $activity->qty_pending_issue_before = $stockBalance->b2c_qty_in_pipeline;
+        $activity->qty_pending_issue_after = $stockBalance->b2c_qty_in_pipeline;
+        $activity->remarks = $request->get('remarks') ?? 'Stock balance adjustment';
+        $activity->event()->associate($stockBalance);
+        $activity->save();
+
+        DB::commit();
+
         $stockBalance->load('product', 'updatedBy');
         return ['data' => $stockBalance];
     }
