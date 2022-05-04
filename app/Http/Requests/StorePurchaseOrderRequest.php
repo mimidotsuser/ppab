@@ -42,7 +42,7 @@ class StorePurchaseOrderRequest extends FormRequest
             'items.*.rfq_item_id' => ['nullable',
                 Rule::exists(RequestForQuotationItem::class, 'id')],
             'items.*.qty' => 'required|numeric|integer|min:1',
-            'items.*.unit_price' => 'numeric|integer|min:1',
+            'items.*.unit_price' => 'numeric|integer|min:0',
             'items.*.unit_of_measure_id' => ['required',
                 Rule::exists(UnitOfMeasure::class, 'id')]
         ];
