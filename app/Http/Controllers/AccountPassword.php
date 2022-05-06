@@ -32,6 +32,7 @@ class AccountPassword extends Controller
         }
 
         $user->password = Hash::make($request->get('password'));
+        $user->update();
 
         return response(['message' => __('passwords.changed')], 201);
     }
