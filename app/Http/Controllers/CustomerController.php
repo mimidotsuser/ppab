@@ -51,10 +51,8 @@ class CustomerController extends Controller
                     $query->orWhereBeginsWith('branch', $searchTerm);
                     $query->orWhereLike('branch', $searchTerm);
 
-                    $query->orWhereLike(DB::raw("CONCAT_ws(' ',`branch`,`name`,`region`)"), $searchTerm);
-                    $query->orWhereLike(DB::raw("CONCAT_ws(' ',`name`,`branch`,`region`)"), $searchTerm);
-                    $query->orWhereLike(DB::raw("CONCAT_ws(' ',`region`,`name`,`branch`)"), $searchTerm);
-                    $query->orWhereLike(DB::raw("CONCAT_ws(' ',`region`,`branch`,`name`)"), $searchTerm);
+                    $query->orWhere(DB::raw("CONCAT_ws(' ',`branch`,`name`,`region`)"),
+                        'like',  '%'.str_replace(' ','%',$searchTerm).'%');
 
                 });
 
