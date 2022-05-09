@@ -9,6 +9,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 
 class CustomerController extends Controller
@@ -41,6 +42,9 @@ class CustomerController extends Controller
         return Customer::with($meta->include)
             ->when($request->search, function ($query, $searchTerm) {
                 $query->where(function ($query) use ($searchTerm) {
+
+                    $query->orWhereLike(DB::raw("CONCAT_ws(' ',`branch`,`name`,`region`)"), $searchTerm);
+
                     $query->orWhereBeginsWith('name', $searchTerm);
                     $query->orWhereLike('name', $searchTerm);
 
