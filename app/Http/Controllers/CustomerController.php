@@ -52,7 +52,13 @@ class CustomerController extends Controller
                     $query->orWhereLike('branch', $searchTerm);
 
                     $query->orWhere(DB::raw("CONCAT_ws(' ',`branch`,`name`,`region`)"),
-                        'like',  '%'.str_replace(' ','%',$searchTerm).'%');
+                        'like', '%' . str_replace(' ', '%', $searchTerm) . '%');
+
+                    $query->orWhere(DB::raw("CONCAT_ws(' ',`name`,`branch`,`region`)"),
+                        'like', '%' . str_replace(' ', '%', $searchTerm) . '%');
+
+                    $query->orWhere(DB::raw("CONCAT_ws(' ',`region`,`name`,`region`)"),
+                        'like', '%' . str_replace(' ', '%', $searchTerm) . '%');
 
                 });
 
