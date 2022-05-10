@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use JetBrains\PhpStorm\ArrayShape;
 
 class ProductItemController extends Controller
@@ -40,7 +41,10 @@ class ProductItemController extends Controller
         if ($request->search) {
             $this->authorize('search', ProductItem::class);
         } else {
-            $this->authorize('viewAny', ProductItem::class);
+            Gate::allowIf(function ($user) {
+                return $user->role->permissions->contains('name', 'productItems.view') ||
+                    $user->role->permissions->contains('name', 'worksheets.create');
+            });
         }
 
         $meta = $this->queryMeta(['created_at', 'product_id', 'sn', 'serial_number'],

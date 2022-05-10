@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use JetBrains\PhpStorm\ArrayShape;
 
 class StockBalanceController extends Controller
@@ -24,7 +25,11 @@ class StockBalanceController extends Controller
     public function index(Request $request): LengthAwarePaginator
     {
 
-        $this->authorize('viewAny', StockBalance::class);
+        Gate::allowIf(function ($user) {
+            return $user->role->permissions->contains('name', 'purchaseRequests.create') ||
+                $user->role->permissions->contains('name', 'stockBalances.viewAny');
+        });
+
         $meta = $this->queryMeta(['out_of_stock'],
             ['createdBy', 'updatedBy', 'product', 'warehouse']);
 

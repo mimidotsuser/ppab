@@ -21,7 +21,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(User::class, 'user');
+        $this->authorizeResource(User::class, 'user', ['except' => ['index']]);
     }
 
     /**
@@ -32,6 +32,12 @@ class UserController extends Controller
      */
     public function index(Request $request): LengthAwarePaginator
     {
+
+        if ($request->search) {
+            $this->authorize('search', User::class);
+        } else {
+            $this->authorize('viewAny', User::class);
+        }
 
         $meta = $this->queryMeta(['created_at', 'first_name', 'last_name'], ['role', 'createdBy']);
 

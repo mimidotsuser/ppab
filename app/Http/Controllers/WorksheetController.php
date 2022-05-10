@@ -20,6 +20,13 @@ use Illuminate\Support\Facades\DB;
 
 class WorksheetController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Worksheet::class, 'worksheet',
+            ['except' => ['index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,6 +34,12 @@ class WorksheetController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->search) {
+            $this->authorize('search', Worksheet::class);
+        } else {
+            $this->authorize('viewAny', Worksheet::class);
+        }
+
         $meta = $this->queryMeta(['created_at', 'sn', 'reference', 'customer_id'],
             ['createdBy', 'updatedBy', 'customer', 'entries', 'entries.location',
                 'entries.warrant', 'entries.contract', 'entries.createdBy', 'entries.remark',
