@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\MaterialRequisition;
 
 use App\Models\MaterialRequisition;
 use Illuminate\Bus\Queueable;
@@ -8,20 +8,22 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFIssueRequestedNotification extends Notification implements ShouldQueue
+class IssuedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
+    private MaterialRequisition $request;
+    private bool $fullyIssued;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(MaterialRequisition $requisition)
+    public function __construct(MaterialRequisition $requisition, $fullyIssued = true)
     {
         $this->request = $requisition;
+        $this->fullyIssued = $fullyIssued;
     }
 
     /**
@@ -45,15 +47,19 @@ class MRFIssueRequestedNotification extends Notification implements ShouldQueue
     {
 
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.issue') . '/' . $this->request->id);
+            . config('weburls.material_requests.history') . '/' . $this->request->id);
 
-        $author = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
+        $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Pending Issue')
-            ->line('Material requisition form (' . $this->request->sn . ') by ' . $author
-                . ' requires your attention')
-            ->action('Click here to action the request', $url)
+            ->subject('Re: Material Request ' . $this->request->sn)
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
+            ->line('Your material requisition form (' . $this->request->sn
+                . ') issuance status has been updated')
+            ->action('Generate Store Issue Note', $url)
+            ->when($this->fullyIssued, function ($mail) {
+                $mail->line('All approved items have been issued to you successfully.');
+            })
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 

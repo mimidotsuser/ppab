@@ -8,8 +8,8 @@ use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
 use App\Models\User;
-use App\Notifications\MRFApprovedNotification;
-use App\Notifications\MRFIssueRequestedNotification;
+use App\Notifications\MaterialRequisition\ApprovedNotification;
+use App\Notifications\MaterialRequisition\IssuanceRequestNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -91,11 +91,11 @@ class ApprovalController extends Controller
         if ($hasOkayedQty) {
             //notify issuer
             Notification::send(User::whereNot('id', Auth::id())->MRFIssuer()->get(),
-                new MRFIssueRequestedNotification($materialRequisition));
+                new IssuanceRequestNotification($materialRequisition));
         }
         //notify requester
         Notification::send($materialRequisition->createdBy,
-            new MRFApprovedNotification($materialRequisition, !$hasOkayedQty));
+            new ApprovedNotification($materialRequisition, !$hasOkayedQty));
 
         return ['data' => $materialRequisition];
     }

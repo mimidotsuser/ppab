@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\MaterialRequisition;
 
 use App\Models\MaterialRequisition;
 use Illuminate\Bus\Queueable;
@@ -8,11 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFVerificationRequestedNotification extends Notification implements ShouldQueue
+class IssuanceRequestNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
+    private MaterialRequisition $request;
 
     /**
      * Create a new notification instance.
@@ -43,13 +43,15 @@ class MRFVerificationRequestedNotification extends Notification implements Shoul
      */
     public function toMail($notifiable)
     {
+
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.verification') . '/' . $this->request->id);
+            . config('weburls.material_requests.issue') . '/' . $this->request->id);
 
         $author = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Pending Verification')
+            ->subject('Material Requisition Form Items Issuance Requested')
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
             ->line('Material requisition form (' . $this->request->sn . ') by ' . $author
                 . ' requires your attention')
             ->action('Click here to action the request', $url)

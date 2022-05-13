@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\MaterialRequisition;
 
 use App\Models\MaterialRequisition;
 use Illuminate\Bus\Queueable;
@@ -8,11 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFApprovalRequestedNotification extends Notification implements ShouldQueue
+class ApprovalRequestNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
+    private MaterialRequisition $request;
 
     /**
      * Create a new notification instance.
@@ -49,7 +49,8 @@ class MRFApprovalRequestedNotification extends Notification implements ShouldQue
         $author = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Pending Approval')
+            ->subject('Material Requisition Form Approval Requested')
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
             ->line('Material requisition form (' . $this->request->sn . ') by ' . $author
                 . ' requires your attention')
             ->action('Click here to action the request', $url)

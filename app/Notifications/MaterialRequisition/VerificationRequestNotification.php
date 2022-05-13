@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\MaterialRequisition;
 
 use App\Models\MaterialRequisition;
 use Illuminate\Bus\Queueable;
@@ -8,11 +8,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFCreatedNotification extends Notification implements ShouldQueue
+class VerificationRequestNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
+    private MaterialRequisition $request;
 
     /**
      * Create a new notification instance.
@@ -44,24 +44,22 @@ class MRFCreatedNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.history') . '/' . $this->request->id);
+            . config('weburls.material_requests.verification') . '/' . $this->request->id);
 
-        $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
+        $author = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Submitted')
-            ->greeting('Dear ' . $name)
-            ->line('Your material requisition form ' . $this->request->sn
-                . ' has been submitted successfully.')
-            ->action('View Request', $url)
-            ->line('We will notify you of the outcome.')
+            ->subject('Material Requisition Form Verification Requested')
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
+            ->line('Material requisition form (' . $this->request->sn . ') by ' . $author
+                . ' requires your attention')
+            ->action('Click here to action the request', $url)
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 
                 $mail->getHeaders()->addTextHeader('In-Reply-To', '<' . $id . '>');
                 $mail->getHeaders()->addTextHeader('References', '<' . $id . '>');
             });
-
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\MaterialRequisition;
 
 use App\Models\MaterialRequisition;
 use Illuminate\Bus\Queueable;
@@ -8,22 +8,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFIssuedNotification extends Notification implements ShouldQueue
+class SubmittedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
-    private $fullyIssued;
+    private MaterialRequisition $request;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(MaterialRequisition $requisition, $fullyIssued = true)
+    public function __construct(MaterialRequisition $requisition)
     {
         $this->request = $requisition;
-        $this->fullyIssued = $fullyIssued;
     }
 
     /**
@@ -41,31 +39,28 @@ class MRFIssuedNotification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
-
         $url = url(config('weburls.root')
             . config('weburls.material_requests.history') . '/' . $this->request->id);
 
-        $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Issue Status Update')
-            ->greeting('Dear ' . $name)
-            ->line('Your material requisition form (' . $this->request->sn
-                . ') status has been updated')
-            ->action('Generate Store Issue Note', $url)
-            ->when($this->request, function ($mail) {
-                $mail->line('The items have been issued to you successfully.');
-            })
+            ->subject('Material Request ' . $this->request->sn)
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
+            ->line('Your material requisition form ' . $this->request->sn
+                . ' has been submitted successfully.')
+            ->action('View Request', $url)
+            ->line('We will notify you of the outcome.')
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 
                 $mail->getHeaders()->addTextHeader('In-Reply-To', '<' . $id . '>');
                 $mail->getHeaders()->addTextHeader('References', '<' . $id . '>');
             });
+
     }
 
     /**
