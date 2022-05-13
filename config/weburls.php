@@ -16,6 +16,11 @@ return [
         'approval' => '/main/material-requisition/approval',
         'verification' => '/main/material-requisition/verification',
         'issue' => '/main/checkout/issue-requests'
+    ],
+    'purchase_requests' => [
+        'history' => '/main/purchase-requisition/history',
+        'approval' => '/main/purchase-requisition/approve',
+        'verification' => '/main/purchase-requisition/check'
     ]
 
 ];

@@ -6,12 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PR\StoreVerificationRequest;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
+use App\Models\User;
+use App\Notifications\PurchaseRequest\ApprovalRequestNotification;
+use App\Notifications\PurchaseRequest\ApprovedNotification;
+use App\Notifications\PurchaseRequest\VerifiedNotification;
 use App\Services\PurchaseRequestService;
 use App\Utils\PurchaseRequestUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class VerificationController extends Controller
 {
@@ -95,9 +101,14 @@ class VerificationController extends Controller
         DB::commit();
 
         if ($hasOkayedQty) {
-            //notify issuer
+            //notify approvers
+            Notification::send(User::whereNot('id', Auth::id())->purchaseRequestApprover()->get(),
+                new ApprovalRequestNotification($purchaseRequest));
         }
+
         //notify requester
+        Notification::send($purchaseRequest->createdBy,
+            new VerifiedNotification($purchaseRequest, !$hasOkayedQty));
 
         return ['data' => $purchaseRequest];
     }
