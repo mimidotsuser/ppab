@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PR\StoreApprovalRequest;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
+use App\Notifications\PurchaseRequest\ApprovedNotification;
 use App\Services\PurchaseRequestService;
 use App\Utils\PurchaseRequestUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
 class ApprovalController extends Controller
@@ -96,6 +98,8 @@ class ApprovalController extends Controller
         DB::commit();
 
         //notify requester
+        Notification::send($purchaseRequest->createdBy,
+            new ApprovedNotification($purchaseRequest, !$hasOkayedQty));
 
         return ['data' => $purchaseRequest];
     }

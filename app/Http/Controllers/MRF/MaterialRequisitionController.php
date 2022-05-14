@@ -10,8 +10,8 @@ use App\Models\MaterialRequisition;
 use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
 use App\Models\User;
-use App\Notifications\MRFCreatedNotification;
-use App\Notifications\MRFVerificationRequestedNotification;
+use App\Notifications\MaterialRequisition\SubmittedNotification;
+use App\Notifications\MaterialRequisition\VerificationRequestNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -172,9 +172,9 @@ class MaterialRequisitionController extends Controller
 
         //notify verifiers
         Notification::send(User::whereNot('id', Auth::id())->MRFVerifier()->get(),
-            new MRFVerificationRequestedNotification($mrf));
+            new VerificationRequestNotification($mrf));
         //notify requester
-        Notification::send(Auth::user(), new MRFCreatedNotification($mrf));
+        Notification::send(Auth::user(), new SubmittedNotification($mrf));
 
         return ['data' => $mrf];
     }

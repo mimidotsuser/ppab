@@ -8,13 +8,18 @@ use App\Http\Requests\PR\StorePurchaseRequisitionRequest;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestActivity;
 use App\Models\PurchaseRequestItem;
+use App\Models\User;
+use App\Notifications\PurchaseRequest\SubmittedNotification;
+use App\Notifications\PurchaseRequest\VerificationRequestNotification;
 use App\Services\PurchaseRequestService;
 use App\Utils\PurchaseRequestUtils;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
 
@@ -132,9 +137,13 @@ class PurchaseRequestController extends Controller
 
         DB::commit();
 
-        //notify requester
-
         //notify verifiers
+        Notification::send(User::whereNot('id', Auth::id())->purchaseRequestVerifier()->get(),
+            new VerificationRequestNotification($pr));
+
+        //notify requester
+        Notification::send(Auth::user(), new SubmittedNotification($pr));
+
 
         return ['data' => $pr];
     }

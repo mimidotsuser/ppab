@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\GoodsReceivedNote;
 
-use App\Models\MaterialRequisition;
+use App\Models\GoodsReceiptNote;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFCreatedNotification extends Notification implements ShouldQueue
+class SubmittedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
+    private GoodsReceiptNote $request;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(MaterialRequisition $requisition)
+    public function __construct(GoodsReceiptNote $goodsReceiptNote)
     {
-        $this->request = $requisition;
+        $this->request = $goodsReceiptNote;
     }
 
     /**
@@ -44,23 +44,16 @@ class MRFCreatedNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.history') . '/' . $this->request->id);
+            . config('weburls.goods_received_note.history') . '/' . $this->request->id);
 
-        $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Submitted')
-            ->greeting('Dear ' . $name)
-            ->line('Your material requisition form ' . $this->request->sn
-                . ' has been submitted successfully.')
+            ->subject('Goods Received Note ' . $this->request->sn)
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
+            ->line('Your GRN form ' . $this->request->sn . ' has been submitted successfully.')
             ->action('View Request', $url)
-            ->line('We will notify you of the outcome.')
-            ->withSymfonyMessage(function ($mail) {
-                $id = $this->request->email_thread_id;
-
-                $mail->getHeaders()->addTextHeader('In-Reply-To', '<' . $id . '>');
-                $mail->getHeaders()->addTextHeader('References', '<' . $id . '>');
-            });
+            ->line('Request has been forwarded to the inspection team. ' .
+                'We will notify you of the outcome.');
 
     }
 

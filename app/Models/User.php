@@ -80,6 +80,26 @@ class User extends Authenticatable
         return $query->whereRelation('role.permissions', 'name', 'checkout.create');
     }
 
+    public function scopePurchaseRequestVerifier($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'purchaseRequests.verify');
+    }
+
+    public function scopePurchaseRequestApprover($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'purchaseRequests.approve');
+    }
+
+    public function scopeGoodsReceivedNoteInspector($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'inspectionNote.create');
+    }
+
+    public function scopeGoodsReceivedNoteApprover($query)
+    {
+        return $query->whereRelation('role.permissions', 'name', 'goodsReceiptNote.approve');
+    }
+
     public function toSearchableArray()
     {
         return [

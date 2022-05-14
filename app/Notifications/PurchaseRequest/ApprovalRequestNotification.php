@@ -1,29 +1,27 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Notifications\PurchaseRequest;
 
-use App\Models\MaterialRequisition;
+use App\Models\PurchaseRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class MRFIssuedNotification extends Notification implements ShouldQueue
+class ApprovalRequestNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private $request;
-    private $fullyIssued;
+    private PurchaseRequest $request;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(MaterialRequisition $requisition, $fullyIssued = true)
+    public function __construct(PurchaseRequest $purchaseRequest)
     {
-        $this->request = $requisition;
-        $this->fullyIssued = $fullyIssued;
+        $this->request = $purchaseRequest;
     }
 
     /**
@@ -41,37 +39,35 @@ class MRFIssuedNotification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
-
         $url = url(config('weburls.root')
-            . config('weburls.material_requests.history') . '/' . $this->request->id);
+            . config('weburls.purchase_requests.approval') . '/' . $this->request->id);
 
-        $name = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
+        $author = $this->request->createdBy->first_name . ' ' . $this->request->createdBy->last_name;
 
         return (new MailMessage)
-            ->subject('Material Request Form Issue Status Update')
-            ->greeting('Dear ' . $name)
-            ->line('Your material requisition form (' . $this->request->sn
-                . ') status has been updated')
-            ->action('Generate Store Issue Note', $url)
-            ->when($this->request, function ($mail) {
-                $mail->line('The items have been issued to you successfully.');
-            })
+            ->subject('Purchase Request Approval Requested')
+            ->greeting('Dear ' . $notifiable->first_name . ' ' . $notifiable->last_name)
+            ->line('Purchase request form (' . $this->request->sn . ') by ' . $author
+                . ' requires your attention')
+            ->action('Click here to action the request', $url)
             ->withSymfonyMessage(function ($mail) {
                 $id = $this->request->email_thread_id;
 
                 $mail->getHeaders()->addTextHeader('In-Reply-To', '<' . $id . '>');
                 $mail->getHeaders()->addTextHeader('References', '<' . $id . '>');
             });
+
     }
+
 
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return array
      */
     public function toArray($notifiable)

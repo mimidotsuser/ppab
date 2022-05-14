@@ -9,7 +9,7 @@ use App\Models\MaterialRequisitionActivity;
 use App\Models\MaterialRequisitionItem;
 use App\Models\ProductItemActivity;
 use App\Models\ProductItemWarrant;
-use App\Notifications\MRFIssuedNotification;
+use App\Notifications\MaterialRequisition\IssuedNotification;
 use App\Services\MaterialRequisitionService;
 use App\Utils\MRFUtils;
 use App\Utils\ProductItemActivityUtils;
@@ -193,7 +193,7 @@ class IssueController extends Controller
         //emit email notification to user
         //notify requester
         Notification::send($materialRequisition->createdBy,
-            new MRFIssuedNotification($materialRequisition, $hasPartiallyIssued == 0));
+            new IssuedNotification($materialRequisition, $hasPartiallyIssued == 0));
 
         return ['data' => $materialRequisition];
 
