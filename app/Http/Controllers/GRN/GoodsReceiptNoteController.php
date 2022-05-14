@@ -10,13 +10,18 @@ use App\Http\Requests\UpdateGoodsReceiptNoteRequest;
 use App\Models\GoodsReceiptNote;
 use App\Models\GoodsReceiptNoteActivity;
 use App\Models\GoodsReceiptNoteItem;
+use App\Models\User;
+use App\Notifications\GoodsReceivedNote\InspectionRequestNotification;
+use App\Notifications\GoodsReceivedNote\SubmittedNotification;
 use App\Utils\GoodsReceiptNoteUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class GoodsReceiptNoteController extends Controller
 {
@@ -100,6 +105,14 @@ class GoodsReceiptNoteController extends Controller
         $activity->save();
 
         DB::commit();
+
+        //notify inspection team
+        Notification::send(User::whereNot('id', Auth::id())->goodsReceivedNoteInspector()->get(),
+            new InspectionRequestNotification($note));
+
+        //notify requester
+        Notification::send(Auth::user(), new SubmittedNotification($note));
+
 
         return ['data' => $note];
     }

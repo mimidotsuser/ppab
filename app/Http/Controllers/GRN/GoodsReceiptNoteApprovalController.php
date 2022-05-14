@@ -5,12 +5,14 @@ namespace App\Http\Controllers\GRN;
 use App\Http\Controllers\Controller;
 use App\Models\GoodsReceiptNote;
 use App\Models\GoodsReceiptNoteActivity;
+use App\Notifications\GoodsReceivedNote\ApprovedNotification;
 use App\Services\GoodsReceiptNoteService;
 use App\Utils\GoodsReceiptNoteUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use function response;
 
 class GoodsReceiptNoteApprovalController extends Controller
@@ -86,6 +88,12 @@ class GoodsReceiptNoteApprovalController extends Controller
         }
 
         DB::commit();
+
+
+        //notify requester
+        Notification::send($goodsReceiptNote->createdBy,
+            new ApprovedNotification($goodsReceiptNote,
+                $request->boolean('approved', true)));
 
         return ['data' => $goodsReceiptNote];
     }

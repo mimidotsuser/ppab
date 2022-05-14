@@ -5,16 +5,24 @@ namespace App\Http\Controllers;
 use App\Actions\GenerateInspectionNoteDoc;
 use App\Http\Requests\StoreInspectionNoteRequest;
 use App\Http\Requests\UpdateInspectionNoteRequest;
+use App\Models\GoodsReceiptNote;
 use App\Models\GoodsReceiptNoteActivity;
 use App\Models\GoodsReceiptNoteItem;
 use App\Models\InspectionChecklist;
 use App\Models\InspectionNote;
+use App\Models\User;
+use App\Notifications\GoodsReceivedNote\ApprovalRequestNotification;
+use App\Notifications\GoodsReceivedNote\ApprovedNotification;
+use App\Notifications\GoodsReceivedNote\InspectedNotification;
+use App\Notifications\GoodsReceivedNote\InspectionRequestNotification;
 use App\Utils\GoodsReceiptNoteUtils;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class InspectionNoteController extends Controller
 {
@@ -58,9 +66,11 @@ class InspectionNoteController extends Controller
      */
     public function store(StoreInspectionNoteRequest $request): array
     {
+        $note = GoodsReceiptNote::findOrFail($request->get('goods_receipt_note_id'));
+
         DB::beginTransaction();
         $inspectionNote = new InspectionNote;
-        $inspectionNote->goods_receipt_note_id = $request->get('goods_receipt_note_id');
+        $inspectionNote->goodsReceiptNote()->associate($note);
         $inspectionNote->remarks = $request->get('remarks');
         $inspectionNote->save();
         $inspectionNote->refresh();
@@ -95,7 +105,13 @@ class InspectionNoteController extends Controller
 
         DB::commit();
 
-        //todo notify approvers
+        //notify inspection team
+        Notification::send(User::whereNot('id', Auth::id())->goodsReceivedNoteApprover()->get(),
+            new ApprovalRequestNotification($note));
+
+        //notify requester
+        Notification::send($note->createdBy, new InspectedNotification($note));
+
 
         return ['data' => $inspectionNote];
     }
