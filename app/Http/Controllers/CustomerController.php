@@ -66,6 +66,9 @@ class CustomerController extends Controller
             ->when($request->get('exclude'), function (Builder $query, $excluded) {
                 $query->whereNotIn('id', explode(',', $excluded));
             })
+            ->when($request->get('ids'), function (Builder $query, $excluded) {
+                $query->whereIn('id', explode(',', $excluded));
+            })
             ->when($request->boolean('parentsOnly', false), function (Builder $query) {
                 return $query->whereNull('parent_id');
 
