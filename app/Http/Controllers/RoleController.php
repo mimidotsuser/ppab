@@ -17,6 +17,8 @@ use JetBrains\PhpStorm\ArrayShape;
 class RoleController extends Controller
 {
 
+    protected $casts = ['editable' => 'boolean'];
+
     public function __construct()
     {
         $this->authorizeResource(Role::class, 'role');
