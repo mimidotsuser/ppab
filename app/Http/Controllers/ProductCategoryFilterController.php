@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use JetBrains\PhpStorm\ArrayShape;
 
 class ProductCategoryFilterController extends Controller
@@ -68,7 +69,12 @@ class ProductCategoryFilterController extends Controller
     #[ArrayShape(['data' => "\Illuminate\Database\Eloquent\Collection"])]
     public function productBalances(Request $request, Product $product): array
     {
-        $this->authorize('viewAny', Product::class);
+
+
+        Gate::allowIf(function ($user) {
+            return $user->role->permissions->contains('name', 'products.search') ||
+                $user->role->permissions->contains('name', 'products.view');
+        });
 
         $data = $product->meldedBalances()
             ->with(['product:id,item_code,variant_of_id,parent_id,product_category_id'])
