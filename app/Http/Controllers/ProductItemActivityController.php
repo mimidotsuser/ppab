@@ -97,7 +97,7 @@ class ProductItemActivityController extends Controller
             if ($request->boolean('out_of_order') === false
                 && $latestActivity->location_type == $morphKey) {
                 // increment the product stock balance
-                ProductItemUpsert::dispatch($productItem->product, -1);
+                ProductItemUpsert::dispatch($productItem->product, 1);
             }
 
             $activity->warehouse = Warehouse::findOrFail($request->get('warehouse_id'));
