@@ -130,11 +130,11 @@ class CustomerController extends Controller
     #[ArrayShape(['data' => "\App\Models\Customer"])]
     public function update(UpdateCustomerRequest $request, Customer $customer): array
     {
-        $customer->parent_id = $request->get('parent_id') ?? $customer->parent_id;
-        $customer->name = $request->get('name') ?? $customer->name;
-        $customer->branch = $request->get('branch') ?? $customer->branch;
-        $customer->region = $request->get('region') ?? $customer->region;
-        $customer->location = $request->get('location') ?? $customer->location;
+        $customer->parent_id = $request->get('parent_id');
+        $customer->name = $request->get('name',$customer->name);
+        $customer->branch = $request->get('branch');
+        $customer->region = $request->get('region');
+        $customer->location = $request->get('location');
 
         $customer->save();
 
