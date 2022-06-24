@@ -211,14 +211,14 @@ class ProductItemController extends Controller
         if ($productItem->latestActivity->location_type == $morphKey) {
 
             // If the item didn't have PO and was not out_of order
-            if (!isset($productItem->purchase_order_id) && $productItem->out_of_order) {
+            if (!isset($productItem->purchase_order_id) && $productItem->out_of_order == false) {
                 // if  now we have PO or  is out of order, decrement Qty In
                 if ($request->boolean('out_of_order', false) ||
                     $request->filled('purchase_order_id')) {
                     ProductItemUpsert::dispatch($productItem->product, -1);
                 }
 
-            } //if item had PO or was out of order
+            } //if item previously had no PO or was out of order
             elseif (!isset($productItem->purchase_order_id) || $productItem->out_of_order == true) {
                 //if the item now is in order and has no purchase order, increment Qty In
                 if (!$request->boolean('out_of_order', false) &&
