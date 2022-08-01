@@ -13,6 +13,12 @@ class MaterialRequisitionItem extends Model
 
     protected $with = ['customer', 'product']; //always eager load
 
+    protected $casts = [
+        'requested_qty' => 'integer',
+        'approved_qty'=>'integer',
+        'issued_qty'=>'integer',
+        'verified_qty'=>'integer',
+    ];
 
     public function request(): BelongsTo
     {
