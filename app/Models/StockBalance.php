@@ -14,6 +14,13 @@ class StockBalance extends Model
 
     protected $hidden = ['b2c_qty_in_pipeline', 'b2b_qty_in_pipeline', 'qty_in', 'qty_out'];
 
+    protected $casts = [
+        'virtual_balance' => 'integer',
+        'stock_balance'=>'integer',
+        'out_of_stock'=>'boolean',
+        'reorder_level'=>'integer',
+    ];
+
     public function product()
     {
         return $this->belongsTo(Product::class);
